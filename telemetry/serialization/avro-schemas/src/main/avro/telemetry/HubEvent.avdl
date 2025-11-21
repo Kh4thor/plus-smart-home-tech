@@ -1,4 +1,58 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol HubEventProtocol {
 
+	//---Базовый тип для всех событий
+	record BaseEventAvro {
+		string id;
+		string hubId;
+		string timestamp;
+	}
+
+	//---Типы событий
+	enum DeviceEventTypeAvro {
+		DEVICE_ADDED,
+		DEVICE_REMOVED
+	}
+
+	enum ScenarioEventTypeAvro {
+		SCENARIO_ADDED,
+		SCENARIO_REMOVED
+	}
+
+	//---События устройств
+	record DeviceEventAvro {
+		BaseEventAvro base;
+		DeviceEventTypeAvro type;
+	}
+
+	record DeviceAddedEventAvro {
+		BaseEventAvro base;
+		DeviceEventTypeAvro type;
+		string deviceModel;
+	}
+
+	record DeviceRemovedEventAvro {
+		BaseEventAvro base;
+		DeviceEventTypeAvro type;
+		string reason;
+	}
+
+	//---События сценариев
+	record ScenarioEventAvro {
+		BaseEventAvro base;
+		ScenarioEventTypeAvro type;
+	}
+
+	record ScenarioAddedEvent {
+		BaseEventAvro base;
+		ScenarioEventTypeAvro type;
+		string scenarioName;
+		string description;
+	}
+
+	record ScenarioRemovedEvent {
+		BaseEventAvro base;
+		ScenarioEventTypeAvro type;
+		string removedBy;
+	}
 }
