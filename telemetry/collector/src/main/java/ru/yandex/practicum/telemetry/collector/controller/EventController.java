@@ -6,6 +6,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.kafka.telemetry.event.BaseDeviceEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.BaseEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.device.DeviceEvent;
 import ru.yandex.practicum.telemetry.collector.model.device.DeviceEventType;
 import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceAddedEvent;
@@ -28,8 +31,16 @@ public class EventController {
     public void post(DeviceEvent deviceEvent) {
         if (deviceEvent.getType() == DeviceEventType.DEVICE_ADDED) {
             DeviceAddedEvent deviceAddedEvent = (DeviceAddedEvent) deviceEvent;
-//            HubEventAvro.newBuilder...
-//            producer.send(avro);
+
+            BaseDeviceEventAvro base = BaseDeviceEventAvro.newBuilder()
+                    .setId(deviceEvent.getId())
+                    .setHubId(deviceEvent.getHubId())
+                    .setTimestamp(deviceEvent.getTimestamp())
+                    .build();
+
+            DeviceEventAvro.newBuilder()
+                    .setBase(base)
+                    .set
         }
     }
 }

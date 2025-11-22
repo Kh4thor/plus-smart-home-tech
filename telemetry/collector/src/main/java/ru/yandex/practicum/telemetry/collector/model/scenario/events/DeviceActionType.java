@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.model.device.events;
+package ru.yandex.practicum.telemetry.collector.model.scenario.events;
 
 public enum DeviceActionType {
     ACTIVATE,

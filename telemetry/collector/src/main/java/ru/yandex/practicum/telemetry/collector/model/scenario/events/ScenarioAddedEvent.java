@@ -3,7 +3,6 @@ package ru.yandex.practicum.telemetry.collector.model.scenario.events;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceAction;
 import ru.yandex.practicum.telemetry.collector.model.scenario.ScenarioEvent;
 import ru.yandex.practicum.telemetry.collector.model.scenario.ScenarioEventType;
 
@@ -13,7 +12,6 @@ import java.util.List;
 @SuperBuilder
 public class ScenarioAddedEvent extends ScenarioEvent {
 
-
     @NotEmpty
     private List<ScenarioCondition> conditions;
 
@@ -21,7 +19,7 @@ public class ScenarioAddedEvent extends ScenarioEvent {
     private List<DeviceAction> actions;
 
     @Override
-    public ScenarioEventType getType(){
+    public ScenarioEventType getType() {
         return ScenarioEventType.SCENARIO_ADDED;
     }
 }

@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 class ScenarioCondition {
-    private String description;
     private String sensorId;
     private ScenarioConditionType type;
     private ScenarioConditionOperation operation;

@@ -1,0 +1,65 @@
+@namespace("ru.yandex.practicum.kafka.telemetry.event")
+protocol ScenarioEventProtocol {
+
+	// --- Базовые состояния сценария ---
+	enum ScenarioEventTypeAvro {
+		SCENARIO_ADDED,
+		SCENARIO_REMOVED
+	}
+
+	// --- Базовые параметры сценария ---
+	record ScenarioEventAvro {
+		string hubId;
+		string timestamp;
+		string name;
+		ScenarioEventTypeAvro type;
+	}
+
+	// --- Сценарий добавления ---
+	record ScenarioAddedEventAvro {
+		ScenarioEventAvro base;
+		array<ScenarioConditionAvro> conditions;
+		array<DeviceAction> actions;
+
+	}
+
+	// --- Сценарий удаления ---
+	record ScenarioRemovedEventAvro {
+		ScenarioEventAvro base;
+	}
+
+	enum ScenarioConditionTypeAvro {
+		MOTION,
+		LUMINOSITY,
+		SWITCH,
+		TEMPERATURE,
+		CO2LEVEL,
+		HUMIDITY
+	}
+
+	enum ScenarioConditionOperationAvro {
+		EQUALS,
+		GREATER_THAN,
+		LOWER_THAN
+	}
+
+	record ScenarioConditionAvro {
+		string sensorId;
+		ScenarioConditionTypeAvro type;
+		ScenarioConditionOperationAvro operation;
+		int value;
+	}
+
+	enum DeviceActionTypeAvro {
+		ACTIVATE,
+		DEACTIVATE,
+		INVERSE,
+		SET_VALUE
+	}
+
+	record DeviceAction {
+		string sensorId;
+		DeviceActionTypeAvro type;
+		int value;
+	}
+}

@@ -1,0 +1,23 @@
+@namespace("ru.yandex.practicum.kafka.telemetry.event")
+protocol HubEventProtocol {
+
+	enum DeviceEventTypeAvro {
+		DEVICE_ADDED,
+		DEVICE_REMOVED
+	}
+
+	record DeviceEventAvro {
+		string id;
+		string hubId;
+		string timestamp;
+		DeviceEventTypeAvro type;
+	}
+
+	record DeviceAddedEventAvro {
+		DeviceEventTypeAvro base;
+	}
+
+	record DeviceRemovedEventAvro {
+		DeviceEventTypeAvro base;
+	}
+}

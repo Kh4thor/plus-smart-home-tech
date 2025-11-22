@@ -13,5 +13,4 @@ public class DeviceAddedEvent extends DeviceEvent {
     public DeviceEventType getType() {
         return DeviceEventType.DEVICE_ADDED;
     }
-
 }
