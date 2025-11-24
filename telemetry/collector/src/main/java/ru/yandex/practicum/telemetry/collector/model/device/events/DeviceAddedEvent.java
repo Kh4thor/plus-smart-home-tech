@@ -9,6 +9,8 @@ import ru.yandex.practicum.telemetry.collector.model.device.DeviceEventType;
 @SuperBuilder
 public class DeviceAddedEvent extends DeviceEvent {
 
+    private DeviceType deviceType;
+
     @Override
     public DeviceEventType getType() {
         return DeviceEventType.DEVICE_ADDED;

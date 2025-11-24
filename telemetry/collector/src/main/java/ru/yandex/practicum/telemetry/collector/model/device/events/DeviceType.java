@@ -1,6 +1,6 @@
-package ru.yandex.practicum.telemetry.collector.model.scenario.events;
+package ru.yandex.practicum.telemetry.collector.model.device.events;
 
-public enum SensorType {
+public enum DeviceType {
     MOTION_SENSOR,
     TEMPERATURE_SENSOR,
     LIGHT_SENSOR,

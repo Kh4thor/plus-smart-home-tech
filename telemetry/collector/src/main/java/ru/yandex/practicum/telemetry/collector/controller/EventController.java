@@ -1,46 +1,32 @@
 package ru.yandex.practicum.telemetry.collector.controller;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.kafka.telemetry.event.BaseDeviceEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.BaseEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.device.DeviceEventType;
-import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
-
-import java.util.Map;
 
 @Slf4j
-@Validated
 @RestController
-@AllArgsConstructor
-@RequestMapping("/events")
-public class EventController {
+@RequestMapping("/events/")
+@RequiredArgsConstructor
+public class CollectorController {
 
-    private final Map<SensorEventType, SensorEvent> sensorEventMap;
-    private final Map<DeviceEventType, DeviceEvent> deviceEventMap;
+    private final CollectorService service;
 
-    @PostMapping()
-    public void post(DeviceEvent deviceEvent) {
-        if (deviceEvent.getType() == DeviceEventType.DEVICE_ADDED) {
-            DeviceAddedEvent deviceAddedEvent = (DeviceAddedEvent) deviceEvent;
+    @PostMapping("/sensors")
+    public void sensorEvent(@RequestBody @Valid SensorEvent sensorEvent) {
+        log.info("getting sensor event {}", sensorEvent);
+        service.sendSensorEvent(sensorEvent);
+    }
 
-            BaseDeviceEventAvro base = BaseDeviceEventAvro.newBuilder()
-                    .setId(deviceEvent.getId())
-                    .setHubId(deviceEvent.getHubId())
-                    .setTimestamp(deviceEvent.getTimestamp())
-                    .build();
-
-            DeviceEventAvro.newBuilder()
-                    .setBase(base)
-                    .set
-        }
+    @PostMapping("/hubs")
+    public void hubEvent(@RequestBody @Valid DeviceEvent deviceEvent) {
+        log.info("getting hub event {}", deviceEvent);
+        service.sendHubEvent(deviceEvent);
     }
 }
