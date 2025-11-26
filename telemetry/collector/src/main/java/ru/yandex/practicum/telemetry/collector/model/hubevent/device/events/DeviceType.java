@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.model.device.events;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.device.events;
 
 public enum DeviceType {
     MOTION_SENSOR,

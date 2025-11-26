@@ -1,11 +1,11 @@
-package ru.yandex.practicum.telemetry.collector.model.scenario.events;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-class ScenarioCondition {
+public class ScenarioCondition {
     private String sensorId;
     private ScenarioConditionType type;
     private ScenarioConditionOperation operation;

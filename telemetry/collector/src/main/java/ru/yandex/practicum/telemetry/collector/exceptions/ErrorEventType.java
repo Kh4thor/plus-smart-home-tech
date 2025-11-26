@@ -1,8 +1,8 @@
 package ru.yandex.practicum.telemetry.collector.exceptions;
 
 import lombok.Getter;
-import ru.yandex.practicum.telemetry.collector.model.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.scenario.ScenarioEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
 
 import java.time.LocalDateTime;

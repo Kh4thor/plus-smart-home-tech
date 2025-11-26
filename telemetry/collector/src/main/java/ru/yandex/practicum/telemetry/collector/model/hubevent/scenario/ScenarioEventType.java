@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.model.scenario;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario;
 
 public enum ScenarioEventType {
     SCENARIO_ADDED,

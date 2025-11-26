@@ -22,13 +22,13 @@ public class GeneralAvroDeserializer implements Deserializer<SpecificRecordBase>
                 DatumReader<SpecificRecordBase> reader;
 
                 switch (topic) {
-                    case EventTopics.DEVICE_EVENTS:
+                    case EventTopic.DEVICE_EVENTS:
                         reader = new SpecificDatumReader<>(DeviceEventAvro.getClassSchema());
                         break;
-                    case EventTopics.SENSOR_EVENTS:
+                    case EventTopic.SENSOR_EVENTS:
                         reader = new SpecificDatumReader<>(SensorEventAvro.getClassSchema());
                         break;
-                    case EventTopics.SCENARIO_EVENTS:
+                    case EventTopic.SCENARIO_EVENTS:
                         reader = new SpecificDatumReader<>(ScenarioEventAvro.getClassSchema());
                         break;
                     default:

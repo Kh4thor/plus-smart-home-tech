@@ -1,10 +1,10 @@
-package ru.yandex.practicum.telemetry.collector.model.scenario.events;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import ru.yandex.practicum.telemetry.collector.model.scenario.ScenarioEvent;
-import ru.yandex.practicum.telemetry.collector.model.scenario.ScenarioEventType;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEventType;
 
 import java.util.List;
 

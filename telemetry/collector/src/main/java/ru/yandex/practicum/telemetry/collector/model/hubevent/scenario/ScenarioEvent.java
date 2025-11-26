@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.model.scenario;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -8,8 +8,9 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorEventType;
-import ru.yandex.practicum.telemetry.collector.model.scenario.events.ScenarioAddedEvent;
-import ru.yandex.practicum.telemetry.collector.model.scenario.events.ScenarioRemovedEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.ScenarioAddedEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.ScenarioRemovedEvent;
 
 @Getter
 @ToString
@@ -27,7 +28,7 @@ import ru.yandex.practicum.telemetry.collector.model.scenario.events.ScenarioRem
         @JsonSubTypes.Type(value = ScenarioRemovedEvent.class, name = "SCENARIO_REMOVED"),
 })
 
-public abstract class ScenarioEvent {
+public abstract class ScenarioEvent extends HubEvent {
 
     @NotNull
     private String hubId;

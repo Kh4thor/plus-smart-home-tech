@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.model.device;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.device;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -7,8 +7,9 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorEventType;
-import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceAddedEvent;
-import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceRemovedEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceAddedEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceRemovedEvent;
 
 @Getter
 @ToString
@@ -25,7 +26,7 @@ import ru.yandex.practicum.telemetry.collector.model.device.events.DeviceRemoved
         @JsonSubTypes.Type(value = DeviceAddedEvent.class, name = "DEVICE_ADDED"),
         @JsonSubTypes.Type(value = DeviceRemovedEvent.class, name = "DEVICE_REMOVED"),
 })
-public abstract class DeviceEvent {
+public abstract class DeviceEvent extends HubEvent {
 
     @NotNull
     private String id;

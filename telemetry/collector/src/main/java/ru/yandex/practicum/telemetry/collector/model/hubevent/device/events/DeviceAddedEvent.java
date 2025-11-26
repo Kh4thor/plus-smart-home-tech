@@ -1,9 +1,9 @@
-package ru.yandex.practicum.telemetry.collector.model.device.events;
+package ru.yandex.practicum.telemetry.collector.model.hubevent.device.events;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import ru.yandex.practicum.telemetry.collector.model.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.device.DeviceEventType;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEventType;
 
 @Getter
 @SuperBuilder
