@@ -1,6 +1,7 @@
 package ru.yandex.practicum.telemetry.collector.service;
 
 import ru.yandex.practicum.kafka.telemetry.event.scenario.*;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.*;
 
@@ -17,7 +18,7 @@ public class ScenarioEventHandler {
                 .setType(toAvro(scenarioEvent.getType()))
                 .build();
 
-        ScenarioEventType scenarioEventType = scenarioEvent.getType();
+        HubEventType scenarioEventType = scenarioEvent.getType();
         switch (scenarioEventType) {
             case SCENARIO_ADDED -> {
                 ScenarioAddedEvent scenarioAddedEvent = (ScenarioAddedEvent) scenarioEvent;
@@ -122,7 +123,7 @@ public class ScenarioEventHandler {
         }
     }
 
-    private ScenarioEventTypeAvro toAvro(ScenarioEventType scenarioEventType) {
+    private ScenarioEventTypeAvro toAvro(HubEventType scenarioEventType) {
         switch (scenarioEventType) {
             case SCENARIO_ADDED -> {
                 return ScenarioEventTypeAvro.SCENARIO_ADDED;

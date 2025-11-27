@@ -6,6 +6,8 @@ protocol DeviceEventProtocol {
 	}
 
 	record DeviceRemovedEventAvro {
+
+
 	}
 
 	enum DeviceTypeAvro {
@@ -16,16 +18,10 @@ protocol DeviceEventProtocol {
 		SWITCH_SENSOR
 	}
 
-	enum DeviceEventTypeAvro {
-		DEVICE_ADDED,
-		DEVICE_REMOVED
-	}
-
 	record DeviceEventAvro {
 		string id;
 		string hubId;
-		timestamp_ms  timestamp;
-		DeviceEventTypeAvro type;
+		timestamp_ms timestamp;
 		union{
 			DeviceAddedEventAvro,
 			DeviceRemovedEventAvro

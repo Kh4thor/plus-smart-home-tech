@@ -9,7 +9,6 @@ protocol ScenarioEventProtocol {
 
 	// --- Сценарий удаления ---
 	record ScenarioRemovedEventAvro {
-		string removedBy;// Добавьте поле
 	}
 
 	enum ScenarioConditionTypeAvro {
@@ -47,18 +46,11 @@ protocol ScenarioEventProtocol {
 		int? value = null;
 	}
 
-	// --- Базовые состояния сценария ---
-	enum ScenarioEventTypeAvro {
-		SCENARIO_ADDED,
-		SCENARIO_REMOVED
-	}
-
 	// --- Базовые параметры сценария ---
 	record ScenarioEventAvro {
 		string hubId;
 		timestamp_ms timestamp;
 		string name;
-		ScenarioEventTypeAvro type;
 		union{
 			ScenarioAddedEventAvro,
 			ScenarioRemovedEventAvro
