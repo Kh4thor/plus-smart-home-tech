@@ -30,9 +30,6 @@ public abstract class DeviceEvent extends HubEvent {
 
     @NotNull
     private String id;
-    private String hubId;
-    private String timestamp;
-    private DeviceEventType type;
 }
 
 

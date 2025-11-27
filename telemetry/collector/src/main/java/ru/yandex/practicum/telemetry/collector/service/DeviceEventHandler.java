@@ -4,8 +4,8 @@ import ru.yandex.practicum.kafka.telemetry.event.device.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventTypeAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceTypeAvro;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceType;
 
@@ -20,7 +20,7 @@ public class DeviceEventHandler {
                 .setType(toAvro(deviceEvent.getType()))
                 .build();
 
-        DeviceEventType deviceEventType = deviceEvent.getType();
+        HubEventType deviceEventType = deviceEvent.getType();
         switch (deviceEventType) {
             case DEVICE_ADDED -> {
                 DeviceAddedEvent deviceAddedEventAvro = (DeviceAddedEvent) deviceEvent;
@@ -38,7 +38,7 @@ public class DeviceEventHandler {
         }
     }
 
-    private DeviceEventTypeAvro toAvro(DeviceEventType deviceEventType) {
+    private DeviceEventTypeAvro toAvro(HubEventType deviceEventType) {
         switch (deviceEventType) {
             case DEVICE_ADDED -> {
                 return DeviceEventTypeAvro.DEVICE_ADDED;

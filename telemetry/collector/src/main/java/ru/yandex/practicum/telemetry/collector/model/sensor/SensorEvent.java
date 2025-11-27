@@ -10,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorSensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.sensor.events.*;
 
+import java.time.Instant;
+
 @Getter
 @ToString
 @SuperBuilder
@@ -32,8 +34,13 @@ public abstract class SensorEvent {
 
     @NotNull
     private String id;
+
+    @NotNull
     private String hubId;
-    private String timestamp;
-    private SensorEventType type;
+
+    private Instant timestamp = Instant.now();
+
+    @NotNull
+    public abstract SensorEventType getType();
 }
 

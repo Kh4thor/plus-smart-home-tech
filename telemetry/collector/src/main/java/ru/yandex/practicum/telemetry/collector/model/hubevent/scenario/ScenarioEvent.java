@@ -2,7 +2,6 @@ package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.ToString;
@@ -30,14 +29,6 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.Sc
 
 public abstract class ScenarioEvent extends HubEvent {
 
-    @NotNull
-    private String hubId;
-
-    private String timestamp;
-
     @Size(min = 3)
     private String name;
-
-    @NotNull
-    private ScenarioEventType type;
 }

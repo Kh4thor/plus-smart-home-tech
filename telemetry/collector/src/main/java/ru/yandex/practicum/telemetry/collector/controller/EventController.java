@@ -2,81 +2,64 @@ package ru.yandex.practicum.telemetry.collector.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.scenario.ScenarioEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.sensor.SensorEventAvro;
-import ru.yandex.practicum.telemetry.collector.kafka.KafkaEventService;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
+import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.service.DeviceEventHandler;
-import ru.yandex.practicum.telemetry.collector.service.ScenarioEventHandler;
 import ru.yandex.practicum.telemetry.collector.service.SensorEventHandler;
-import ru.yandex.practicum.telemetry.collector.service.TopicHandler;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
+@Validated
 @RestController
-@RequestMapping("/events/")
+@RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EventController {
-
-    private final TopicHandler topicHandler;
-    private final KafkaEventService kafkaEventService;
     private final Map<SensorEventType, SensorEventHandler> sensorEventHandlers;
-    private final Map<Class<? extends HubEvent>, DeviceEventHandler> deviceEventHandlers;
-    private final Map<Class<? extends HubEvent>, ScenarioEventHandler> scenarioEventHandlers;
+    private final Map<HubEventType, DeviceEventHandler> deviceEventHandlerMap;
 
-    // Конструктор с параметрами
-    public EventController(
-            TopicHandler topicHandler,
-            KafkaEventService kafkaEventService,
-            Map<SensorEventType, SensorEventHandler> sensorEventHandlers,
-            Map<Class<? extends HubEvent>, DeviceEventHandler> deviceEventHandlers,
-            Map<Class<? extends HubEvent>, ScenarioEventHandler> scenarioEventHandlers) {
-        this.topicHandler = topicHandler;
-        this.kafkaEventService = kafkaEventService;
-        this.sensorEventHandlers = sensorEventHandlers;
-        this.deviceEventHandlers = deviceEventHandlers;
-        this.scenarioEventHandlers = scenarioEventHandlers;
+    public EventController(Set<SensorEventHandler> sensorEventHandlers, Set<DeviceEventHandler> hubEventHandlers) {
+        // Преобразовываем набор хендлеров в map, где ключ - тип события от конкретного датчика или hub'а
+        // Это нужно для упрощения поиска подходящего хендлера во время обработки событий
+        this.sensorEventHandlers = sensorEventHandlers.stream()
+                .collect(Collectors.toMap(SensorEventHandler::getMessageType, Function.identity()));
+        this.hubEventHandlers = hubEventHandlers.stream()
+                .collect(Collectors.toMap(HubEventHandler::getMessageType, Function.identity()));
     }
 
     @PostMapping("/sensors")
-    public void sensorEvent(@RequestBody @Valid SensorEvent sensorEvent) {
-        log.info("getting sensor event {}", sensorEvent);
-        String topic = topicHandler.getTopic(sensorEvent);
-        // Получаем обработчик по типу сенсорного события
-        SensorEventHandler sensorEventHandler = sensorEventHandlers.get(sensorEvent.getType());
+    public void collectSensorEvent(@Valid @RequestBody SensorEvent request) {
+        // Проверяем есть ли обработчик для полученного события
+        SensorEventHandler sensorEventHandler = sensorEventHandlers.get(request.getType());
         if (sensorEventHandler == null) {
-            log.error("No handler found for sensor event type: {}", sensorEvent.getType());
-            return;
+            throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getType());
         }
-        SensorEventAvro sensorEventAvro = sensorEventHandler.toAvro(sensorEvent);
-        kafkaEventService.send(topic, sensorEventAvro);
+        sensorEventHandler.handle(request);
     }
 
     @PostMapping("/hubs")
-    public void hubEvent(@RequestBody @Valid HubEvent hubEvent) {
-        log.info("getting hub event {}", hubEvent);
-        String topic = topicHandler.getTopic(hubEvent);
-
-        if (hubEvent instanceof DeviceEvent) {
-            DeviceEventHandler deviceEventHandler = deviceEventHandlers.get(hubEvent.getClass());
-            DeviceEventAvro deviceEventAvro = deviceEventHandler.toAvro((DeviceEvent) hubEvent);
-            kafkaEventService.send(topic, deviceEventAvro);
-
-        } else if (hubEvent instanceof ScenarioEvent) {
-            ScenarioEventHandler scenarioEventHandler = scenarioEventHandlers.get(hubEvent.getClass());
-            ScenarioEventAvro scenarioEventAvro = scenarioEventHandler.toAvro((ScenarioEvent) hubEvent);
-            kafkaEventService.send(topic, scenarioEventAvro);
-        } else {
-            log.error("Unsupported hub event type: {}", hubEvent.getClass());
+    public void collectHubEvent(@RequestBody @Valid HubEvent request) {
+        log.info("json: {}", request.toString());
+        if (request.getType() == HubEventType.DEVICE_ADDED) {
+            DeviceAddedEvent deviceAddedEvent = (DeviceAddedEvent) request;
+//            HubEventAvro.newBuilder().;
+//            producer.send(avro);
         }
+        HubEventHandler hubEventHandler = hubEventHandlers.get(request.getType());
+        if (hubEventHandler == null) {
+            throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getType());
+        }
+        hubEventHandler.handle(request);
     }
 }
