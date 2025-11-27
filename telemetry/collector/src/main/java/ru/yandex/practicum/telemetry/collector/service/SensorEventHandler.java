@@ -91,5 +91,4 @@ public class SensorEventHandler {
             default -> throw new IllegalArgumentException("Unknown device type: " + sensorEventType);
         }
     }
-
 }

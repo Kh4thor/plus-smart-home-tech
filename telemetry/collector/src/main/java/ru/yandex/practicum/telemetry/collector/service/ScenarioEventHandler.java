@@ -15,7 +15,6 @@ public class ScenarioEventHandler {
                 .setHubId(scenarioEvent.getHubId())
                 .setTimestamp(scenarioEvent.getTimestamp())
                 .setName(scenarioEvent.getName())
-                .setType(toAvro(scenarioEvent.getType()))
                 .build();
 
         HubEventType scenarioEventType = scenarioEvent.getType();
@@ -123,13 +122,13 @@ public class ScenarioEventHandler {
         }
     }
 
-    private ScenarioEventTypeAvro toAvro(HubEventType scenarioEventType) {
+    private HubEventType toAvro(HubEventType scenarioEventType) {
         switch (scenarioEventType) {
             case SCENARIO_ADDED -> {
-                return ScenarioEventTypeAvro.SCENARIO_ADDED;
+                return HubEventType.SCENARIO_ADDED;
             }
             case SCENARIO_REMOVED -> {
-                return ScenarioEventTypeAvro.SCENARIO_REMOVED;
+                return HubEventType.SCENARIO_REMOVED;
             }
             default -> throw new IllegalArgumentException("Unknown scenario event type: " + scenarioEventType);
         }

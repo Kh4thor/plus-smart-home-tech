@@ -2,7 +2,6 @@ package ru.yandex.practicum.telemetry.collector.service;
 
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventTypeAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceTypeAvro;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
@@ -17,7 +16,6 @@ public class DeviceEventHandler {
                 .setId(deviceEvent.getId())
                 .setHubId(deviceEvent.getHubId())
                 .setTimestamp(deviceEvent.getTimestamp())
-                .setType(toAvro(deviceEvent.getType()))
                 .build();
 
         HubEventType deviceEventType = deviceEvent.getType();
@@ -38,17 +36,17 @@ public class DeviceEventHandler {
         }
     }
 
-    private DeviceEventTypeAvro toAvro(HubEventType deviceEventType) {
-        switch (deviceEventType) {
-            case DEVICE_ADDED -> {
-                return DeviceEventTypeAvro.DEVICE_ADDED;
-            }
-            case DEVICE_REMOVED -> {
-                return DeviceEventTypeAvro.DEVICE_REMOVED;
-            }
-            default -> throw new IllegalArgumentException("Unknown device event type: " + deviceEventType);
-        }
-    }
+//    private HubEventTypeAvro toAvro(HubEventType deviceEventType) {
+//        switch (deviceEventType) {
+//            case DEVICE_ADDED -> {
+//                return DeviceEventTypeAvro.DEVICE_ADDED;
+//            }
+//            case DEVICE_REMOVED -> {
+//                return DeviceEventTypeAvro.DEVICE_REMOVED;
+//            }
+//            default -> throw new IllegalArgumentException("Unknown device event type: " + deviceEventType);
+//        }
+//    }
 
     private DeviceTypeAvro toAvro(DeviceType deviceType) {
 
