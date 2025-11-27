@@ -31,7 +31,7 @@ protocol ScenarioEventProtocol {
 		string sensorId;
 		ScenarioConditionTypeAvro type;
 		ScenarioConditionOperationAvro operation;
-		int value;
+		union{null, int, boolean} value = null;
 	}
 
 	enum DeviceActionTypeAvro {
@@ -44,7 +44,7 @@ protocol ScenarioEventProtocol {
 	record DeviceActionAvro {
 		string sensorId;
 		DeviceActionTypeAvro type;
-		int value;
+		int? value = null;
 	}
 
 	// --- Базовые состояния сценария ---
@@ -56,7 +56,7 @@ protocol ScenarioEventProtocol {
 	// --- Базовые параметры сценария ---
 	record ScenarioEventAvro {
 		string hubId;
-		string timestamp;
+		timestamp_ms timestamp;
 		string name;
 		ScenarioEventTypeAvro type;
 		union{

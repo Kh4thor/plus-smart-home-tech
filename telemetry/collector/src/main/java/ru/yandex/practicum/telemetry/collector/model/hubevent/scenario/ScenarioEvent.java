@@ -38,5 +38,6 @@ public abstract class ScenarioEvent extends HubEvent {
     @Size(min = 3)
     private String name;
 
+    @NotNull
     private ScenarioEventType type;
 }

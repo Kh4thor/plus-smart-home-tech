@@ -1,29 +1,42 @@
 package ru.yandex.practicum.telemetry.collector.kafka;
 
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 
 @Getter
-@ToString
-@ConfigurationProperties("collector.kafka.producer")
+@Setter
+@ConfigurationProperties("collector.kafka")
 public class KafkaConfig {
-    private final Properties properties;
-    private final Map<String, String> topics = new HashMap<>();
+    private ProducerConfig producer;
 
-    public KafkaConfig(Properties properties, Map<String, String> topics) {
-        this.properties = properties;
+    @Getter
+    public static class ProducerConfig {
+        private final Properties properties;
+        private final EnumMap<TopicType, String> topics = new EnumMap<>(TopicType.class);
 
-        this.topics.put(EventTopic.DEVICE_EVENTS, EventTopic.DEVICE_EVENTS);
-        this.topics.put(EventTopic.SENSOR_EVENTS, EventTopic.SENSOR_EVENTS);
-        this.topics.put(EventTopic.SCENARIO_EVENTS, EventTopic.SCENARIO_EVENTS);
+        public ProducerConfig(Properties properties, Map<String, String> topics) {
+            this.properties = properties;
+            for (Map.Entry<String, String> entry : topics.entrySet()) {
+                this.topics.put(TopicType.from(entry.getKey()), entry.getValue());
+            }
+        }
+    }
 
-        if (topics != null) {
-            this.topics.putAll(topics);
+    public enum TopicType {
+        SENSORS_EVENTS, HUBS_EVENTS;
+
+        public static TopicType from(String type) {
+            for (TopicType value : values()) {
+                if (value.name().equalsIgnoreCase(type.replace("-", "_"))) {
+                    return value;
+                }
+            }
+            return null;
         }
     }
 }

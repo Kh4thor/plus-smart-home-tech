@@ -24,7 +24,7 @@ protocol DeviceEventProtocol {
 	record DeviceEventAvro {
 		string id;
 		string hubId;
-		string timestamp;
+		timestamp_ms  timestamp;
 		DeviceEventTypeAvro type;
 		union{
 			DeviceAddedEventAvro,
