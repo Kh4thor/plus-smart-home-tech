@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.service.handler.hub;
+package ru.yandex.practicum.telemetry.collector.service;
 
 import ru.yandex.practicum.kafka.telemetry.event.scenario.*;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
@@ -7,7 +7,7 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.*;
 
 import java.util.List;
 
-public class ScenarioEventHandler extends HubEventHandler {
+public class ScenarioEventHandler {
 
     public ScenarioEventAvro toAvro(ScenarioEvent scenarioEvent) {
 

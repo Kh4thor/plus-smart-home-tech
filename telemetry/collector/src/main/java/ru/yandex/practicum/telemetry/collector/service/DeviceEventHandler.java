@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.service.handler.hub;
+package ru.yandex.practicum.telemetry.collector.service;
 
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
@@ -9,7 +9,8 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceType;
 
-public class DeviceEventHandler extends HubEventHandler {
+public class DeviceEventHandler {
+
     public DeviceEventAvro toAvro(DeviceEvent deviceEvent) {
 
         DeviceEventAvro base = DeviceEventAvro.newBuilder()

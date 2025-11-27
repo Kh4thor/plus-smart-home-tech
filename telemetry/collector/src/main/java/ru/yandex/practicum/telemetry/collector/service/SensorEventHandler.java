@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
+package ru.yandex.practicum.telemetry.collector.service;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.sensor.*;
@@ -10,7 +10,6 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.events.*;
 public class SensorEventHandler {
 
     public SensorEventAvro toAvro(SensorEvent sensorEvent) {
-
 
         SensorEventAvro base = SensorEventAvro.newBuilder()
                 .setId(sensorEvent.getId())
