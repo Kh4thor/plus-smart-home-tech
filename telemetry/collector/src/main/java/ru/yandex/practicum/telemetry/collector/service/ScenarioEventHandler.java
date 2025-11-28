@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.service;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.scenario.*;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.*;
 
 import java.util.List;
 
+@Component
 public class ScenarioEventHandler {
 
     public ScenarioEventAvro toAvro(ScenarioEvent scenarioEvent) {

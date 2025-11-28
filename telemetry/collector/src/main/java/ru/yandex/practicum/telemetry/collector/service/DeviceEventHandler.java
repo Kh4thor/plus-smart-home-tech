@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.service;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.device.DeviceTypeAvro;
@@ -8,6 +9,7 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.DeviceType;
 
+@Component
 public class DeviceEventHandler {
 
     public DeviceEventAvro toAvro(DeviceEvent deviceEvent) {

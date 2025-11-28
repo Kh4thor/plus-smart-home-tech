@@ -2,11 +2,13 @@ package ru.yandex.practicum.telemetry.collector.model.hubevent;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
 @Getter
+@ToString
 @SuperBuilder
 public abstract class HubEvent {
 
