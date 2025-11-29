@@ -9,6 +9,8 @@ protocol ScenarioEventProtocol {
 
 	// --- Сценарий удаления ---
 	record ScenarioRemovedEventAvro {
+
+
 	}
 
 	enum ScenarioConditionTypeAvro {
@@ -50,7 +52,7 @@ protocol ScenarioEventProtocol {
 	record ScenarioEventAvro {
 		string hubId;
 		timestamp_ms timestamp;
-		string name;
+		string? name = null;
 		union{
 			ScenarioAddedEventAvro,
 			ScenarioRemovedEventAvro

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorEventType;
@@ -26,6 +27,8 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.device.events.Devi
         @JsonSubTypes.Type(value = DeviceAddedEvent.class, name = "DEVICE_ADDED"),
         @JsonSubTypes.Type(value = DeviceRemovedEvent.class, name = "DEVICE_REMOVED"),
 })
+
+@NoArgsConstructor
 public abstract class DeviceEvent extends HubEvent {
 
     @NotNull

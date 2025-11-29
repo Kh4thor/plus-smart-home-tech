@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorEventType;
@@ -27,6 +28,7 @@ import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events.Sc
         @JsonSubTypes.Type(value = ScenarioRemovedEvent.class, name = "SCENARIO_REMOVED"),
 })
 
+@NoArgsConstructor
 public abstract class ScenarioEvent extends HubEvent {
 
     @Size(min = 3)

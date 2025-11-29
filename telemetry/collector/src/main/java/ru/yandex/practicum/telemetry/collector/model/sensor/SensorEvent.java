@@ -4,8 +4,7 @@ package ru.yandex.practicum.telemetry.collector.model.sensor;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.exceptions.ErrorSensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.sensor.events.*;
@@ -30,6 +29,9 @@ import java.time.Instant;
         @JsonSubTypes.Type(value = ClimateSensorEvent.class, name = "CLIMATE_SENSOR_EVENT"),
         @JsonSubTypes.Type(value = SwitchSensorEvent.class, name = "SWITCH_SENSOR_EVENT")
 })
+
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class SensorEvent {
 
     @NotNull
@@ -38,6 +40,7 @@ public abstract class SensorEvent {
     @NotNull
     private String hubId;
 
+    @Builder.Default
     private Instant timestamp = Instant.now();
 
     @NotNull

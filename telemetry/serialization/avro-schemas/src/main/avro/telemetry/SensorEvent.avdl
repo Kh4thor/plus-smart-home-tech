@@ -51,7 +51,8 @@ protocol SensorEventProtocol {
 			LightSensorEventAvro,
 			MotionSensorEventAvro,
 			SwitchSensorEventAvro,
-			TemperatureSensorEventAvro
+			TemperatureSensorEventAvro,
+			null
 		} payload;
 	}
 }

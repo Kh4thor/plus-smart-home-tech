@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.service;
 
+import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.scenario.*;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
@@ -13,17 +14,14 @@ public class ScenarioEventHandler {
 
     public ScenarioEventAvro toAvro(ScenarioEvent scenarioEvent) {
 
-        ScenarioEventAvro base = ScenarioEventAvro.newBuilder()
-                .setHubId(scenarioEvent.getHubId())
-                .setTimestamp(scenarioEvent.getTimestamp())
-                .setName(scenarioEvent.getName())
-                .build();
+        if (scenarioEvent == null) {
+            throw new IllegalArgumentException("scenarioEvent is null");
+        }
 
         HubEventType scenarioEventType = scenarioEvent.getType();
         switch (scenarioEventType) {
-            case SCENARIO_ADDED -> {
-                ScenarioAddedEvent scenarioAddedEvent = (ScenarioAddedEvent) scenarioEvent;
 
+            case SCENARIO_ADDED -> {
                 List<DeviceActionAvro> deviceActionAvroList = ((ScenarioAddedEvent) scenarioEvent).getActions()
                         .stream()
                         .map(this::toAvro)
@@ -39,11 +37,11 @@ public class ScenarioEventHandler {
                         .setConditions(scenarioConditionAvroList)
                         .build();
 
-                base.setPayload(payload);
-                return base;
+                return setPayload(scenarioEvent, payload);
             }
             case SCENARIO_REMOVED -> {
-                return base;
+                ScenarioEventAvro payload = ScenarioEventAvro.newBuilder().build();
+                return setPayload(scenarioEvent, payload);
             }
             default -> throw new IllegalArgumentException("Unknown scenario condition operation: " + scenarioEventType);
         }
@@ -59,43 +57,25 @@ public class ScenarioEventHandler {
     }
 
     private ScenarioConditionOperationAvro toAvro(ScenarioConditionOperation scenarioConditionOperation) {
-        switch (scenarioConditionOperation) {
-            case EQUALS -> {
-                return ScenarioConditionOperationAvro.EQUALS;
-            }
-            case GREATER_THAN -> {
-                return ScenarioConditionOperationAvro.GREATER_THAN;
-            }
-            case LOWER_THAN -> {
-                return ScenarioConditionOperationAvro.LOWER_THAN;
-            }
-            default ->
-                    throw new IllegalArgumentException("Unknown scenario condition operation: " + scenarioConditionOperation);
-        }
+        return switch (scenarioConditionOperation) {
+            case EQUALS -> ScenarioConditionOperationAvro.EQUALS;
+            case GREATER_THAN -> ScenarioConditionOperationAvro.GREATER_THAN;
+            case LOWER_THAN -> ScenarioConditionOperationAvro.LOWER_THAN;
+            default -> throw new IllegalArgumentException("Unknown scenario condition operation: "
+                    + scenarioConditionOperation);
+        };
     }
 
     private ScenarioConditionTypeAvro toAvro(ScenarioConditionType scenarioConditionType) {
-        switch (scenarioConditionType) {
-            case CO2LEVEL -> {
-                return ScenarioConditionTypeAvro.CO2LEVEL;
-            }
-            case HUMIDITY -> {
-                return ScenarioConditionTypeAvro.HUMIDITY;
-            }
-            case MOTION -> {
-                return ScenarioConditionTypeAvro.MOTION;
-            }
-            case SWITCH -> {
-                return ScenarioConditionTypeAvro.SWITCH;
-            }
-            case LUMINOSITY -> {
-                return ScenarioConditionTypeAvro.LUMINOSITY;
-            }
-            case TEMPERATURE -> {
-                return ScenarioConditionTypeAvro.TEMPERATURE;
-            }
+        return switch (scenarioConditionType) {
+            case CO2LEVEL -> ScenarioConditionTypeAvro.CO2LEVEL;
+            case HUMIDITY -> ScenarioConditionTypeAvro.HUMIDITY;
+            case MOTION -> ScenarioConditionTypeAvro.MOTION;
+            case SWITCH -> ScenarioConditionTypeAvro.SWITCH;
+            case LUMINOSITY -> ScenarioConditionTypeAvro.LUMINOSITY;
+            case TEMPERATURE -> ScenarioConditionTypeAvro.TEMPERATURE;
             default -> throw new IllegalArgumentException("Unknown scenario condition type: " + scenarioConditionType);
-        }
+        };
     }
 
     private DeviceActionAvro toAvro(DeviceAction deviceAction) {
@@ -107,32 +87,29 @@ public class ScenarioEventHandler {
     }
 
     private DeviceActionTypeAvro toAvro(DeviceActionType deviceActionType) {
-        switch (deviceActionType) {
-            case ACTIVATE -> {
-                return DeviceActionTypeAvro.ACTIVATE;
-            }
-            case DEACTIVATE -> {
-                return DeviceActionTypeAvro.DEACTIVATE;
-            }
-            case INVERSE -> {
-                return DeviceActionTypeAvro.INVERSE;
-            }
-            case SET_VALUE -> {
-                return DeviceActionTypeAvro.SET_VALUE;
-            }
+        return switch (deviceActionType) {
+            case ACTIVATE -> DeviceActionTypeAvro.ACTIVATE;
+            case DEACTIVATE -> DeviceActionTypeAvro.DEACTIVATE;
+            case INVERSE -> DeviceActionTypeAvro.INVERSE;
+            case SET_VALUE -> DeviceActionTypeAvro.SET_VALUE;
             default -> throw new IllegalArgumentException("Unknown device action type: " + deviceActionType);
-        }
+        };
     }
 
     private HubEventType toAvro(HubEventType scenarioEventType) {
-        switch (scenarioEventType) {
-            case SCENARIO_ADDED -> {
-                return HubEventType.SCENARIO_ADDED;
-            }
-            case SCENARIO_REMOVED -> {
-                return HubEventType.SCENARIO_REMOVED;
-            }
+        return switch (scenarioEventType) {
+            case SCENARIO_ADDED -> HubEventType.SCENARIO_ADDED;
+            case SCENARIO_REMOVED -> HubEventType.SCENARIO_REMOVED;
             default -> throw new IllegalArgumentException("Unknown scenario event type: " + scenarioEventType);
-        }
+        };
+    }
+
+    private ScenarioEventAvro setPayload(ScenarioEvent scenarioEvent, SpecificRecordBase payload) {
+        return ScenarioEventAvro.newBuilder()
+                .setHubId(scenarioEvent.getHubId())
+                .setTimestamp(scenarioEvent.getTimestamp())
+                .setName(scenarioEvent.getName())
+                .setPayload(payload)
+                .build();
     }
 }

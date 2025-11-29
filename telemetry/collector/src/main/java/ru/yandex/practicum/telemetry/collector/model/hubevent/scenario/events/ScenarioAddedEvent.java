@@ -2,6 +2,7 @@ package ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.events;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Getter
 @SuperBuilder
+@NoArgsConstructor
 public class ScenarioAddedEvent extends ScenarioEvent {
 
     @NotEmpty
