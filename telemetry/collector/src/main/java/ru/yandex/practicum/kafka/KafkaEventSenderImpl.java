@@ -16,6 +16,7 @@ import ru.yandex.practicum.model.sensor.SensorEvent;
 import ru.yandex.practicum.service.HubEventHandler;
 import ru.yandex.practicum.service.SensorEventHandler;
 
+import javax.annotation.PostConstruct;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -23,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     private final HubEventHandler hubEventHandler;
     private final SensorEventHandler sensorEventHandler;
-    private final Producer<String, SensorEventAvro> sensorProducer;
-    private final Producer<String, HubEventAvro> hubProducer;
+    private Producer<String, SensorEventAvro> sensorProducer;
+    private Producer<String, HubEventAvro> hubProducer;
 
     @Value("${kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
@@ -52,8 +53,12 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
             SensorEventHandler sensorEventHandler) {
         this.hubEventHandler = hubEventHandler;
         this.sensorEventHandler = sensorEventHandler;
+    }
 
-        // Создаем продюсеры один раз при старте
+    @PostConstruct
+    public void init() {
+        System.out.println("Initializing Kafka producers with: " + bootstrapServers);
+
         this.sensorProducer = createProducer();
         this.hubProducer = createProducer();
 
