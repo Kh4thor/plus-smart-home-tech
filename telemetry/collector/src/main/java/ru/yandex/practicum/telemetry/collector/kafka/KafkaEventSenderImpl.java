@@ -1,87 +1,99 @@
 package ru.yandex.practicum.telemetry.collector.kafka;
 
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer;
-import ru.yandex.practicum.kafka.telemetry.event.device.DeviceEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.scenario.ScenarioEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.sensor.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.hubevent.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hubevent.device.DeviceEvent;
-import ru.yandex.practicum.telemetry.collector.model.hubevent.scenario.ScenarioEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.service.DeviceEventHandler;
-import ru.yandex.practicum.telemetry.collector.service.ScenarioEventHandler;
+import ru.yandex.practicum.telemetry.collector.service.HubEventHandler;
 import ru.yandex.practicum.telemetry.collector.service.SensorEventHandler;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @Service
-public class KafkaEventSenderImpl implements KafkaEventSender {
-
-    private final DeviceEventHandler deviceEventHandler;
-    private final ScenarioEventHandler scenarioEventHandler;
+public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
+    private final HubEventHandler hubEventHandler;
     private final SensorEventHandler sensorEventHandler;
+    private final Producer<String, SensorEventAvro> sensorProducer;
+    private final Producer<String, HubEventAvro> hubProducer;
 
-    public KafkaEventSenderImpl(DeviceEventHandler deviceEventHandler, ScenarioEventHandler scenarioEventHandler, SensorEventHandler sensorEventHandler) {
-        this.deviceEventHandler = deviceEventHandler;
-        this.scenarioEventHandler = scenarioEventHandler;
+    public KafkaEventSenderImpl(
+            HubEventHandler hubEventHandler,
+            SensorEventHandler sensorEventHandler) {
+        this.hubEventHandler = hubEventHandler;
         this.sensorEventHandler = sensorEventHandler;
+
+        // Создаем продюсеры один раз при старте
+        this.sensorProducer = createProducer();
+        this.hubProducer = createProducer();
+
+        System.out.println("✅ Kafka producers initialized");
+    }
+
+    private <T> Producer<String, T> createProducer() {
+        Properties config = new Properties();
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class);
+        config.put(ProducerConfig.ACKS_CONFIG, "all");
+        config.put(ProducerConfig.RETRIES_CONFIG, 3);
+        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
+        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60000);
+
+        return new KafkaProducer<>(config);
     }
 
     @Override
     public boolean send(SensorEvent event) {
-        final Properties config = new Properties();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class);
-
-        final String topic = "telemetry.sensors.v1";
-
-        try (Producer<String, SensorEventAvro> producer = new KafkaProducer<>(config)) {
+        try {
             final SensorEventAvro sensorEventAvro = sensorEventHandler.toAvro(event);
-            final ProducerRecord<String, SensorEventAvro> record = new ProducerRecord<>(topic, sensorEventAvro);
-            producer.send(record);
+            final ProducerRecord<String, SensorEventAvro> record =
+                    new ProducerRecord<>("telemetry.sensors.v1", event.getHubId(), sensorEventAvro);
+
+            sensorProducer.send(record).get(5, TimeUnit.SECONDS);
+
+            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + event.getHubId());
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка отправки в Kafka", e);
+            System.err.println("❌ Failed to send SensorEvent: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
-    public boolean send(HubEvent event) {
-        final Properties config = new Properties();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class);
+    public boolean send(HubEvent hubEvent) {
+        try {
+            final HubEventAvro hubEventAvro = hubEventHandler.toAvro(hubEvent);
+            final ProducerRecord<String, HubEventAvro> record =
+                    new ProducerRecord<>("telemetry.hubs.v1", hubEvent.getHubId(), hubEventAvro);
 
-        final String topic = "telemetry.hubs.v1";
+            hubProducer.send(record).get(5, TimeUnit.SECONDS);
 
-        if (event instanceof DeviceEvent deviceEvent) {
-            try (Producer<String, DeviceEventAvro> producer = new KafkaProducer<>(config)) {
-                DeviceEventAvro deviceEventAvro = deviceEventHandler.toAvro(deviceEvent);
-                ProducerRecord<String, DeviceEventAvro> record = new ProducerRecord<>(topic, deviceEventAvro);
-                producer.send(record);
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException("Ошибка отправки в Kafka", e);
-            }
-        } else if (event instanceof ScenarioEvent scenarioEvent) {
-            try (Producer<String, ScenarioEventAvro> producer = new KafkaProducer<>(config)) {
-                ScenarioEventAvro scenarioEventAvro = scenarioEventHandler.toAvro(scenarioEvent);
-                ProducerRecord<String, ScenarioEventAvro> record = new ProducerRecord<>(topic, scenarioEventAvro);
-                producer.send(record);
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException("Ошибка отправки в Kafka", e);
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported HubEvent type: " + event.getClass().getSimpleName());
+            System.out.println("✅ Sent HubEvent to Kafka, hubId: " + hubEvent.getHubId());
+            return true;
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send HubEvent: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (sensorProducer != null) {
+            sensorProducer.close();
+            System.out.println("✅ Sensor producer closed");
+        }
+        if (hubProducer != null) {
+            hubProducer.close();
+            System.out.println("✅ Hub producer closed");
         }
     }
 }

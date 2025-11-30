@@ -13,8 +13,9 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 @AllArgsConstructor
 public class MotionSensorEvent extends SensorEvent {
 
-    private Boolean motionDetected;
-    private Integer sensitivity;
+    private Integer linkQuality;
+    private Boolean motion;
+    private Integer voltage;
 
    @Override
     public SensorEventType getType(){
