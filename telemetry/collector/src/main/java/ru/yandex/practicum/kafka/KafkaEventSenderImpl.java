@@ -1,5 +1,6 @@
 package ru.yandex.practicum.kafka;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -16,7 +17,6 @@ import ru.yandex.practicum.model.sensor.SensorEvent;
 import ru.yandex.practicum.service.HubEventHandler;
 import ru.yandex.practicum.service.SensorEventHandler;
 
-import javax.annotation.PostConstruct;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
