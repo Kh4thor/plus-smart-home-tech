@@ -15,7 +15,6 @@ import java.util.List;
 public class HubEventHandlerProto {
 
     public HubEvent toModel(HubEventProto hubEventProto) {
-
         switch (hubEventProto.getPayloadCase()) {
             case DEVICE_ADDED_EVENT -> {
                 DeviceAddedEventProto deviceAddedEventProto = hubEventProto.getDeviceAddedEvent();
@@ -93,7 +92,7 @@ public class HubEventHandlerProto {
                 .sensorId(scenarioConditionProto.getSensorId())
                 .type(toModel(scenarioConditionProto.getType()))
                 .operation(toModel(scenarioConditionProto.getOperation()))
-                .value(scenarioConditionProto.getValue())
+                .value(scenarioConditionProto.hasValue() ? scenarioConditionProto.getValue() : null)
                 .build();
     }
 
@@ -109,7 +108,7 @@ public class HubEventHandlerProto {
         return DeviceAction.builder()
                 .sensorId(deviceActionProto.getSensorId())
                 .type(toModel(deviceActionProto.getType()))
-                .value(deviceActionProto.getValue())
+                .value(deviceActionProto.hasValue() ? deviceActionProto.getValue() : null)
                 .build();
     }
 
@@ -125,6 +124,7 @@ public class HubEventHandlerProto {
 
 
     private Instant getTimestamp(HubEventProto hubEventProto) {
+
         return Instant.ofEpochSecond(
                 hubEventProto.getTimestamp().getSeconds(),
                 hubEventProto.getTimestamp().getNanos()
