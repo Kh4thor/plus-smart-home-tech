@@ -9,13 +9,17 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.model.hubevent.HubEvent;
 import ru.yandex.practicum.model.sensor.SensorEvent;
 import ru.yandex.practicum.service.HubEventHandlerAvro;
+import ru.yandex.practicum.service.HubEventHandlerProto;
 import ru.yandex.practicum.service.SensorEventHandlerAvro;
+import ru.yandex.practicum.service.SensorEventHandlerProto;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     private final HubEventHandlerAvro hubEventHandlerAvro;
     private final SensorEventHandlerAvro sensorEventHandlerAvro;
+    private final HubEventHandlerProto hubEventHandlerProto;
+    private final SensorEventHandlerProto sensorEventHandlerProto;
+
     private Producer<String, SensorEventAvro> sensorProducer;
     private Producer<String, HubEventAvro> hubProducer;
 
@@ -50,9 +57,11 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
 
     public KafkaEventSenderImpl(
             HubEventHandlerAvro hubEventHandlerAvro,
-            SensorEventHandlerAvro sensorEventHandlerAvro) {
+            SensorEventHandlerAvro sensorEventHandlerAvro, HubEventHandlerProto hubEventHandlerProto, SensorEventHandlerProto sensorEventHandlerProto) {
         this.hubEventHandlerAvro = hubEventHandlerAvro;
         this.sensorEventHandlerAvro = sensorEventHandlerAvro;
+        this.hubEventHandlerProto = hubEventHandlerProto;
+        this.sensorEventHandlerProto = sensorEventHandlerProto;
     }
 
     @PostConstruct
@@ -79,15 +88,16 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     }
 
     @Override
-    public boolean send(SensorEvent event) {
+    public boolean send(SensorEventProto sensorEventProto) {
         try {
-            final SensorEventAvro sensorEventAvro = sensorEventHandlerAvro.toAvro(event);
+            final SensorEvent sensorEvent = sensorEventHandlerProto.toModel(sensorEventProto);
+            final SensorEventAvro sensorEventAvro = sensorEventHandlerAvro.toAvro(sensorEvent);
             final ProducerRecord<String, SensorEventAvro> record =
-                    new ProducerRecord<>(sensorsTopic, event.getHubId(), sensorEventAvro);
+                    new ProducerRecord<>(sensorsTopic, sensorEvent.getHubId(), sensorEventAvro);
 
             sensorProducer.send(record).get(5, TimeUnit.SECONDS);
 
-            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + event.getHubId());
+            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + sensorEvent.getHubId());
             return true;
         } catch (Exception e) {
             System.err.println("❌ Failed to send SensorEvent: " + e.getMessage());
@@ -96,8 +106,9 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     }
 
     @Override
-    public boolean send(HubEvent hubEvent) {
+    public boolean send(HubEventProto hubEventProto) {
         try {
+            final HubEvent hubEvent = hubEventHandlerProto.toModel(hubEventProto);
             final HubEventAvro hubEventAvro = hubEventHandlerAvro.toAvro(hubEvent);
             final ProducerRecord<String, HubEventAvro> record =
                     new ProducerRecord<>(hubsTopic, hubEvent.getHubId(), hubEventAvro);
