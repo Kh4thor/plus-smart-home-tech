@@ -1,129 +1,123 @@
 package ru.yandex.practicum.service;
 
-import com.google.protobuf.Timestamp;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.grpc.telemetry.event.*;
+import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.hubevent.HubEvent;
 import ru.yandex.practicum.model.hubevent.device.events.DeviceAddedEvent;
 import ru.yandex.practicum.model.hubevent.device.events.DeviceRemovedEvent;
 import ru.yandex.practicum.model.hubevent.device.events.DeviceType;
 import ru.yandex.practicum.model.hubevent.scenario.events.*;
 
-import java.time.Instant;
 import java.util.List;
 
 @Component
 public class HubEventHandler {
 
-    public HubEventProto toProto(HubEvent hubEvent) {
+    public HubEventAvro toAvro(HubEvent hubEvent) {
 
-        Instant instant = hubEvent.getTimestamp();  // java.time.Instant
-        Timestamp timestamp = Timestamp.newBuilder()
-                .setSeconds(instant.getEpochSecond())
-                .setNanos(instant.getNano())
-                .build();
+        SpecificRecordBase payload = null;
 
-        HubEventProto.Builder hubEventProto = HubEventProto.newBuilder()
+        HubEventAvro.Builder hubEventAvro = HubEventAvro.newBuilder()
                 .setHubId(hubEvent.getHubId())
-                .setTimestamp(timestamp);
+                .setTimestamp(hubEvent.getTimestamp());
 
         switch (hubEvent.getType()) {
             case DEVICE_ADDED -> {
                 DeviceAddedEvent deviceAddedEvent = (DeviceAddedEvent) hubEvent;
-                DeviceAddedEventProto deviceAddedEventProto = DeviceAddedEventProto.newBuilder()
+                payload = DeviceAddedEventAvro.newBuilder()
                         .setId(deviceAddedEvent.getId())
-                        .setType(toProto(deviceAddedEvent.getDeviceType()))
+                        .setType(toAvro(deviceAddedEvent.getDeviceType()))
                         .build();
-                hubEventProto.setDeviceAddedEvent(deviceAddedEventProto).build();
             }
             case DEVICE_REMOVED -> {
                 DeviceRemovedEvent deviceRemovedEvent = (DeviceRemovedEvent) hubEvent;
-                DeviceRemovedEventProto deviceRemovedEventProto = DeviceRemovedEventProto.newBuilder()
+                payload = DeviceRemovedEventAvro.newBuilder()
                         .setId(deviceRemovedEvent.getId())
                         .build();
-                hubEventProto.setDeviceRemovedEvent(deviceRemovedEventProto).build();
             }
             case SCENARIO_ADDED -> {
                 ScenarioAddedEvent scenarioAddedEvent = (ScenarioAddedEvent) hubEvent;
-                List<DeviceActionProto> actionsProto = scenarioAddedEvent.getActions().stream()
-                        .map(this::toProto)
+                List<DeviceActionAvro> actionsAvros = scenarioAddedEvent.getActions().stream()
+                        .map(this::toAvro)
                         .toList();
 
-                List<ScenarioConditionProto> conditionsProto = scenarioAddedEvent.getConditions().stream()
-                        .map(this::toProto)
+                List<ScenarioConditionAvro> conditionAvros = scenarioAddedEvent.getConditions().stream()
+                        .map(this::toAvro)
                         .toList();
 
-                ScenarioAddedEventProto scenarioAddedEventProto = ScenarioAddedEventProto.newBuilder()
+                payload = ScenarioAddedEventAvro.newBuilder()
                         .setName(scenarioAddedEvent.getName())
-                        .addAllActions(actionsProto)
-                        .addAllConditions(conditionsProto)
+                        .setActions(actionsAvros)
+                        .setConditions(conditionAvros)
                         .build();
-                hubEventProto.setScenarioAdded(scenarioAddedEventProto).build();
             }
             case SCENARIO_REMOVED -> {
                 ScenarioRemovedEvent scenarioRemovedEvent = (ScenarioRemovedEvent) hubEvent;
-                ScenarioRemovedEventProto scenarioRemovedEventProto = ScenarioRemovedEventProto.newBuilder()
+                payload = ScenarioRemovedEventAvro.newBuilder()
                         .setName(scenarioRemovedEvent.getName())
                         .build();
-                hubEventProto.setScenarioRemoved(scenarioRemovedEventProto);
             }
-            default ->  throw new IllegalArgumentException("Unknown hub event type: " + hubEvent.getType());
         }
-        return hubEventProto.build();
+
+        if (payload == null){
+            throw new IllegalArgumentException("Unknown hub event type: " + hubEvent.getType());
+        }
+        return hubEventAvro.setPayload(payload).build();
     }
 
-    private ScenarioConditionProto toProto(ScenarioCondition scenarioCondition) {
-        return ScenarioConditionProto.newBuilder()
-                .setOperation(toProto(scenarioCondition.getOperation()))
-                .setType(toProto(scenarioCondition.getType()))
+    private ScenarioConditionAvro toAvro(ScenarioCondition scenarioCondition) {
+        return ScenarioConditionAvro.newBuilder()
+                .setOperation(toAvro(scenarioCondition.getOperation()))
+                .setType(toAvro(scenarioCondition.getType()))
                 .setSensorId(scenarioCondition.getSensorId())
                 .setValue(scenarioCondition.getValue())
                 .build();
     }
 
-    private ConditionTypeProto toProto(ScenarioConditionType scenarioConditionType) {
+    private ConditionTypeAvro toAvro(ScenarioConditionType scenarioConditionType) {
         return switch (scenarioConditionType) {
-            case MOTION -> ConditionTypeProto.MOTION;
-            case LUMINOSITY -> ConditionTypeProto.LUMINOSITY;
-            case SWITCH -> ConditionTypeProto.SWITCH;
-            case HUMIDITY -> ConditionTypeProto.HUMIDITY;
-            case TEMPERATURE -> ConditionTypeProto.TEMPERATURE;
-            case CO2LEVEL -> ConditionTypeProto.CO2LEVEL;
+            case MOTION -> ConditionTypeAvro.MOTION;
+            case LUMINOSITY -> ConditionTypeAvro.LUMINOSITY;
+            case SWITCH -> ConditionTypeAvro.SWITCH;
+            case HUMIDITY -> ConditionTypeAvro.HUMIDITY;
+            case TEMPERATURE -> ConditionTypeAvro.TEMPERATURE;
+            case CO2LEVEL -> ConditionTypeAvro.CO2LEVEL;
         };
     }
 
-    private ConditionOperationProto toProto(ScenarioConditionOperation scenarioConditionOperation) {
+    private ConditionOperationAvro toAvro(ScenarioConditionOperation scenarioConditionOperation) {
         return switch (scenarioConditionOperation) {
-            case EQUALS -> ConditionOperationProto.EQUALS;
-            case LOWER_THAN -> ConditionOperationProto.LOWER_THAN;
-            case GREATER_THAN -> ConditionOperationProto.GREATER_THAN;
+            case EQUALS -> ConditionOperationAvro.EQUALS;
+            case LOWER_THAN -> ConditionOperationAvro.LOWER_THAN;
+            case GREATER_THAN -> ConditionOperationAvro.GREATER_THAN;
         };
     }
 
-    private ActionTypeProto toProto(DeviceActionType deviceActionType) {
+    private ActionTypeAvro toAvro(DeviceActionType deviceActionType) {
         return switch (deviceActionType) {
-            case ACTIVATE -> ActionTypeProto.ACTIVATE;
-            case DEACTIVATE -> ActionTypeProto.DEACTIVATE;
-            case INVERSE -> ActionTypeProto.INVERSE;
-            case SET_VALUE -> ActionTypeProto.SET_VALUE;
+            case ACTIVATE -> ActionTypeAvro.ACTIVATE;
+            case DEACTIVATE -> ActionTypeAvro.DEACTIVATE;
+            case INVERSE -> ActionTypeAvro.INVERSE;
+            case SET_VALUE -> ActionTypeAvro.SET_VALUE;
         };
     }
 
-    private DeviceActionProto toProto(DeviceAction deviceAction) {
-        return DeviceActionProto.newBuilder()
-                .setType(toProto(deviceAction.getType()))
+    private DeviceActionAvro toAvro(DeviceAction deviceAction) {
+        return DeviceActionAvro.newBuilder()
+                .setType(toAvro(deviceAction.getType()))
                 .setSensorId(deviceAction.getSensorId())
                 .setValue(deviceAction.getValue())
                 .build();
     }
 
-    private DeviceTypeProto toProto(DeviceType deviceType) {
+    private DeviceTypeAvro toAvro(DeviceType deviceType) {
         return switch (deviceType) {
-            case MOTION_SENSOR -> DeviceTypeProto.MOTION_SENSOR;
-            case TEMPERATURE_SENSOR -> DeviceTypeProto.TEMPERATURE_SENSOR;
-            case LIGHT_SENSOR -> DeviceTypeProto.LIGHT_SENSOR;
-            case CLIMATE_SENSOR -> DeviceTypeProto.CLIMATE_SENSOR;
-            case SWITCH_SENSOR -> DeviceTypeProto.SWITCH_SENSOR;
+            case MOTION_SENSOR -> DeviceTypeAvro.MOTION_SENSOR;
+            case TEMPERATURE_SENSOR -> DeviceTypeAvro.TEMPERATURE_SENSOR;
+            case LIGHT_SENSOR -> DeviceTypeAvro.LIGHT_SENSOR;
+            case CLIMATE_SENSOR -> DeviceTypeAvro.CLIMATE_SENSOR;
+            case SWITCH_SENSOR -> DeviceTypeAvro.SWITCH_SENSOR;
         };
     }
 }
