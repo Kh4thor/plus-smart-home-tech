@@ -12,7 +12,7 @@ import ru.yandex.practicum.model.hubevent.scenario.events.*;
 import java.util.List;
 
 @Component
-public class HubEventHandler {
+public class HubEventHandlerAvro {
 
     public HubEventAvro toAvro(HubEvent hubEvent) {
 

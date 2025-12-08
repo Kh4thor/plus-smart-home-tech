@@ -14,16 +14,16 @@ import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.model.hubevent.HubEvent;
 import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.service.HubEventHandler;
-import ru.yandex.practicum.service.SensorEventHandler;
+import ru.yandex.practicum.service.HubEventHandlerAvro;
+import ru.yandex.practicum.service.SensorEventHandlerAvro;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
-    private final HubEventHandler hubEventHandler;
-    private final SensorEventHandler sensorEventHandler;
+    private final HubEventHandlerAvro hubEventHandlerAvro;
+    private final SensorEventHandlerAvro sensorEventHandlerAvro;
     private Producer<String, SensorEventAvro> sensorProducer;
     private Producer<String, HubEventAvro> hubProducer;
 
@@ -49,10 +49,10 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     private String deliveryTimeoutMs;
 
     public KafkaEventSenderImpl(
-            HubEventHandler hubEventHandler,
-            SensorEventHandler sensorEventHandler) {
-        this.hubEventHandler = hubEventHandler;
-        this.sensorEventHandler = sensorEventHandler;
+            HubEventHandlerAvro hubEventHandlerAvro,
+            SensorEventHandlerAvro sensorEventHandlerAvro) {
+        this.hubEventHandlerAvro = hubEventHandlerAvro;
+        this.sensorEventHandlerAvro = sensorEventHandlerAvro;
     }
 
     @PostConstruct
@@ -81,7 +81,7 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Override
     public boolean send(SensorEvent event) {
         try {
-            final SensorEventAvro sensorEventAvro = sensorEventHandler.toAvro(event);
+            final SensorEventAvro sensorEventAvro = sensorEventHandlerAvro.toAvro(event);
             final ProducerRecord<String, SensorEventAvro> record =
                     new ProducerRecord<>(sensorsTopic, event.getHubId(), sensorEventAvro);
 
@@ -98,7 +98,7 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Override
     public boolean send(HubEvent hubEvent) {
         try {
-            final HubEventAvro hubEventAvro = hubEventHandler.toAvro(hubEvent);
+            final HubEventAvro hubEventAvro = hubEventHandlerAvro.toAvro(hubEvent);
             final ProducerRecord<String, HubEventAvro> record =
                     new ProducerRecord<>(hubsTopic, hubEvent.getHubId(), hubEventAvro);
 

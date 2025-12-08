@@ -10,10 +10,6 @@ import ru.yandex.practicum.model.hubevent.scenario.ScenarioEvent;
 
 import java.time.Instant;
 
-@Getter
-@ToString
-@SuperBuilder
-
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -26,6 +22,9 @@ import java.time.Instant;
         @JsonSubTypes.Type(value = ScenarioEvent.class, name = "SCENARIO_REMOVED")
 })
 
+@Getter
+@ToString
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class HubEvent {

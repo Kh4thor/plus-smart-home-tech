@@ -7,7 +7,7 @@ import ru.yandex.practicum.model.sensor.SensorEvent;
 import ru.yandex.practicum.model.sensor.events.*;
 
 @Component
-public class SensorEventHandler {
+public class SensorEventHandlerAvro {
 
     public SensorEventAvro toAvro(SensorEvent sensorEvent) {
 
