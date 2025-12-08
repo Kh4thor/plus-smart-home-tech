@@ -6,7 +6,7 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 
 public interface KafkaEventSender {
 
-    boolean send(SensorEventProto sensorEventProto);
+    void send(SensorEventProto sensorEventProto);
 
-    boolean send(HubEventProto sensorEventProto);
+    void send(HubEventProto sensorEventProto);
 }

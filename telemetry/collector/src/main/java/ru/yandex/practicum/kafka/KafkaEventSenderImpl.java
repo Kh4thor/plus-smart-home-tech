@@ -88,7 +88,7 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     }
 
     @Override
-    public boolean send(SensorEventProto sensorEventProto) {
+    public void send(SensorEventProto sensorEventProto) {
         try {
             final SensorEvent sensorEvent = sensorEventHandlerProto.toModel(sensorEventProto);
             final SensorEventAvro sensorEventAvro = sensorEventHandlerAvro.toAvro(sensorEvent);
@@ -98,15 +98,13 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
             sensorProducer.send(record).get(5, TimeUnit.SECONDS);
 
             System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + sensorEvent.getHubId());
-            return true;
         } catch (Exception e) {
             System.err.println("❌ Failed to send SensorEvent: " + e.getMessage());
-            return false;
         }
     }
 
     @Override
-    public boolean send(HubEventProto hubEventProto) {
+    public void send(HubEventProto hubEventProto) {
         try {
             final HubEvent hubEvent = hubEventHandlerProto.toModel(hubEventProto);
             final HubEventAvro hubEventAvro = hubEventHandlerAvro.toAvro(hubEvent);
@@ -116,10 +114,8 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
             hubProducer.send(record).get(5, TimeUnit.SECONDS);
 
             System.out.println("✅ Sent HubEvent to Kafka, hubId: " + hubEvent.getHubId());
-            return true;
         } catch (Exception e) {
             System.err.println("❌ Failed to send HubEvent: " + e.getMessage());
-            return false;
         }
     }
 
