@@ -1,0 +1,39 @@
+package ru.yandex.practicum.kafka.deserializer;
+
+import org.apache.avro.io.BinaryDecoder;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.specific.SpecificDatumReader;
+import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+
+public class HubEventAvroDeserializer implements Deserializer<HubEventAvro> {
+
+
+    private static final Logger log = LoggerFactory.getLogger(HubEventAvroDeserializer.class);
+    private final DecoderFactory decoderFactory = DecoderFactory.get();
+    private final DatumReader<HubEventAvro> datumReader = new SpecificDatumReader<>(HubEventAvro.class);
+
+    @Override
+    public HubEventAvro deserialize(String topic, byte[] data) {
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace("Deserializing HubEventAvro from topic: {}, data size: {} bytes",
+                        topic, data.length);
+            }
+
+            BinaryDecoder decoder = decoderFactory.binaryDecoder(data, null);
+            return datumReader.read(null, decoder);
+
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "Failed to deserialize HubEventAvro from topic [%s]. Data length: %d bytes",
+                    topic, data.length);
+            log.error(errorMsg, e);
+            throw new SerializationException(errorMsg, e);
+        }
+    }
+}

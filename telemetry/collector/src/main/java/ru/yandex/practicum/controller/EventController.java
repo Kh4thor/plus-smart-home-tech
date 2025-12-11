@@ -9,7 +9,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.KafkaEventSender;
-import telemetry.collector.CollectorControllerGrpc;
+import telemetry.service.collector.CollectorControllerGrpc;
 
 @Slf4j
 @GrpcService
