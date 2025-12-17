@@ -1,6 +1,7 @@
 package ru.yandex.practicum.telemetry.analyzer.service;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.kafka.telemetry.event.*;
@@ -17,14 +18,14 @@ import java.util.Set;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScenarioService {
     private final ScenarioRepository scenarioRepository;
     private final ConditionRepository conditionRepository;
     private final ActionRepository actionRepository;
     private final SensorRepository sensorRepository;
 
-    public Scenario add(ScenarioAddedEventAvro scenarioAddedEventAvro, String hubId) {
+    public Scenario save(ScenarioAddedEventAvro scenarioAddedEventAvro, String hubId) {
         Set<String> sensors = new HashSet<>();
         scenarioAddedEventAvro.getConditions().forEach(condition -> sensors.add(condition.getSensorId()));
 
@@ -79,20 +80,20 @@ public class ScenarioService {
 
             scenario.addAction(deviceActionAvro.getSensorId(), action);
         }
-
         conditionRepository.saveAll(scenario.getConditions().values());
         actionRepository.saveAll(scenario.getActions().values());
         return scenarioRepository.save(scenario);
     }
 
     public void delete(String name, String hubId) {
-        Optional<Scenario> optScenario = scenarioRepository.findByHubIdAndName(hubId, name);
-        if (optScenario.isPresent()) {
-            Scenario scenario = optScenario.get();
-            conditionRepository.deleteAll(scenario.getConditions().values());
-            actionRepository.deleteAll(scenario.getActions().values());
-            scenarioRepository.delete(scenario);
-        }
+        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(hubId, name);
+
+        String message = String.format("Scenario with name '%s' and hubId '%s' not found", name, hubId);
+        Scenario scenario = scenarioOpt.orElseThrow(() -> new EntityNotFoundException(message));
+
+        conditionRepository.deleteAll(scenario.getConditions().values());
+        actionRepository.deleteAll(scenario.getActions().values());
+        scenarioRepository.delete(scenario);
     }
 
     private Integer mapValue(Object value) {
