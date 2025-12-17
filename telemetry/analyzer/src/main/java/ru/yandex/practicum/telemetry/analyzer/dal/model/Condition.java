@@ -1,10 +1,8 @@
-package ru.yandex.practicum.repository.model;
+package ru.yandex.practicum.telemetry.analyzer.dal.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.kafka.telemetry.event.ConditionOperationAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 
 @Entity
 @Getter
@@ -17,10 +15,10 @@ public class Condition {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ConditionTypeAvro type;
+    private ConditionType type;
 
     @Enumerated(EnumType.STRING)
-    private ConditionOperationAvro operation;
+    private ConditionOperation operation;
 
     private Integer value;
 }

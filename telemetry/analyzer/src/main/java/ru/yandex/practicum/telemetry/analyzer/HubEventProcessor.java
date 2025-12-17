@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.telemetry.analyzer;
 
 
 import lombok.extern.slf4j.Slf4j;

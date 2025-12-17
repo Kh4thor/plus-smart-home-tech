@@ -1,4 +1,4 @@
-package ru.yandex.practicum.repository.model;
+package ru.yandex.practicum.telemetry.analyzer.dal.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
