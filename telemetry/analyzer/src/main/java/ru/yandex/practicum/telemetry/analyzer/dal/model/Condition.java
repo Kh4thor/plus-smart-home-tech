@@ -21,4 +21,9 @@ public class Condition {
     private ConditionOperation operation;
 
     private Integer value;
+
+    @Transient
+    public boolean check(int sensorValue) {
+        return operation.apply(sensorValue, this.value);
+    }
 }

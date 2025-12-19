@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.analyzer.service;
+package ru.yandex.practicum.telemetry.analyzer.dal.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
