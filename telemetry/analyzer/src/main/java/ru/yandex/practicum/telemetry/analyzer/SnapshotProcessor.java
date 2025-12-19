@@ -1,6 +1,22 @@
 package ru.yandex.practicum.telemetry.analyzer;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+import ru.yandex.practicum.telemetry.analyzer.kafka.KafkaConfig;
 import ru.yandex.practicum.telemetry.analyzer.service.SnapshotAnalyser;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Класс AggregationStarter, ответственный за запуск агрегации данных.
@@ -19,7 +35,6 @@ public class SnapshotProcessor {
     private final List<String> topics;
     private final Duration pollTimeout;
 
-    @Autowired
     public SnapshotProcessor(SnapshotAnalyser analyser, KafkaConfig kafkaConfig) {
         this.analyser = analyser;
 
