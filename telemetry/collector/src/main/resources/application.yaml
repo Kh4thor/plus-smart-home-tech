@@ -4,6 +4,20 @@ grpc:
   client:
     echo:
       address: 'static://localhost:9090'
-      enable-keep-alive: true  # kebab-case предпочтительнее в YAML
+      enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
+
+kafka:
+  bootstrap-servers: localhost:9092
+  topic:
+    hubs: telemetry.hubs.v1
+    sensors: telemetry.sensors.v1
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+    acks: all
+    retries: 3
+    request-timeout-ms: 3000
+    delivery-timeout-ms: 6000
+
