@@ -34,4 +34,9 @@ public class AvroDeserializerFactory {
     public HubEventAvroDeserializer hubEventDeserializer() {
         return new HubEventAvroDeserializer();
     }
+
+    @Bean
+    public SnapshotDeserializer snapshotDeserializer() {
+        return new SnapshotDeserializer();
+    }
 }

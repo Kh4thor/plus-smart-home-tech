@@ -1,6 +1,5 @@
 package ru.yandex.practicum.telemetry.analyzer;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -23,7 +22,6 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SnapshotProcessor {
     private final SnapshotAnalyser analyser;
 
