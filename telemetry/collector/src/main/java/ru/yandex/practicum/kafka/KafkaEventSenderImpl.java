@@ -15,26 +15,14 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.model.hubevent.HubEvent;
-import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.service.HubEventHandlerAvro;
-import ru.yandex.practicum.service.HubEventHandlerProto;
-import ru.yandex.practicum.service.SensorEventHandlerAvro;
-import ru.yandex.practicum.service.SensorEventHandlerProto;
+import ru.yandex.practicum.service.HubEventProtoMapper;
+import ru.yandex.practicum.service.SensorEventProtoMapper;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
-    private final HubEventHandlerAvro hubEventHandlerAvro;
-    private final SensorEventHandlerAvro sensorEventHandlerAvro;
-    private final HubEventHandlerProto hubEventHandlerProto;
-    private final SensorEventHandlerProto sensorEventHandlerProto;
-
-    private Producer<String, SensorEventAvro> sensorProducer;
-    private Producer<String, HubEventAvro> hubProducer;
-
     @Value("${kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
@@ -56,16 +44,10 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Value("${kafka.producer.delivery-timeout-ms:60000}")
     private String deliveryTimeoutMs;
 
-    public KafkaEventSenderImpl(
-            HubEventHandlerAvro hubEventHandlerAvro,
-            SensorEventHandlerAvro sensorEventHandlerAvro,
-            HubEventHandlerProto hubEventHandlerProto,
-            SensorEventHandlerProto sensorEventHandlerProto) {
-        this.hubEventHandlerAvro = hubEventHandlerAvro;
-        this.sensorEventHandlerAvro = sensorEventHandlerAvro;
-        this.hubEventHandlerProto = hubEventHandlerProto;
-        this.sensorEventHandlerProto = sensorEventHandlerProto;
-    }
+    private Producer<String, SensorEventAvro> sensorProducer;
+    private Producer<String, HubEventAvro> hubProducer;
+    private SensorEventProtoMapper sensorEventProtoMapper;
+    private HubEventProtoMapper hubEventProtoMapper;
 
     @PostConstruct
     public void init() {
@@ -93,14 +75,13 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Override
     public void send(SensorEventProto sensorEventProto) {
         try {
-            final SensorEvent sensorEvent = sensorEventHandlerProto.toModel(sensorEventProto);
-            final SensorEventAvro sensorEventAvro = sensorEventHandlerAvro.toAvro(sensorEvent);
+            final SensorEventAvro sensorEventAvro = sensorEventProtoMapper.toAvro(sensorEventProto);
             final ProducerRecord<String, SensorEventAvro> record =
-                    new ProducerRecord<>(sensorsTopic, sensorEvent.getHubId(), sensorEventAvro);
+                    new ProducerRecord<>(sensorsTopic, sensorEventProto.getHubId(), sensorEventAvro);
 
             sensorProducer.send(record).get(5, TimeUnit.SECONDS);
 
-            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + sensorEvent.getHubId());
+            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + sensorEventProto.getHubId());
         } catch (Exception e) {
             System.err.println("❌ Failed to send SensorEvent: " + e.getMessage());
         }
@@ -110,14 +91,13 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Override
     public void send(HubEventProto hubEventProto) {
         try {
-            final HubEvent hubEvent = hubEventHandlerProto.toModel(hubEventProto);
-            final HubEventAvro hubEventAvro = hubEventHandlerAvro.toAvro(hubEvent);
+            final HubEventAvro hubEventAvro = hubEventProtoMapper.toAvro(hubEventProto);
             final ProducerRecord<String, HubEventAvro> record =
-                    new ProducerRecord<>(hubsTopic, hubEvent.getHubId(), hubEventAvro);
+                    new ProducerRecord<>(hubsTopic, hubEventProto.getHubId(), hubEventAvro);
 
             hubProducer.send(record).get(5, TimeUnit.SECONDS);
 
-            System.out.println("✅ Sent HubEvent to Kafka, hubId: " + hubEvent.getHubId());
+            System.out.println("✅ Sent HubEvent to Kafka, hubId: " + hubEventProto.getHubId());
         } catch (Exception e) {
             System.err.println("❌ Failed to send HubEvent: " + e.getMessage());
         }
