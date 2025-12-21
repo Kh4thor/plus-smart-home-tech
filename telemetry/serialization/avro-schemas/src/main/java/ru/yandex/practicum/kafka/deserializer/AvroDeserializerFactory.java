@@ -17,11 +17,15 @@ public class AvroDeserializerFactory {
     @Value("${kafka.topic.hubs:telemetry.hubs.v1}")
     private String hubsTopic;
 
+    @Value("${kafka.topic.snapshots:telemetry.snapshots.v1")
+    private String snapshotsTopic;
+
     @Bean
     public Map<String, Deserializer<?>> deserializers() {
         Map<String, Deserializer<?>> deserializers = new HashMap<>();
         deserializers.put(hubsTopic, new HubEventAvroDeserializer());
         deserializers.put(sensorsTopic, new SensorEventAvroDeserializer());
+        deserializers.put(snapshotsTopic, new SnapshotAvroDeserializer());
         return deserializers;
     }
 
@@ -36,7 +40,7 @@ public class AvroDeserializerFactory {
     }
 
     @Bean
-    public SnapshotDeserializer snapshotDeserializer() {
-        return new SnapshotDeserializer();
+    public SnapshotAvroDeserializer snapshotDeserializer() {
+        return new SnapshotAvroDeserializer();
     }
 }

@@ -90,7 +90,6 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
         return new KafkaProducer<>(config);
     }
 
-    @Async
     @Override
     public void send(SensorEventProto sensorEventProto) {
         try {

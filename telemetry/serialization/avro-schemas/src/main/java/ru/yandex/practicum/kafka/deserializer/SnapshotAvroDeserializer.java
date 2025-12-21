@@ -8,17 +8,16 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
-public class SnapshotDeserializer  implements Deserializer<SensorsSnapshotAvro> {
-    private static final Logger log = LoggerFactory.getLogger(SnapshotDeserializer.class);
+public class SnapshotAvroDeserializer  implements Deserializer<SensorsSnapshotAvro> {
+    private static final Logger log = LoggerFactory.getLogger(SnapshotAvroDeserializer.class);
 
     private final DecoderFactory decoderFactory = DecoderFactory.get();
     private final DatumReader<SensorsSnapshotAvro> datumReader;
 
-    public SnapshotDeserializer()  {
-        this.datumReader = new SpecificDatumReader<>(SensorEventAvro.getClassSchema());
+    public SnapshotAvroDeserializer()  {
+        this.datumReader = new SpecificDatumReader<>(SensorsSnapshotAvro.getClassSchema());
     }
 
     @Override
