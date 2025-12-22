@@ -65,14 +65,15 @@ public class HubEventProtoMapper {
         return hubEventAvro.setPayload(payload).build();
     }
 
-
     private ScenarioConditionAvro toAvro(ScenarioConditionProto scenarioConditionProto) {
-        return ScenarioConditionAvro.newBuilder()
+        ScenarioConditionAvro.Builder scenarioConditionAvro = ScenarioConditionAvro.newBuilder()
                 .setOperation(toAvro(scenarioConditionProto.getOperation()))
                 .setType(toAvro(scenarioConditionProto.getType()))
-                .setSensorId(scenarioConditionProto.getSensorId())
-                .setValue(scenarioConditionProto.getValue())
-                .build();
+                .setSensorId(scenarioConditionProto.getSensorId());
+        if (scenarioConditionProto.hasValue()) {
+            scenarioConditionAvro.setValue(scenarioConditionProto.getValue());
+        }
+        return scenarioConditionAvro.setValue(500).build();
     }
 
     private ConditionTypeAvro toAvro(ConditionTypeProto conditionTypeProto) {
@@ -87,12 +88,14 @@ public class HubEventProtoMapper {
         return ActionTypeAvro.valueOf(actionTypeProto.name());
     }
 
-    private DeviceActionAvro toAvro(DeviceActionProto deviceAction) {
-        return DeviceActionAvro.newBuilder()
-                .setType(toAvro(deviceAction.getType()))
-                .setSensorId(deviceAction.getSensorId())
-                .setValue(deviceAction.getValue())
-                .build();
+    private DeviceActionAvro toAvro(DeviceActionProto deviceActionProto) {
+        DeviceActionAvro.Builder deviceActionAvro = DeviceActionAvro.newBuilder()
+                .setType(toAvro(deviceActionProto.getType()))
+                .setSensorId(deviceActionProto.getSensorId());
+        if (deviceActionProto.hasValue()) {
+            deviceActionAvro.setValue(deviceActionProto.getValue());
+        }
+        return deviceActionAvro.setValue(500).build();
     }
 
     private DeviceTypeAvro toAvro(DeviceTypeProto deviceType) {
