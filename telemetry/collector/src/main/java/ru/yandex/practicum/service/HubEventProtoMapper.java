@@ -8,6 +8,8 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 import java.time.Instant;
 import java.util.List;
 
+import static ru.yandex.practicum.grpc.telemetry.event.ScenarioConditionProto.ValueCase.BOOL_VALUE;
+
 @Component
 public class HubEventProtoMapper {
 
@@ -65,15 +67,6 @@ public class HubEventProtoMapper {
         return hubEventAvro.setPayload(payload).build();
     }
 
-    private ScenarioConditionAvro toAvro(ScenarioConditionProto scenarioConditionProto) {
-        return ScenarioConditionAvro.newBuilder()
-                .setOperation(toAvro(scenarioConditionProto.getOperation()))
-                .setType(toAvro(scenarioConditionProto.getType()))
-                .setSensorId(scenarioConditionProto.getSensorId())
-                .setValue(scenarioConditionProto.hasValue() ? scenarioConditionProto.getValue() : null)
-                .build();
-    }
-
     private ConditionTypeAvro toAvro(ConditionTypeProto conditionTypeProto) {
         return ConditionTypeAvro.valueOf(conditionTypeProto.name());
     }
@@ -86,16 +79,27 @@ public class HubEventProtoMapper {
         return ActionTypeAvro.valueOf(actionTypeProto.name());
     }
 
+    private DeviceTypeAvro toAvro(DeviceTypeProto deviceType) {
+        return DeviceTypeAvro.valueOf(deviceType.name());
+    }
+
+    private ScenarioConditionAvro toAvro(ScenarioConditionProto scenarioConditionProto) {
+
+        return ScenarioConditionAvro.newBuilder()
+                .setOperation(toAvro(scenarioConditionProto.getOperation()))
+                .setType(toAvro(scenarioConditionProto.getType()))
+                .setSensorId(scenarioConditionProto.getSensorId())
+                .setValue(scenarioConditionProto.getValueCase().equals(BOOL_VALUE) ?
+                        scenarioConditionProto.getBoolValue() : scenarioConditionProto.getIntValue())
+                .build();
+    }
+
     private DeviceActionAvro toAvro(DeviceActionProto deviceActionProto) {
         return DeviceActionAvro.newBuilder()
                 .setType(toAvro(deviceActionProto.getType()))
                 .setSensorId(deviceActionProto.getSensorId())
-                .setValue(deviceActionProto.hasValue() ? deviceActionProto.getValue() : null)
+                .setValue(deviceActionProto.getValue())
                 .build();
-    }
-
-    private DeviceTypeAvro toAvro(DeviceTypeProto deviceType) {
-        return DeviceTypeAvro.valueOf(deviceType.name());
     }
 
     private Instant getTimestamp(HubEventProto hubEventProto) {
