@@ -59,11 +59,9 @@ public class SensorEventProtoMapper {
                         .build();
             }
         }
-
         if (payload == null) {
-            throw new IllegalArgumentException("Unknown sensor event type");
+            throw new IllegalArgumentException("Unknown sensor event type " + sensorEventProto.getPayloadCase());
         }
-
         return sensorEventAvro.setPayload(payload).build();
     }
 

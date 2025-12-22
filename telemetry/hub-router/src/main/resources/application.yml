@@ -1,0 +1,17 @@
+server:
+  port: 8082
+
+grpc:
+  server:
+    port: 59090
+
+  client:
+    collector:
+      address: 'static://localhost:59091'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+hub-router:
+  execution:
+    mode: ANALYZE
