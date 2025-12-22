@@ -22,16 +22,16 @@ public class HubEventProtoMapper {
                 .setTimestamp(getTimestamp(hubEventProto));
 
         switch (hubEventProto.getPayloadCase()) {
-            case DEVICE_ADDED_EVENT -> {
-                DeviceAddedEventProto eventProto = hubEventProto.getDeviceAddedEvent();
+            case DEVICE_ADDED -> {
+                DeviceAddedEventProto eventProto = hubEventProto.getDeviceAdded();
                 payload = DeviceAddedEventAvro.newBuilder()
                         .setId(eventProto.getId())
                         .setType(toAvro(eventProto.getType()))
                         .build();
             }
 
-            case DEVICE_REMOVED_EVENT -> {
-                DeviceRemovedEventProto eventProto = hubEventProto.getDeviceRemovedEvent();
+            case DEVICE_REMOVED -> {
+                DeviceRemovedEventProto eventProto = hubEventProto.getDeviceRemoved();
                 payload = DeviceRemovedEventAvro.newBuilder()
                         .setId(eventProto.getId())
                         .build();
@@ -39,11 +39,11 @@ public class HubEventProtoMapper {
 
             case SCENARIO_ADDED -> {
                 ScenarioAddedEventProto eventProto = hubEventProto.getScenarioAdded();
-                List<DeviceActionAvro> actionsAvros = eventProto.getActionsList().stream()
+                List<DeviceActionAvro> actionsAvros = eventProto.getActionList().stream()
                         .map(this::toAvro)
                         .toList();
 
-                List<ScenarioConditionAvro> conditionAvros = eventProto.getConditionsList().stream()
+                List<ScenarioConditionAvro> conditionAvros = eventProto.getConditionList().stream()
                         .map(this::toAvro)
                         .toList();
 
@@ -103,6 +103,9 @@ public class HubEventProtoMapper {
     }
 
     private Instant getTimestamp(HubEventProto hubEventProto) {
+        if (hubEventProto.getTimestamp() == null) {
+            return Instant.now();
+        }
         return Instant.ofEpochSecond(
                 hubEventProto.getTimestamp().getSeconds(),
                 hubEventProto.getTimestamp().getNanos()

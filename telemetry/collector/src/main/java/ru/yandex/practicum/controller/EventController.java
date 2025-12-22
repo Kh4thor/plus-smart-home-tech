@@ -2,8 +2,8 @@ package ru.yandex.practicum.controller;
 
 import com.google.protobuf.Empty;
 import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
@@ -13,66 +13,33 @@ import telemetry.service.collector.CollectorControllerGrpc;
 
 @Slf4j
 @GrpcService
-@RequiredArgsConstructor
 public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
 
     private final KafkaEventSender kafkaEventSender;
 
+    public EventController(KafkaEventSender kafkaEventSender) {
+        this.kafkaEventSender = kafkaEventSender;
+    }
+
     @Override
-    public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
-        String hubId = request.getHubId();
-        String payloadCase = request.getPayloadCase().name();
-
-        log.info("📥 [gRPC] Received HubEvent - hubId: {}, payload: {}", hubId, payloadCase);
-
+    public void collectHubEvent(HubEventProto hubProto, StreamObserver<Empty> responseObserver) {
         try {
-            // Детальная отладка для SCENARIO_ADDED
-            if (request.getPayloadCase() == HubEventProto.PayloadCase.SCENARIO_ADDED) {
-                log.debug("📋 SCENARIO_ADDED details: name={}, actions={}, conditions={}",
-                        request.getScenarioAdded().getName(),
-                        request.getScenarioAdded().getActionsList().size(),
-                        request.getScenarioAdded().getConditionsList().size());
-            }
-
-            log.debug("Sending HubEvent to Kafka...");
-            kafkaEventSender.send(request);
-
+            kafkaEventSender.send(hubProto);
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-
-            log.info("✅ [gRPC] HubEvent processed successfully - hubId: {}", hubId);
-
         } catch (Exception e) {
-            log.error("❌ [gRPC] ERROR in collectHubEvent - hubId: {}, payload: {}, error: {}",
-                    hubId, payloadCase, e.getMessage(), e);
-            responseObserver.onError(Status.INTERNAL
-                    .withDescription("Failed to process hub event: " + e.getMessage())
-                    .asRuntimeException());
+            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
         }
     }
 
     @Override
-    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
-        String hubId = request.getHubId();
-        String payloadCase = request.getPayloadCase().name();
-
-        log.info("📥 [gRPC] Received SensorEvent - hubId: {}, type: {}", hubId, payloadCase);
-
+    public void collectSensorEvent(SensorEventProto sensorProto, StreamObserver<Empty> responseObserver) {
         try {
-            log.debug("Sending SensorEvent to Kafka...");
-            kafkaEventSender.send(request);
-
+            kafkaEventSender.send(sensorProto);
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-
-            log.info("✅ [gRPC] SensorEvent processed successfully - hubId: {}", hubId);
-
         } catch (Exception e) {
-            log.error("❌ [gRPC] ERROR in collectSensorEvent - hubId: {}, type: {}, error: {}",
-                    hubId, payloadCase, e.getMessage(), e);
-            responseObserver.onError(Status.INTERNAL
-                    .withDescription("Failed to process sensor event: " + e.getMessage())
-                    .asRuntimeException());
+            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
         }
     }
 }
