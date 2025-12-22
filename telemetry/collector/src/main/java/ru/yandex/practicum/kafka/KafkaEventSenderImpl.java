@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
@@ -87,7 +86,6 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
         }
     }
 
-    @Async
     @Override
     public void send(HubEventProto hubEventProto) {
         try {
