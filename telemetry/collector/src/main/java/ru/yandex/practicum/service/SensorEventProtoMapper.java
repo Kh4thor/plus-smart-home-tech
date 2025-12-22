@@ -17,7 +17,7 @@ public class SensorEventProtoMapper {
         SensorEventAvro.Builder sensorEventAvro = SensorEventAvro.newBuilder()
                 .setId(sensorEventProto.getId())
                 .setHubId(sensorEventProto.getHubId())
-                .setTimestamp(sensorEventProto.getTimestamp() == null ? Instant.now() : getTimestamp(sensorEventProto));
+                .setTimestamp(getTimestamp(sensorEventProto));
 
         switch (sensorEventProto.getPayloadCase()) {
             case CLIMATE_SENSOR -> {
@@ -54,7 +54,7 @@ public class SensorEventProtoMapper {
             case SWITCH_SENSOR -> {
                 SwitchSensorProto sensor = sensorEventProto.getSwitchSensor();
                 payload = SwitchSensorAvro.newBuilder()
-                        .setStat(sensor.getStat())
+                        .setStat(sensor.getState())
                         .build();
             }
         }
@@ -66,6 +66,9 @@ public class SensorEventProtoMapper {
 
 
     private Instant getTimestamp(SensorEventProto sensorEventProto) {
+        if  (sensorEventProto.getTimestamp() == null) {
+            return Instant.now();
+        }
         return Instant.ofEpochSecond(
                 sensorEventProto.getTimestamp().getSeconds(),
                 sensorEventProto.getTimestamp().getNanos()
