@@ -43,5 +43,5 @@ message  ClimateSensorProto {
 }
 
 message SwitchSensorProto {
-  bool state = 1;
+  bool stat = 1;
 }

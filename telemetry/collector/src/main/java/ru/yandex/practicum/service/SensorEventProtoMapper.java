@@ -17,8 +17,7 @@ public class SensorEventProtoMapper {
         SensorEventAvro.Builder sensorEventAvro = SensorEventAvro.newBuilder()
                 .setId(sensorEventProto.getId())
                 .setHubId(sensorEventProto.getHubId())
-                .setTimestamp(getTimestamp(sensorEventProto));
-
+                .setTimestamp(getTimestamp(sensorEventProto) == null ? Instant.now() : getTimestamp(sensorEventProto));
 
         switch (sensorEventProto.getPayloadCase()) {
             case CLIMATE_SENSOR -> {
@@ -55,15 +54,13 @@ public class SensorEventProtoMapper {
             case SWITCH_SENSOR -> {
                 SwitchSensorProto sensor = sensorEventProto.getSwitchSensor();
                 payload = SwitchSensorAvro.newBuilder()
-                        .setStat(sensor.getState())
+                        .setStat(sensor.getStat())
                         .build();
             }
         }
-
         if (payload == null) {
-            throw new IllegalArgumentException("Unknown sensor event type");
+            throw new IllegalArgumentException("Unknown sensor event type " + sensorEventProto.getPayloadCase());
         }
-
         return sensorEventAvro.setPayload(payload).build();
     }
 

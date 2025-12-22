@@ -1,6 +1,8 @@
 package ru.yandex.practicum.kafka;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -19,10 +21,12 @@ import ru.yandex.practicum.service.HubEventProtoMapper;
 import ru.yandex.practicum.service.SensorEventProtoMapper;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
+
     @Value("${kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
@@ -32,31 +36,20 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     @Value("${kafka.topic.hubs:telemetry.hubs.v1}")
     private String hubsTopic;
 
-    @Value("${kafka.producer.acks:all}")
-    private String acks;
-
-    @Value("${kafka.producer.retries:3}")
-    private String retries;
-
-    @Value("${kafka.producer.request-timeout-ms:30000}")
-    private String requestTimeoutMs;
-
-    @Value("${kafka.producer.delivery-timeout-ms:60000}")
-    private String deliveryTimeoutMs;
+    private final SensorEventProtoMapper sensorEventProtoMapper;
+    private final HubEventProtoMapper hubEventProtoMapper;
 
     private Producer<String, SensorEventAvro> sensorProducer;
     private Producer<String, HubEventAvro> hubProducer;
-    private SensorEventProtoMapper sensorEventProtoMapper;
-    private HubEventProtoMapper hubEventProtoMapper;
 
     @PostConstruct
     public void init() {
-        System.out.println("Initializing Kafka producers with: " + bootstrapServers);
+        log.info("Initializing Kafka producers with bootstrap servers: {}", bootstrapServers);
 
         this.sensorProducer = createProducer();
         this.hubProducer = createProducer();
 
-        System.out.println("✅ Kafka producers initialized");
+        log.info("Kafka producers initialized successfully");
     }
 
     private <T> Producer<String, T> createProducer() {
@@ -64,10 +57,10 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class.getName());
-        config.put(ProducerConfig.ACKS_CONFIG, acks);
-        config.put(ProducerConfig.RETRIES_CONFIG, retries);
-        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs);
-        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
+        config.put(ProducerConfig.ACKS_CONFIG, "all");
+        config.put(ProducerConfig.RETRIES_CONFIG, 3);
+        config.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 1);
+        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
 
         return new KafkaProducer<>(config);
     }
@@ -79,11 +72,18 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
             final ProducerRecord<String, SensorEventAvro> record =
                     new ProducerRecord<>(sensorsTopic, sensorEventProto.getHubId(), sensorEventAvro);
 
-            sensorProducer.send(record).get(5, TimeUnit.SECONDS);
+            sensorProducer.send(record, (metadata, exception) -> {
+                if (exception != null) {
+                    log.error("Failed to send SensorEvent to Kafka, hubId: {}", sensorEventProto.getHubId(), exception);
+                } else {
+                    log.info("Sent SensorEvent to Kafka, hubId: {}, partition: {}, offset: {}",
+                            sensorEventProto.getHubId(), metadata.partition(), metadata.offset());
+                }
+            });
 
-            System.out.println("✅ Sent SensorEvent to Kafka, hubId: " + sensorEventProto.getHubId());
         } catch (Exception e) {
-            System.err.println("❌ Failed to send SensorEvent: " + e.getMessage());
+            log.error("Failed to process SensorEvent for hubId: {}", sensorEventProto.getHubId(), e);
+            throw new RuntimeException("Failed to send sensor event to Kafka", e);
         }
     }
 
@@ -95,11 +95,18 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
             final ProducerRecord<String, HubEventAvro> record =
                     new ProducerRecord<>(hubsTopic, hubEventProto.getHubId(), hubEventAvro);
 
-            hubProducer.send(record).get(5, TimeUnit.SECONDS);
+            hubProducer.send(record, (metadata, exception) -> {
+                if (exception != null) {
+                    log.error("Failed to send HubEvent to Kafka, hubId: {}", hubEventProto.getHubId(), exception);
+                } else {
+                    log.info("Sent HubEvent to Kafka, hubId: {}, partition: {}, offset: {}",
+                            hubEventProto.getHubId(), metadata.partition(), metadata.offset());
+                }
+            });
 
-            System.out.println("✅ Sent HubEvent to Kafka, hubId: " + hubEventProto.getHubId());
         } catch (Exception e) {
-            System.err.println("❌ Failed to send HubEvent: " + e.getMessage());
+            log.error("Failed to process HubEvent for hubId: {}", hubEventProto.getHubId(), e);
+            throw new RuntimeException("Failed to send hub event to Kafka", e);
         }
     }
 
@@ -107,11 +114,11 @@ public class KafkaEventSenderImpl implements KafkaEventSender, DisposableBean {
     public void destroy() {
         if (sensorProducer != null) {
             sensorProducer.close();
-            System.out.println("✅ Sensor producer closed");
+            log.info("Sensor producer closed");
         }
         if (hubProducer != null) {
             hubProducer.close();
-            System.out.println("✅ Hub producer closed");
+            log.info("Hub producer closed");
         }
     }
 }

@@ -12,11 +12,12 @@ import java.util.List;
 public class HubEventProtoMapper {
 
     public HubEventAvro toAvro(HubEventProto hubEventProto) {
+
         SpecificRecordBase payload = null;
 
         HubEventAvro.Builder hubEventAvro = HubEventAvro.newBuilder()
                 .setHubId(hubEventProto.getHubId())
-                .setTimestamp(Instant.now());
+                .setTimestamp(getTimestamp(hubEventProto));
 
         switch (hubEventProto.getPayloadCase()) {
             case DEVICE_ADDED_EVENT -> {
@@ -96,5 +97,12 @@ public class HubEventProtoMapper {
 
     private DeviceTypeAvro toAvro(DeviceTypeProto deviceType) {
         return DeviceTypeAvro.valueOf(deviceType.name());
+    }
+
+    private Instant getTimestamp(HubEventProto hubEventProto) {
+        return Instant.ofEpochSecond(
+                hubEventProto.getTimestamp().getSeconds(),
+                hubEventProto.getTimestamp().getNanos()
+        );
     }
 }
