@@ -6,14 +6,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # Создаст таблицы
-    show-sql: true      # Для отладки
+      ddl-auto: update
+    show-sql: false  # Отключаем стандартный вывод, используем логирование
+    properties:
+      hibernate:
+        format_sql: true
 
 analyzer:
   kafka:
     common-properties:
       bootstrap.servers: localhost:9092
-      # НЕТ schema.registry.url и specific.avro.reader!
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
     consumers:
@@ -26,9 +28,6 @@ analyzer:
           auto.offset.reset: earliest
           group.id: analyzer-hub-events
           value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventAvroDeserializer
-          # ТОЛЬКО если нужны кастомные настройки Avro:
-          avro.serializer.buffer.bytes: "65536"
-          avro.use.logical.type.converters: "true"
 
       - type: SnapshotProcessor
         topics:
@@ -51,6 +50,23 @@ server:
 
 logging:
   level:
-    ru.yandex.practicum.telemetry.analyzer: DEBUG
-    org.springframework.kafka: DEBUG
-    ru.yandex.practicum.kafka.deserializer: TRACE  # Логи десериализаторов
+    # Analyzer компоненты
+    ru.yandex.practicum.telemetry.analyzer: INFO
+    ru.yandex.practicum.telemetry.analyzer.HubEventProcessor: DEBUG
+    ru.yandex.practicum.telemetry.analyzer.SnapshotProcessor: DEBUG
+    ru.yandex.practicum.telemetry.analyzer.service.SnapshotAnalyser: DEBUG
+    ru.yandex.practicum.telemetry.analyzer.dal: INFO
+
+    # Десериализаторы
+    ru.yandex.practicum.kafka.deserializer: INFO
+
+    # SQL логи
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+    # Spring и Kafka
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %highlight(%-5level) - %cyan(%logger{36}) - %msg%n"
