@@ -12,8 +12,8 @@ import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Action;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Condition;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.DeviceActionType;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Scenario;
+import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.DeviceActionType;
 import ru.yandex.practicum.telemetry.analyzer.dal.repository.ScenarioRepository;
 
 import java.time.Instant;

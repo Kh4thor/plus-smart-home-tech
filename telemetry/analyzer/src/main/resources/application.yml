@@ -1,72 +1,58 @@
 spring:
+  #Db connection
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/plus-smart-home-tech
     username: postgres
-    password: password
-
+    password: test
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false  # Отключаем стандартный вывод, используем логирование
-    properties:
-      hibernate:
-        format_sql: true
-
-analyzer:
-  kafka:
-    common-properties:
-      bootstrap.servers: localhost:9092
-      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
-    consumers:
-      - type: HubEventProcessor
-        topics:
-          - telemetry.hubs.v1
-        poll-timeout: PT5S
-        properties:
-          enable.auto.commit: false
-          auto.offset.reset: earliest
-          group.id: analyzer-hub-events
-          value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventAvroDeserializer
-
-      - type: SnapshotProcessor
-        topics:
-          - telemetry.snapshots.v1
-        poll-timeout: PT5S
-        properties:
-          enable.auto.commit: false
-          auto.offset.reset: earliest
-          group.id: analyzer-snapshots
-          value.deserializer: ru.yandex.practicum.kafka.deserializer.SnapshotAvroDeserializer
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties.hibernate:
+      jdbc.time_zone: UTC
+      format_sql: true
+      temp.use_jdbc_metadata_defaults: false
+    hibernate.ddl-auto: none
+    show-sql: false
+  sql.init.mode: always
+  logging:
+    level:
+      ru.yandex.practicum.telemetry: DEBUG
+      ru.yandex.practicum.telemetry.analyzer: TRACE
+      ru.yandex.practicum.telemetry.analyzer.kafka: DEBUG
+      ru.yandex.practicum.kafka.deserializer: DEBUG
+      org.springframework.context.annotation: DEBUG
+      org.apache.kafka: INFO
 
 grpc:
   client:
     hub-router:
-      address: static://localhost:59090
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
       negotiationType: plaintext
 
-server:
-  port: 8083
-
-logging:
-  level:
-    # Analyzer компоненты
-    ru.yandex.practicum.telemetry.analyzer: INFO
-    ru.yandex.practicum.telemetry.analyzer.HubEventProcessor: DEBUG
-    ru.yandex.practicum.telemetry.analyzer.SnapshotProcessor: DEBUG
-    ru.yandex.practicum.telemetry.analyzer.service.SnapshotAnalyser: DEBUG
-    ru.yandex.practicum.telemetry.analyzer.dal: INFO
-
-    # Десериализаторы
-    ru.yandex.practicum.kafka.deserializer: INFO
-
-    # SQL логи
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
-    # Spring и Kafka
-    org.springframework.kafka: INFO
-    org.apache.kafka: WARN
-
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %highlight(%-5level) - %cyan(%logger{36}) - %msg%n"
+analyzer:
+  kafka:
+    common-properties:
+      "bootstrap.servers": localhost:9092
+      "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer"
+      "enable.auto.commit": false
+      "auto.offset.reset": earliest
+    consumers:
+      - type: SnapshotProcessor
+        properties:
+          "value.deserializer": "ru.yandex.practicum.kafka.deserializer.SnapshotAvroDeserializer"
+          "group.id": "telemetry.analyzer.snapshot"
+        topics:
+          - "telemetry.snapshots.v1"
+        poll-timeout: 500ms
+      - type: HubEventProcessor
+        properties:
+          "value.deserializer": "ru.yandex.practicum.kafka.deserializer.HubEventAvroDeserializer"
+          "group.id": "telemetry.analyzer.hub"
+        topics:
+          - "telemetry.hubs.v1"
+        # поток событий от хабов будет не высокой интенсивности,
+        # поэтому можно увеличить таймаут ожидания и
+        # повысить тем самым пропускную способность
+        poll-timeout: 100ms

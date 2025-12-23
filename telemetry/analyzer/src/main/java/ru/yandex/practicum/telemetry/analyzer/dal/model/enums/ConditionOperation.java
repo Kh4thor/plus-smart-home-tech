@@ -1,6 +1,7 @@
-package ru.yandex.practicum.telemetry.analyzer.dal.model;
+package ru.yandex.practicum.telemetry.analyzer.dal.model.enums;
 
 import ru.yandex.practicum.kafka.telemetry.event.ConditionOperationAvro;
+import ru.yandex.practicum.telemetry.analyzer.dal.model.Operation;
 
 public enum ConditionOperation implements Operation {
 

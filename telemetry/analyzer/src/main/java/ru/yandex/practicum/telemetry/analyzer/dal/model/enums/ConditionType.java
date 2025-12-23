@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.analyzer.dal.model;
+package ru.yandex.practicum.telemetry.analyzer.dal.model.enums;
 
 import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 
