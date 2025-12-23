@@ -3,36 +3,20 @@ spring:
     url: jdbc:postgresql://localhost:5432/plus-smart-home-tech
     username: postgres
     password: password
-    driver-class-name: org.postgresql.Driver
-  
+
   jpa:
     hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: false
-  
-  sql:
-    init:
-      mode: always
+      ddl-auto: update  # Создаст таблицы
+    show-sql: true      # Для отладки
 
 analyzer:
   kafka:
     common-properties:
       bootstrap.servers: localhost:9092
+      # НЕТ schema.registry.url и specific.avro.reader!
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
     consumers:
-      - type: SnapshotProcessor
-        topics:
-          - telemetry.snapshots.v1
-        poll-timeout: PT5S
-        properties:
-          enable.auto.commit: false
-          auto.offset.reset: earliest
-          group.id: snapshot.group.id
-          client.id: SnapshotProcessor
-          value.deserializer: ru.yandex.practicum.kafka.deserializer.SnapshotAvroDeserializer
       - type: HubEventProcessor
         topics:
           - telemetry.hubs.v1
@@ -40,17 +24,33 @@ analyzer:
         properties:
           enable.auto.commit: false
           auto.offset.reset: earliest
-          group.id: hubEvent.group.id
-          client.id: HubEventProcessor
+          group.id: analyzer-hub-events
           value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventAvroDeserializer
+          # ТОЛЬКО если нужны кастомные настройки Avro:
+          avro.serializer.buffer.bytes: "65536"
+          avro.use.logical.type.converters: "true"
+
+      - type: SnapshotProcessor
+        topics:
+          - telemetry.snapshots.v1
+        poll-timeout: PT5S
+        properties:
+          enable.auto.commit: false
+          auto.offset.reset: earliest
+          group.id: analyzer-snapshots
+          value.deserializer: ru.yandex.practicum.kafka.deserializer.SnapshotAvroDeserializer
 
 grpc:
   client:
     hub-router:
       address: static://localhost:59090
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
       negotiationType: plaintext
 
 server:
   port: 8083
+
+logging:
+  level:
+    ru.yandex.practicum.telemetry.analyzer: DEBUG
+    org.springframework.kafka: DEBUG
+    ru.yandex.practicum.kafka.deserializer: TRACE  # Логи десериализаторов
