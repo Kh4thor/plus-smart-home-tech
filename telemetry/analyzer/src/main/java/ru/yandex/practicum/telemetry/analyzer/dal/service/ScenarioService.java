@@ -1,16 +1,16 @@
 package ru.yandex.practicum.telemetry.analyzer.dal.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Action;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Condition;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Scenario;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.ConditionOperation;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.ConditionType;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.DeviceActionType;
 import ru.yandex.practicum.telemetry.analyzer.dal.repository.ActionRepository;
 import ru.yandex.practicum.telemetry.analyzer.dal.repository.ConditionRepository;
 import ru.yandex.practicum.telemetry.analyzer.dal.repository.ScenarioRepository;
@@ -30,25 +30,25 @@ public class ScenarioService {
     private final ActionRepository actionRepository;
     private final SensorRepository sensorRepository;
 
-    public Scenario save(ScenarioAddedEventAvro scenarioAddedEventAvro, String hubId) {
+    public Scenario save(ScenarioAddedEventAvro event, String hubId) {
         Set<String> sensors = new HashSet<>();
-        scenarioAddedEventAvro.getConditions().forEach(condition -> sensors.add(condition.getSensorId()));
+        event.getConditions().forEach(condition -> sensors.add(condition.getSensorId()));
+        event.getActions().forEach(action -> sensors.add(action.getSensorId()));
 
         boolean allSensorsExists = sensorRepository.existsByIdInAndHubId(sensors, hubId);
-        if (!allSensorsExists) {
+        if(!allSensorsExists) {
             throw new IllegalStateException("Нет возможности создать сценарий с использованием неизвестного устройства");
         }
 
-        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(hubId, scenarioAddedEventAvro.getName());
+        Optional<Scenario> maybeExist = scenarioRepository.findByHubIdAndName(hubId, event.getName());
 
         Scenario scenario;
-        if (scenarioOpt.isEmpty()) {
+        if(maybeExist.isEmpty()) {
             scenario = new Scenario();
-            scenario.setName(scenarioAddedEventAvro.getName());
+            scenario.setName(event.getName());
             scenario.setHubId(hubId);
         } else {
-            scenario = scenarioOpt.get();
-
+            scenario = maybeExist.get();
             Map<String, Condition> conditions = scenario.getConditions();
             conditionRepository.deleteAll(conditions.values());
             scenario.getConditions().clear();
@@ -58,47 +58,38 @@ public class ScenarioService {
             scenario.getActions().clear();
         }
 
-        for (ScenarioConditionAvro scenarioConditionAvro : scenarioAddedEventAvro.getConditions()) {
+        for (ScenarioConditionAvro eventCondition : event.getConditions()) {
             Condition condition = new Condition();
+            condition.setType(eventCondition.getType());
+            condition.setOperation(ConditionOperation.from(eventCondition.getOperation()));
+            condition.setValue(mapValue(eventCondition.getValue()));
 
-            ConditionTypeAvro conditionTypeAvro = scenarioConditionAvro.getType();
-            ConditionType conditionType = ConditionType.from(conditionTypeAvro);
-            condition.setType(conditionType);
-
-            ConditionOperationAvro conditionOperationAvro = scenarioConditionAvro.getOperation();
-            ConditionOperation conditionOperation = ConditionOperation.from(conditionOperationAvro);
-            condition.setOperation(conditionOperation);
-            condition.setValue(mapValue(scenarioConditionAvro.getValue()));
-
-            scenario.addCondition(scenarioConditionAvro.getSensorId(), condition);
+            scenario.addCondition(eventCondition.getSensorId(), condition);
         }
 
-        for (DeviceActionAvro deviceActionAvro : scenarioAddedEventAvro.getActions()) {
+        for (DeviceActionAvro eventAction : event.getActions()) {
             Action action = new Action();
-
-            ActionTypeAvro actionTypeAvro = deviceActionAvro.getType();
-            DeviceActionType deviceActionType = DeviceActionType.from(actionTypeAvro);
-            action.setType(deviceActionType);
-            if (deviceActionAvro.getType().equals(ActionTypeAvro.SET_VALUE)) {
-                action.setValue(mapValue(deviceActionAvro.getValue()));
+            action.setType(eventAction.getType());
+            if(eventAction.getType().equals(ActionTypeAvro.SET_VALUE)) {
+                action.setValue(mapValue(eventAction.getValue()));
             }
 
-            scenario.addAction(deviceActionAvro.getSensorId(), action);
+            scenario.addAction(eventAction.getSensorId(), action);
         }
+
         conditionRepository.saveAll(scenario.getConditions().values());
         actionRepository.saveAll(scenario.getActions().values());
         return scenarioRepository.save(scenario);
     }
 
     public void delete(String name, String hubId) {
-        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(hubId, name);
-
-        String message = String.format("Scenario with name '%s' and hubId '%s' not found", name, hubId);
-        Scenario scenario = scenarioOpt.orElseThrow(() -> new EntityNotFoundException(message));
-
-        conditionRepository.deleteAll(scenario.getConditions().values());
-        actionRepository.deleteAll(scenario.getActions().values());
-        scenarioRepository.delete(scenario);
+        Optional<Scenario> optScenario = scenarioRepository.findByHubIdAndName(hubId, name);
+        if(optScenario.isPresent()) {
+            Scenario scenario = optScenario.get();
+            conditionRepository.deleteAll(scenario.getConditions().values());
+            actionRepository.deleteAll(scenario.getActions().values());
+            scenarioRepository.delete(scenario);
+        }
     }
 
     private Integer mapValue(Object value) {

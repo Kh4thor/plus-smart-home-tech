@@ -13,7 +13,6 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Action;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Condition;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.Scenario;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.DeviceActionType;
 import ru.yandex.practicum.telemetry.analyzer.dal.repository.ScenarioRepository;
 
 import java.time.Instant;
@@ -109,11 +108,6 @@ public class SnapshotAnalyser {
                 .build();
         for (Map.Entry<String, Action> actionEntry : scenario.getActions().entrySet()) {
             Action scenarioAction = actionEntry.getValue();
-
-
-            DeviceActionType deviceActionType = scenarioAction.getType();
-
-
             DeviceActionProto.Builder acctionBuilder = DeviceActionProto.newBuilder()
                     .setSensorId(actionEntry.getKey())
                     .setType(map(scenarioAction.getType()));
@@ -137,13 +131,12 @@ public class SnapshotAnalyser {
         }
     }
 
-    private ActionTypeProto map(DeviceActionType type) {
+    private ActionTypeProto map(ActionTypeAvro avro) {
         for (ActionTypeProto value : ActionTypeProto.values()) {
-            if (value.name().equalsIgnoreCase(type.name())) {
+            if (value.name().equalsIgnoreCase(avro.name())) {
                 return value;
             }
         }
         return null;
     }
 }
-

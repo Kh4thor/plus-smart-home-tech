@@ -3,8 +3,8 @@ package ru.yandex.practicum.telemetry.analyzer.dal.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.ConditionOperation;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.ConditionType;
 
 @Entity
 @Getter
@@ -17,7 +17,7 @@ public class Condition {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ConditionType type;
+    private ConditionTypeAvro type;
 
     @Enumerated(EnumType.STRING)
     private ConditionOperation operation;

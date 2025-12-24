@@ -22,6 +22,7 @@ public class SnapshotServiceImpl implements SnapshotService {
     public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         // Находим снапшот состояния датчиков конкретного хаба.
         // Если снэпшот ещё не вычислялся - создаём новый.
+
         final SensorsSnapshotAvro snapshot = sensors.computeIfAbsent(
                 event.getHubId(),
                 hubId ->  // создаём новый снапшот

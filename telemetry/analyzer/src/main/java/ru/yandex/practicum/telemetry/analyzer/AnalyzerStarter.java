@@ -3,6 +3,8 @@ package ru.yandex.practicum.telemetry.analyzer;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.telemetry.analyzer.service.HubEventProcessor;
+import ru.yandex.practicum.telemetry.analyzer.service.SnapshotProcessor;
 
 @Component
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package ru.yandex.practicum.telemetry.analyzer.dal.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.telemetry.analyzer.dal.model.enums.DeviceActionType;
+import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 
 @Getter
 @Setter
@@ -16,6 +16,6 @@ public class Action {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private DeviceActionType type;
+    private ActionTypeAvro type;
     private Integer value;
 }
