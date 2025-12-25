@@ -1,19 +1,34 @@
-# ========== AGGREGATOR KAFKA ==========
-# Producer
-aggregator.kafka.producer.topic=telemetry.snapshots.v1
+sping:
+  application:
+    name: aggregator
 
-# Consumer
-aggregator.kafka.consumer.topic=telemetry.sensors.v1
-aggregator.kafka.consumer.poll-timeout=PT5S
+aggregator:
+  kafka:
+    producer:
+      topic: telemetry.snapshots.v1
+      properties:
+        bootstrap:
+          servers: localhost:9092
+        key:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+        value:
+          serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
 
-# ????? ???????? Kafka
-aggregator.kafka.producer.properties.bootstrap.servers=localhost:9092
-aggregator.kafka.producer.properties.key.serializer=org.apache.kafka.common.serialization.StringSerializer
-aggregator.kafka.producer.properties.value.serializer=ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
-
-aggregator.kafka.consumer.properties.bootstrap.servers=localhost:9092
-aggregator.kafka.consumer.properties.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-aggregator.kafka.consumer.properties.value.deserializer=ru.yandex.practicum.kafka.deserializer.SensorEventAvroDeserializer
-aggregator.kafka.consumer.properties.group.id=aggregator-group
-aggregator.kafka.consumer.properties.auto.offset.reset=earliest
-aggregator.kafka.consumer.properties.enable.auto.commit=false
+    consumer:
+      topic: telemetry.sensors.v1
+      poll-timeout: PT5S
+      properties:
+        bootstrap:
+          servers: localhost:9092
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value:
+          deserializer: ru.yandex.practicum.kafka.deserializer.SensorEventAvroDeserializer
+        group:
+          id: aggregator-group
+        auto:
+          offset:
+            reset: earliest
+        enable:
+          auto:
+            commit: false
