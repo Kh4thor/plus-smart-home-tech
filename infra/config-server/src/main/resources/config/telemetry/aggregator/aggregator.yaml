@@ -1,7 +1,3 @@
-spring:
-  application:
-    name: aggregator # имя текущего сервиса
-
 aggregator:
   kafka:
     producer: # отправитель сообщений

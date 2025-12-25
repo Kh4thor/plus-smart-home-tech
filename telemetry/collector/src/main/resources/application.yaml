@@ -1,6 +1,6 @@
 spring:
   application:
-    name: analyzer # имя текущего сервиса
+    name: collector # имя текущего сервиса
   config:
     import: configserver:http://localhost:8888 # сервер конфигураций
   cloud:

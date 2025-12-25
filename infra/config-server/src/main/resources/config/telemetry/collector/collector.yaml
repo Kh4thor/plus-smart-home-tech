@@ -1,0 +1,18 @@
+grpc:
+  server:
+    port: 59091
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic:
+      hubs: telemetry.hubs.v1
+      sensors: telemetry.sensors.v1
+    # Kafka Producer Configuration
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+      acks: all
+      retries: 3
+      request-timeout-ms: 3000
+      delivery-timeout-ms: 6000
