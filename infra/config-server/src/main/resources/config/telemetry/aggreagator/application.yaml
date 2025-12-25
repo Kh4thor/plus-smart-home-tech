@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: aggregator # имя текущего сервиса
+  config:
+    import: configserver:http://localhost:8888 # сервер конфигураций
+  cloud:
+    config:
+      fail-fast: true # aggregator падает, если конфигурационный сервер недоступен
+    retry:
+      useRandomPolicy: true
+      max-interval: 6000
+
+aggregator:
+  kafka:
+    producer: # отправитель сообщений
+      topic: telemetry.snapshots.v1 # тема для датчиков
+      properties:
+        bootstrap:
+          servers: localhost:9092 # адрес брокера (обязательный параметр)
+        key:
+          serializer: org.apache.kafka.common.serialization.StringSerializer # сериализатор ключа
+        value:
+          serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer # сериализатор значения
+
+    consumer: # потребитель сообщений
+      topic: telemetry.sensors.v1 # тема для получения данных с датчиков
+      poll-timeout: PT5S # таймаут опроса сообщений (5 секунд)
+      properties:
+        bootstrap:
+          servers: localhost:9092 # адрес брокера (обязательный параметр)
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer # десериализатор ключа
+        value:
+          deserializer: ru.yandex.practicum.kafka.deserializer.SensorEventAvroDeserializer # десериализатор значения
+        group:
+          id: aggregator-group # идентификатор группы потребителей
+        auto:
+          offset:
+            reset: earliest # начать чтение с самых старых сообщений
+        enable:
+          auto:
+            commit: false # отключить автоматический коммит офсетов
