@@ -14,21 +14,27 @@ import java.io.IOException;
 public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
 
     private final EncoderFactory encoderFactory = EncoderFactory.get();
-    private BinaryEncoder encoder;
 
+    @Override
     public byte[] serialize(String topic, SpecificRecordBase data) {
+        if (data == null) {
+            return null;
+        }
+
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            byte[] result = null;
-            encoder = encoderFactory.binaryEncoder(out, encoder);
-            if (data != null) {
-                DatumWriter<SpecificRecordBase> writer = new SpecificDatumWriter<>(data.getSchema());
-                writer.write(data, encoder);
-                encoder.flush();
-                result = out.toByteArray();
-            }
-            return result;
+            // ВАЖНО: Используем DIRECT binary encoder для union
+            BinaryEncoder encoder = encoderFactory.directBinaryEncoder(out, null);
+
+            DatumWriter<SpecificRecordBase> writer = new SpecificDatumWriter<>(data.getSchema());
+            writer.write(data, encoder);
+            encoder.flush();
+
+            return out.toByteArray();
+
         } catch (IOException ex) {
-            throw new SerializationException("Ошибка сериализации данных для топика [" + topic + "]", ex);
+            throw new SerializationException(
+                    "Ошибка сериализации " + data.getClass().getSimpleName() +
+                            " для топика [" + topic + "]", ex);
         }
     }
 }

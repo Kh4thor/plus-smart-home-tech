@@ -1,37 +1,45 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.Valid;
+import com.google.protobuf.Empty;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import net.devh.boot.grpc.server.service.GrpcService;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.KafkaEventSender;
-import ru.yandex.practicum.model.hubevent.HubEvent;
-import ru.yandex.practicum.model.sensor.SensorEvent;
+import telemetry.service.collector.CollectorControllerGrpc;
 
 @Slf4j
-@Validated
-@RestController
-@RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
-public class EventController {
+@GrpcService
+public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
+
     private final KafkaEventSender kafkaEventSender;
 
     public EventController(KafkaEventSender kafkaEventSender) {
         this.kafkaEventSender = kafkaEventSender;
     }
 
-    @PostMapping("/sensors")
-    public boolean collectSensorEvent(@Valid @RequestBody SensorEvent sensorEvent) {
-        log.info("json: {}", sensorEvent.toString());
-        return kafkaEventSender.send(sensorEvent);
+    @Override
+    public void collectHubEvent(HubEventProto hubProto, StreamObserver<Empty> responseObserver) {
+        try {
+            kafkaEventSender.send(hubProto);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
+        }
     }
 
-    @PostMapping("/hubs")
-    public boolean collectHubEvent(@RequestBody @Valid HubEvent hubEvent) {
-        log.info("json: {}", hubEvent.toString());
-        return kafkaEventSender.send(hubEvent);
+    @Override
+    public void collectSensorEvent(SensorEventProto sensorProto, StreamObserver<Empty> responseObserver) {
+        try {
+            kafkaEventSender.send(sensorProto);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
+        }
     }
 }
