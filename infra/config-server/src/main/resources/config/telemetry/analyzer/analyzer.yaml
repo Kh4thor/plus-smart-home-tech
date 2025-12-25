@@ -1,4 +1,5 @@
 spring:
+  #Db connection
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/plus-smart-home-tech
