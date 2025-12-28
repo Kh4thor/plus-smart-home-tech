@@ -16,3 +16,6 @@ grpc:
       retries: 3
       request-timeout-ms: 3000
       delivery-timeout-ms: 6000
+
+server:
+  port: 8080
