@@ -9,3 +9,8 @@ spring:
     retry:
       useRandomPolicy: true #случайная экспоненциальная выдержка между ретраями
       max-interval: 6000 #максимально возможный интервал, после которого fail
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
