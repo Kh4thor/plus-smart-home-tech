@@ -22,7 +22,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateByAdmin(Product toUpdate) {
+    public Product update(Product toUpdate) {
         UUID id = toUpdate.getProductId();
         Product current = productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
 
@@ -58,6 +58,14 @@ public class ProductService {
             current.setQuantityState(toUpdate.getQuantityState());
         }
         Product updated = productRepository.save(current);
+        return true;
+    }
+
+    public boolean remove(UUID id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException();
+        }
+        productRepository.deleteById(id);
         return true;
     }
 }
