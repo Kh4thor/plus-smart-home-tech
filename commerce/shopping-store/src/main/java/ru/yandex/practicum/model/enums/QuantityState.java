@@ -1,6 +1,6 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.model.enums;
 
-public enum Quantity {
+public enum QuantityState {
     ENDED, // товар закончился
     FEW, // осталось меньше 10 ед.
     ENOUGH, // осталось от 10 до 100 ед.
