@@ -1,13 +1,17 @@
 package ru.yandex.practicum.exception;
 
 
-import org.springframework.http.HttpStatus;
+import jakarta.ws.rs.NotFoundException;
+import lombok.Getter;
 
-public class ProductNotFoundException extends RuntimeException {
-    private Cause cause;
-    private StackTrace stackTrace;
-    private HttpStatus httpStatus;
-    private String userMessage;
-    private String message;
-    private Suppressed suppressed;
+import java.util.UUID;
+
+@Getter
+public class ProductNotFoundException extends NotFoundException {
+    private final String userMessage;
+
+    public ProductNotFoundException(String errorMessage, UUID id) {
+        super("Product id=" + id + " not found");
+        this.userMessage = errorMessage;
+    }
 }

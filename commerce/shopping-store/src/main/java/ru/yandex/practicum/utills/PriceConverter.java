@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model.utills;
+package ru.yandex.practicum.utills;
 
 public class PriceConverter {
 

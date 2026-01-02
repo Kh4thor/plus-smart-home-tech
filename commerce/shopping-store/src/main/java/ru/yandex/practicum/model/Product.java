@@ -1,13 +1,10 @@
 package ru.yandex.practicum.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.*;
-import jakarta.validation.constraints.NotNull;
-import ru.yandex.practicum.model.enums.ProductCategory;
-import ru.yandex.practicum.model.enums.ProductState;
-import ru.yandex.practicum.model.enums.QuantityState;
+import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.enums.ProductState;
+import ru.yandex.practicum.enums.QuantityState;
 
 import java.util.UUID;
 

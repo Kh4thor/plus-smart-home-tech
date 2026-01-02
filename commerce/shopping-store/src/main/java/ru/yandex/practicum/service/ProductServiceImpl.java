@@ -15,7 +15,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getById(UUID id) {
-        return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+        String userMessage = "Unable to get product by id";
+        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
     }
 
     @Override
@@ -26,8 +27,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public Product update(Product toUpdate) {
+        String userMessage = "Unable to update product";
         UUID id = toUpdate.getProductId();
-        Product current = productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+        Product current = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
 
         if (toUpdate.getProductName() != null) {
             current.setProductName(toUpdate.getProductName());
@@ -56,8 +58,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public boolean updateQuantityState(Product toUpdate) {
+        String userMessage = "Unable to update product quantity state";
         UUID id = toUpdate.getProductId();
-        Product current = productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+        Product current = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
         if (toUpdate.getQuantityState() != null) {
             current.setQuantityState(toUpdate.getQuantityState());
         }
@@ -68,7 +71,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean remove(UUID id) {
         if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException();
+            String userMessage = "Unable to remove product by id";
+            throw new ProductNotFoundException(userMessage, id);
         }
         productRepository.deleteById(id);
         return true;
