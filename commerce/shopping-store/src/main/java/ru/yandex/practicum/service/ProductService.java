@@ -1,8 +1,8 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.dto.PageableDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.Product;
 
 import java.util.List;
@@ -19,5 +19,5 @@ public interface ProductService {
 
     boolean remove(UUID id);
 
-    List<ProductDto> findByFilter(ProductCategory category, PageableDto pageableDto);
+    List<ProductDto> findByCategoryAndPageable(ProductCategory category, Pageable pageable);
 }

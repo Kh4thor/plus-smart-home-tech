@@ -3,12 +3,13 @@ package ru.yandex.practicum.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.PageableDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.exception.ProductNotFoundException;
+import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
+import ru.yandex.practicum.utills.ProductMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,8 +21,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Override
-    public List<ProductDto> findByFilter(ProductCategory category, PageableDto pageableDto) {
-        return List.of();
+    public List<ProductDto> findByCategoryAndPageable(ProductCategory category, Pageable pageable) {
+        return productRepository.findByCategoryAndPageable(category, pageable).stream()
+                .map(ProductMapper::toProductDto)
+                .toList();
     }
 
     @Override
@@ -35,13 +38,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product create(Product product) {
-        Product created =  productRepository.save(product);
+        Product created = productRepository.save(product);
         log.info("Product has been created: {}", created);
         return created;
     }
 
-    @Transactional
+
     @Override
+    @Transactional
     public Product update(Product toUpdate) {
         String userMessage = "Unable to update product";
         UUID id = toUpdate.getProductId();
@@ -73,12 +77,12 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product updated = productRepository.save(current);
-        log.info("Product has been updated: {}", updated);
+        log.info("Product has been updated to: {}", updated);
         return updated;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public boolean updateQuantityState(Product toUpdate) {
         String userMessage = "Unable to update product quantity state";
         UUID id = toUpdate.getProductId();
@@ -87,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
             current.setQuantityState(toUpdate.getQuantityState());
         }
         Product updated = productRepository.save(current);
-        log.info("QuantityState has been updated: {}", updated.getQuantityState());
+        log.info("QuantityState has been updated to: {}", updated.getQuantityState());
         return true;
     }
 

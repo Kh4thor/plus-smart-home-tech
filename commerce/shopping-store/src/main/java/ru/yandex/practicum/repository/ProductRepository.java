@@ -1,19 +1,17 @@
 package ru.yandex.practicum.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.dto.PageableDto;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.model.Product;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-@Service
-public interface ProductRepository extends JpaRepository<Product, UUID>, QuerydslPredicateExecutor<Product> {
+@Repository
+public interface ProductRepository extends JpaRepository<Product, UUID>, QuerydslPredicateExecutor<Product>, CustomQueryDSL {
 
-    public default List<Product> findByFilter(PageableDto pageableDto) {
-        return new ArrayList<>();
-    }
+    Page<Product> findByCategory(ProductCategory category, Pageable pageable);
 }

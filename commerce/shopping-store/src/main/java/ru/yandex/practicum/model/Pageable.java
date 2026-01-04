@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dto;
+package ru.yandex.practicum.model;
 
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageableDto {
+public class Pageable {
 
     @Min(value = 0, message = "Значение page не может быть меньше 0")
     private Integer page;
