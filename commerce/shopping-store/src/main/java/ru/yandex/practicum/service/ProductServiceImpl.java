@@ -1,27 +1,43 @@
 package ru.yandex.practicum.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.PageableDto;
+import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
 
+import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
 
     @Override
+    public List<ProductDto> findByFilter(ProductCategory category, PageableDto pageableDto) {
+        return List.of();
+    }
+
+    @Override
     public Product getById(UUID id) {
         String userMessage = "Unable to get product by id";
-        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
+        return productRepository.findById(id).orElseThrow(() -> {
+            log.warn("Unable to get product by id={}", id);
+            return new ProductNotFoundException(userMessage, id);
+        });
     }
 
     @Override
     public Product create(Product product) {
-        return productRepository.save(product);
+        Product created =  productRepository.save(product);
+        log.info("Product has been created: {}", created);
+        return created;
     }
 
     @Transactional
@@ -29,7 +45,10 @@ public class ProductServiceImpl implements ProductService {
     public Product update(Product toUpdate) {
         String userMessage = "Unable to update product";
         UUID id = toUpdate.getProductId();
-        Product current = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
+        Product current = productRepository.findById(id).orElseThrow(() -> {
+            log.warn("Unable to update product={}", id);
+            return new ProductNotFoundException(userMessage, id);
+        });
 
         if (toUpdate.getProductName() != null) {
             current.setProductName(toUpdate.getProductName());
@@ -52,7 +71,10 @@ public class ProductServiceImpl implements ProductService {
         if (toUpdate.getProductCategory() != null) {
             current.setProductCategory(toUpdate.getProductCategory());
         }
-        return productRepository.save(current);
+
+        Product updated = productRepository.save(current);
+        log.info("Product has been updated: {}", updated);
+        return updated;
     }
 
     @Transactional
@@ -65,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
             current.setQuantityState(toUpdate.getQuantityState());
         }
         Product updated = productRepository.save(current);
+        log.info("QuantityState has been updated: {}", updated.getQuantityState());
         return true;
     }
 
@@ -75,6 +98,7 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductNotFoundException(userMessage, id);
         }
         productRepository.deleteById(id);
+        log.info("Product has been removed id:{}", id);
         return true;
     }
 }

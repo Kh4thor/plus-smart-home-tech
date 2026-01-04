@@ -4,11 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.dto.PageableDto;
 import ru.yandex.practicum.dto.ProductDto;
-import ru.yandex.practicum.utills.ProductMapper;
+import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
+import ru.yandex.practicum.utills.ProductMapper;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -17,6 +20,12 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<ProductDto> getAllProducts(@RequestParam ProductCategory category, PageableDto pageableDto) {
+    return productService.findByFilter(category, pageableDto);
+}
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
