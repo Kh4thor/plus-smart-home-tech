@@ -1,10 +1,12 @@
 package ru.yandex.practicum.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
@@ -16,9 +18,10 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public List<ProductDto> findByCategory(ProductCategory category, Pageable pageable) {
@@ -82,12 +85,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean updateQuantityState(Product toUpdate) {
+    public boolean updateQuantityState(SetProductQuantityStateRequest request) {
         String userMessage = "Unable to update product quantity state";
-        UUID id = toUpdate.getProductId();
+        UUID id = request.getProductId();
         Product current = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
-        if (toUpdate.getQuantityState() != null) {
-            current.setQuantityState(toUpdate.getQuantityState());
+        if (request.getQuantityState() != null) {
+            current.setQuantityState(request.getQuantityState());
         }
         Product updated = productRepository.save(current);
         log.info("QuantityState has been updated to: {}", updated.getQuantityState());
@@ -105,3 +108,5 @@ public class ProductServiceImpl implements ProductService {
         return true;
     }
 }
+
+

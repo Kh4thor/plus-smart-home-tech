@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import org.springframework.data.domain.Pageable;
 import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.model.Product;
 
@@ -15,7 +16,7 @@ public interface ProductService {
 
     Product update(Product toUpdate);
 
-    boolean updateQuantityState(Product toUpdate);
+    boolean updateQuantityState(SetProductQuantityStateRequest request);
 
     boolean remove(UUID id);
 
