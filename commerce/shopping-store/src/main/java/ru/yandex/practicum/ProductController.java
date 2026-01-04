@@ -1,16 +1,15 @@
 package ru.yandex.practicum;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.enums.ProductCategory;
-import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
 import ru.yandex.practicum.utills.ProductMapper;
@@ -30,7 +29,12 @@ public class ProductController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProductDto> getAllProducts(@RequestParam ProductCategory category, @RequestParam Pageable pageable) {
-        return productService.findByCategoryAndPageable(category, pageable);
+        log.debug("API: GET /api/v1/shopping-store: GET /products?category={}&page={}&size={}&sort={}",
+                category,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSort());
+        return productService.findByCategory(category, pageable);
     }
 
     @PutMapping
@@ -67,13 +71,5 @@ public class ProductController {
     public ProductDto getProduct(@PathVariable UUID productId) {
         Product product = productService.getById(productId);
         return ProductMapper.toProductDto(product);
-    }
-
-    private Pageable toPageable(String json) throws JsonProcessingException {
-        try {
-            return objectMapper.readValue(json, Pageable.class);
-        } catch (JsonProcessingException | IllegalArgumentException e) {
-            throw new BadRequestException("Expected fields: page, size, sort");
-        }
     }
 }

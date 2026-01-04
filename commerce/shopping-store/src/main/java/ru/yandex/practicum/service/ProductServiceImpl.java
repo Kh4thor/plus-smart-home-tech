@@ -1,12 +1,12 @@
 package ru.yandex.practicum.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.exception.ProductNotFoundException;
-import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.utills.ProductMapper;
@@ -21,8 +21,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Override
-    public List<ProductDto> findByCategoryAndPageable(ProductCategory category, Pageable pageable) {
-        return productRepository.findByCategoryAndPageable(category, pageable).stream()
+    public List<ProductDto> findByCategory(ProductCategory category, Pageable pageable) {
+        return productRepository.findByProductCategory(category, pageable).stream()
                 .map(ProductMapper::toProductDto)
                 .toList();
     }
@@ -42,7 +42,6 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product has been created: {}", created);
         return created;
     }
-
 
     @Override
     @Transactional
