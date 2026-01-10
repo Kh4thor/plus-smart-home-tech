@@ -1,7 +1,6 @@
 package ru.yandex.practicum.service;
 
 import org.springframework.data.domain.Pageable;
-import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.model.Product;
@@ -20,5 +19,5 @@ public interface ProductService {
 
     boolean remove(UUID id);
 
-    List<ProductDto> findByCategory(ProductCategory category, Pageable pageable);
+    List<Product> findByCategory(ProductCategory category, Pageable pageable);
 }

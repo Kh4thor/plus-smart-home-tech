@@ -45,9 +45,7 @@ public class ProductController {
      * @param category категория товаров для фильтрации (обязательный параметр)
      * @param pageable параметры пагинации и сортировки (обязательный параметр)
      * @return список {@link ProductDto} товаров, соответствующих критериям
-     *
      * @apiNote Пример запроса: {@code GET /api/v1/shopping-store?category=LIGHTING&page=0&size=20&sort=price,desc}
-     *
      * @see ProductCategory
      * @see Pageable
      * @see ProductDto
@@ -60,7 +58,9 @@ public class ProductController {
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 pageable.getSort());
-        return productService.findByCategory(category, pageable);
+        return productService.findByCategory(category, pageable).stream()
+                .map(ProductMapper::toProductDto)
+                .toList();
     }
 
     /**
@@ -70,10 +70,8 @@ public class ProductController {
      * @param productDto DTO с данными нового товара (обязательный параметр)
      * @return {@link ProductDto} созданного товара с присвоенным ID
      * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
-     *
      * @apiNote Использует HTTP метод PUT для создания, что нестандартно для REST,
-     *          но соответствует спецификации проекта
-     *
+     * но соответствует спецификации проекта
      * @see ProductDto
      * @see Product
      */
@@ -95,10 +93,8 @@ public class ProductController {
      * @param productDto DTO с обновленными данными товара (обязательный параметр)
      * @return {@link ProductDto} обновленного товара
      * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
-     * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
-     *
+     * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
      * @apiNote Для частичного обновления используйте соответствующие эндпоинты
-     *
      * @see ProductDto
      * @see Product
      */
@@ -119,10 +115,8 @@ public class ProductController {
      * @param productId UUID идентификатор товара для удаления (обязательный параметр)
      * @return {@code true} если товар успешно удален, {@code false} в случае ошибки
      * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
-     *
      * @apiNote Использует HTTP метод POST для удаления, что нестандартно для REST,
-     *          но соответствует спецификации проекта
-     *
+     * но соответствует спецификации проекта
      * @see UUID
      */
     @PostMapping("/removeProductFromStore")
@@ -145,12 +139,10 @@ public class ProductController {
      * @param request DTO с идентификатором товара и новым статусом количества (обязательный параметр)
      * @return {@code true} если статус успешно обновлен, {@code false} в случае ошибки
      * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
-     * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
-     *
+     * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
      * @apiNote Пример запроса:
-     *          {@code POST /api/v1/shopping-store/quantityState}
-     *          Body: {"productId": "uuid", "quantityState": "FEW"}
-     *
+     * {@code POST /api/v1/shopping-store/quantityState}
+     * Body: {"productId": "uuid", "quantityState": "FEW"}
      * @see SetProductQuantityStateRequest
      * @see ru.yandex.practicum.enums.QuantityState
      */
@@ -172,9 +164,7 @@ public class ProductController {
      * @param productId UUID идентификатор товара (обязательный параметр пути)
      * @return {@link ProductDto} с полной информацией о товаре
      * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
-     *
      * @apiNote Пример запроса: {@code GET /api/v1/shopping-store/{productId}}
-     *
      * @see ProductDto
      * @see UUID
      */

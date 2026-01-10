@@ -5,13 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
-import ru.yandex.practicum.utills.ProductMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,10 +22,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public List<ProductDto> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategoryAndIsRemovedFalse(category, pageable).stream()
-                .map(ProductMapper::toProductDto)
-                .toList();
+    public List<Product> findByCategory(ProductCategory category, Pageable pageable) {
+        return productRepository.findByProductCategoryAndIsRemovedFalse(category, pageable);
     }
 
     @Override
@@ -77,7 +73,6 @@ public class ProductServiceImpl implements ProductService {
         if (toUpdate.getProductCategory() != null) {
             current.setProductCategory(toUpdate.getProductCategory());
         }
-
         log.info("Product has been updated to: {}", current);
         return current;
     }
