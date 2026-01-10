@@ -31,17 +31,23 @@ public class Product {
     @Column(name = "image_src")
     private String imageSrc;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "quantity_state", nullable = false)
     private QuantityState quantityState;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "product_state", nullable = false)
     private ProductState productState;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "product_category")
     private ProductCategory productCategory;
 
     @Column(name = "price")
     private Integer price;
+
+    @Column(name = "removed")
+    private boolean removed;
 }
 
 

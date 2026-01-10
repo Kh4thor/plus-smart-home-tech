@@ -7,10 +7,12 @@ import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.model.Product;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    List<Product> findByProductCategory(ProductCategory productCategory, Pageable pageable);
+    List<Product> findByProductCategoryAndIsRemovedFalse(ProductCategory productCategory, Pageable pageable);
+    Optional<Product> findByProductIdAndIsRemovedFalse(UUID productId);
 }

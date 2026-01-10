@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class ShoppingCartDto {
 
-   private String cartId;
-
+   private String shoppingCartId;
    private Map<UUID, Integer> products;
 }

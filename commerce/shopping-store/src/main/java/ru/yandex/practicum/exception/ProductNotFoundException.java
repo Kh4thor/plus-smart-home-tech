@@ -10,8 +10,8 @@ import java.util.UUID;
 public class ProductNotFoundException extends NotFoundException {
     private final String userMessage;
 
-    public ProductNotFoundException(String errorMessage, UUID id) {
+    public ProductNotFoundException(String userMessage, UUID id) {
         super("Product id=" + id + " not found");
-        this.userMessage = errorMessage;
+        this.userMessage = userMessage;
     }
 }

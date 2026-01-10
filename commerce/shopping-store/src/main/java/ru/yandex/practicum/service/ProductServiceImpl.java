@@ -25,16 +25,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategory(category, pageable).stream()
+        return productRepository.findByProductCategoryAndIsRemovedFalse(category, pageable).stream()
                 .map(ProductMapper::toProductDto)
                 .toList();
     }
 
     @Override
     public Product getById(UUID id) {
-        String userMessage = "Unable to get product by id";
-        return productRepository.findById(id).orElseThrow(() -> {
-            log.warn("Unable to get product by id={}", id);
+        String userMessage = "Unable to get product";
+        return productRepository.findByProductIdAndIsRemovedFalse(id).orElseThrow(() -> {
+            log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
     }
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
         String userMessage = "Unable to update product";
         UUID id = toUpdate.getProductId();
         Product current = productRepository.findById(id).orElseThrow(() -> {
-            log.warn("Unable to update product={}", id);
+            log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
 
@@ -78,9 +78,8 @@ public class ProductServiceImpl implements ProductService {
             current.setProductCategory(toUpdate.getProductCategory());
         }
 
-        Product updated = productRepository.save(current);
-        log.info("Product has been updated to: {}", updated);
-        return updated;
+        log.info("Product has been updated to: {}", current);
+        return current;
     }
 
     @Override
@@ -88,25 +87,30 @@ public class ProductServiceImpl implements ProductService {
     public boolean updateQuantityState(SetProductQuantityStateRequest request) {
         String userMessage = "Unable to update product quantity state";
         UUID id = request.getProductId();
-        Product current = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(userMessage, id));
+        Product current = productRepository.findByProductIdAndIsRemovedFalse(id)
+                .orElseThrow(() -> {
+                    log.warn("{} id={}", userMessage, id);
+                    return new ProductNotFoundException(userMessage, id);
+                });
         if (request.getQuantityState() != null) {
             current.setQuantityState(request.getQuantityState());
         }
-        Product updated = productRepository.save(current);
-        log.info("QuantityState has been updated to: {}", updated.getQuantityState());
+        log.info("QuantityState has been updated for product id={} to {}",
+                id, current.getQuantityState());
         return true;
     }
 
     @Override
+    @Transactional
     public boolean remove(UUID id) {
-        if (!productRepository.existsById(id)) {
-            String userMessage = "Unable to remove product by id";
-            throw new ProductNotFoundException(userMessage, id);
-        }
-        productRepository.deleteById(id);
-        log.info("Product has been removed id:{}", id);
-        return true;
+        String userMessage = "Unable to remove product";
+        Product current = productRepository.findByProductIdAndIsRemovedFalse(id).orElseThrow(() -> {
+            log.warn("{} id={}", userMessage, id);
+            return new ProductNotFoundException(userMessage, id);
+        });
+
+        current.setRemoved(true);
+        log.info("Product has been removed id={}", id);
+        return current.isRemoved();
     }
 }
-
-
