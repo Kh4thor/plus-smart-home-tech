@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.AddressDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.dto.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
+import ru.yandex.practicum.service.WarehouseService;
 
 @Slf4j
 @RestController

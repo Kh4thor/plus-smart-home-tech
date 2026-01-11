@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
