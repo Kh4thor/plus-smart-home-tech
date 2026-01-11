@@ -12,4 +12,11 @@ public class ShoppingCartMapper {
                 .products(shoppingCart.getProducts())
                 .build();
     }
+
+    public static ShoppingCart toShoppingCart(ShoppingCartDto shoppingCartDto, String username) {
+        return ShoppingCart.builder()
+                .username(username)
+                .products(shoppingCartDto.getProducts())
+                .build();
+    }
 }

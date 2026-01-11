@@ -2,6 +2,7 @@ package ru.yandex.practicum.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
 import ru.yandex.practicum.enums.ProductCategory;
@@ -19,10 +20,10 @@ public class ProductDto {
 
     private UUID productId;
 
-    @NotNull(message = "Поле productName не может быть null")
+    @NotBlank(message = "Поле productName не может быть пустым")
     private String productName;
 
-    @NotNull(message = "Поле description не может быть null")
+    @NotBlank(message = "Поле description не может быть пустым")
     private String description;
 
     private String imageSrc;
