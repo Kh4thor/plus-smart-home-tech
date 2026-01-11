@@ -1,14 +1,21 @@
 package ru.yandex.practicum.model;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import ru.yandex.practicum.dto.DimensionDto;
 
 import java.util.UUID;
 
 public class NewProductInWarehouseRequest {
 
+    @NotNull
     private UUID productId;
+
     private boolean fragile;
+
+    @NotNull(message = "Объект dimension не может быть null")
     private DimensionDto dimension;
 
-
+    @DecimalMin(value = "1.0")
+    private Double weight;
 }

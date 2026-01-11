@@ -14,10 +14,10 @@ public class DimensionDto {
     private Double width;
 
     @NotNull(message = "Поле height не может быть null")
-    @DecimalMin(value = "1.0", message = "Значение поля width не может быть меньше 1.0")
+    @DecimalMin(value = "1.0", message = "Значение поля height не может быть меньше 1.0")
     private Double height;
 
     @NotNull(message = "Поле depth не может быть null")
-    @DecimalMin(value = "1.0", message = "Значение поля width не может быть меньше 1.0")
+    @DecimalMin(value = "1.0", message = "Значение поля depth не может быть меньше 1.0")
     private Double depth;
 }
