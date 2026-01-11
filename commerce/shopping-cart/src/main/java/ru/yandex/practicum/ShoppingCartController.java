@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.ChangeQuantityDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.service.ShoppingCartMapper;
@@ -24,7 +25,7 @@ public class ShoppingCartController {
 
     @GetMapping
     public ShoppingCartDto getShoppingCart(@RequestParam @NotBlank String username) {
-        ShoppingCart retrieved = shoppingCartService.getShoppingCart(username);
+        ShoppingCart retrieved = shoppingCartService.getShoppingCart(username.trim());
         return ShoppingCartMapper.toShoppingCartDto(retrieved);
     }
 
@@ -33,14 +34,14 @@ public class ShoppingCartController {
     public ShoppingCartDto putShoppingCart(
             @RequestBody @Valid ShoppingCartDto shoppingCartDto,
             @RequestParam @NotBlank String username) {
-        ShoppingCart saved = shoppingCartService.save(shoppingCartDto, username);
+        ShoppingCart saved = shoppingCartService.save(shoppingCartDto, username.trim());
         return ShoppingCartMapper.toShoppingCartDto(saved);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public boolean deleteShoppingCart(@RequestParam @NotBlank String username) {
-        return shoppingCartService.deleteShoppingCartBy(username);
+        return shoppingCartService.deleteShoppingCartBy(username.trim());
     }
 
     @PostMapping("/remove")
@@ -54,5 +55,10 @@ public class ShoppingCartController {
 
     @PostMapping("change-quantity")
     @ResponseStatus(HttpStatus.OK)
-    public void changeQuantity()
+    public ShoppingCartDto changeQuantity(
+            @RequestParam @NotBlank String username,
+            @RequestBody ChangeQuantityDto changeQuantityDto) {
+        ShoppingCart shoppingCart = shoppingCartService.changeQuantity(username.trim(), changeQuantityDto);
+        return ShoppingCartMapper.toShoppingCartDto(shoppingCart);
+    }
 }

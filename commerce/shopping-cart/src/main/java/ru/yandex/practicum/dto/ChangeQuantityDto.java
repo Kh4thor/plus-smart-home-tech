@@ -2,9 +2,15 @@ package ru.yandex.practicum.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.*;
 
 import java.util.UUID;
 
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChangeQuantityDto {
 
     @NotNull(message = "Значение поля productId не может быть null")

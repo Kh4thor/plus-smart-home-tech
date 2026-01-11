@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.ChangeQuantityDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
+import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.exception.ShoppingCartNotFoundException;
 import ru.yandex.practicum.model.ShoppingCart;
 
@@ -46,6 +48,13 @@ public class ShoppingCartService {
 
     @Transactional
     public ShoppingCart removeShoppingCartBy(String username, List<UUID> productIds) {
+
+        String userMessage = "Unable to remove shopping cart";
+        shoppingCartRepository.findByUsername(username).orElseThrow(() -> {
+            log.warn("{} by username={}", userMessage, username);
+            return new ShoppingCartNotFoundException(userMessage, username);
+        });
+
         ShoppingCart shoppingCart = getShoppingCart(username);
         Map<UUID, Integer> products = shoppingCart.getProducts();
         productIds.forEach(products::remove);
@@ -53,5 +62,16 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public
+    public ShoppingCart changeQuantity(String username, ChangeQuantityDto changeQuantityDto) {
+        ShoppingCart shoppingCart = getShoppingCart(username);
+        Map<UUID, Integer> products = shoppingCart.getProducts();
+        UUID productId = changeQuantityDto.getProductId();
+        Integer newQuantity = changeQuantityDto.getNewQuantity();
+        if (!products.containsKey(productId)) {
+            String userMessage = "Unable to change quantity";
+            throw new ProductNotFoundException(userMessage, productId);
+        }
+        products.put(changeQuantityDto.getProductId(), changeQuantityDto.getNewQuantity());
+        return shoppingCart;
+    }
 }
