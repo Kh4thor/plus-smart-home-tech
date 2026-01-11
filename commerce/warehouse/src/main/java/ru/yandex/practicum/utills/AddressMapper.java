@@ -5,7 +5,7 @@ import ru.yandex.practicum.model.Address;
 
 public class AddressMapper {
 
-    public AddressDto toAddressDto(Address address) {
+    public static AddressDto toAddressDto(Address address) {
         if (address == null)
             return null;
 
@@ -18,7 +18,7 @@ public class AddressMapper {
                 .build();
     }
 
-    public Address toAddress(AddressDto addressDto) {
+    public static Address toAddress(AddressDto addressDto) {
         if (addressDto == null)
             return null;
 

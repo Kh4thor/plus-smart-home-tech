@@ -2,9 +2,13 @@ package ru.yandex.practicum.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
+@Builder
 public class NewProductInWarehouseRequest {
 
     @NotNull

@@ -5,7 +5,7 @@ import ru.yandex.practicum.model.Dimension;
 
 public class DimensionMapper {
 
-    public Dimension toDimension(DimensionDto dimensionDto) {
+    public static Dimension toDimension(DimensionDto dimensionDto) {
         if (dimensionDto == null)
             return null;
 
@@ -16,7 +16,7 @@ public class DimensionMapper {
                 .build();
     }
 
-    public DimensionDto toDimensionDto(Dimension dimension) {
+    public static DimensionDto toDimensionDto(Dimension dimension) {
         if (dimension == null)
             return null;
 
