@@ -5,8 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.AddressDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
-import ru.yandex.practicum.model.AddProductToWarehouseRequest;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
+import ru.yandex.practicum.repository.WarehouseRepository;
 
 @Service
 @RequiredArgsConstructor

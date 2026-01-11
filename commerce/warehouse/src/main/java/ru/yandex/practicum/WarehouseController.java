@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.AddressDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
-import ru.yandex.practicum.model.AddProductToWarehouseRequest;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
 
 @Slf4j
 @RestController

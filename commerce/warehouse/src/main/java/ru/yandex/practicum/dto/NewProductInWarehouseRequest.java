@@ -1,8 +1,7 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import ru.yandex.practicum.dto.DimensionDto;
 
 import java.util.UUID;
 
