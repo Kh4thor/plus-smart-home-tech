@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 public class NewProductInWarehouseRequest {
 
-    @NotNull
+    @NotNull(message = "Поле productId не может быть null")
     private UUID productId;
 
     private boolean fragile;

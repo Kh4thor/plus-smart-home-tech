@@ -1,7 +1,7 @@
 package ru.yandex.practicum.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Map;
@@ -17,6 +17,6 @@ public class ShoppingCartDto {
     private UUID shoppingCartId;
 
     @NotNull(message = "Список products не может быть null")
-    @Size(min = 1)
+    @NotEmpty(message = "Список товаров не может быть пустым")
     private Map<UUID, Integer> products;
 }

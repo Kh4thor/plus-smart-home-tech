@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.AddressDto;
-import ru.yandex.practicum.dto.ShoppingCartDto;
-import ru.yandex.practicum.dto.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.*;
 import ru.yandex.practicum.service.WarehouseService;
 
 @Slf4j
@@ -21,14 +18,14 @@ public class WarehouseController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public void registerProduct(@RequestBody @Valid NewProductInWarehouseRequest newProduct) {
-        warehouseService.registerProduct(newProduct);
+    public void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest newProduct) {
+        warehouseService.registerNewProduct(newProduct);
     }
 
     @PostMapping("/check")
     @ResponseStatus(HttpStatus.OK)
-    public void checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto) {
-        warehouseService.checkProductQuantity(shoppingCartDto);
+    public BookedProductsDto checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto) {
+        return warehouseService.checkProductQuantity(shoppingCartDto);
     }
 
     @PostMapping("/add")
