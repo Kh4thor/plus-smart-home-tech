@@ -36,7 +36,7 @@ public class WarehouseController {
 
     @GetMapping("/address")
     @ResponseStatus(HttpStatus.OK)
-    public void getAddress(@RequestBody @Valid AddressDto addressDto) {
-        warehouseService.getAddress(addressDto);
+    public AddressDto getAddress(@RequestBody @Valid AddressDto addressDto) {
+        return warehouseService.getAddress(addressDto);
     }
 }

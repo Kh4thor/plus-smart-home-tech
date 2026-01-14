@@ -7,10 +7,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface WarehouseRepository extends JpaRepository<WarehouseProduct, UUID> {
 
+    default Map<UUID, WarehouseProduct> findAllAsMapByIds(Set<UUID> productIds) {
+        return findAllById(productIds).stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+    }
+
     Optional<WarehouseProduct> findByProductId(UUID productId);
 
-    Map<UUID, WarehouseProduct> findAllAsMapByIds(Set<UUID> productIds);
+    boolean existsByProductId(UUID productId);
 }
