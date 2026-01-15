@@ -1,14 +1,12 @@
--- Таблица shopping_carts
 CREATE TABLE shopping_carts (
     cart_id UUID PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    status VARCHAR(50) NOT NULL
+    username VARCHAR(255),
+    status VARCHAR(50)
 );
 
--- Таблица cart_products для Map<UUID, Integer> products
 CREATE TABLE cart_products (
     cart_id UUID NOT NULL REFERENCES shopping_carts(cart_id) ON DELETE CASCADE,
-    product_id UUID NOT NULL,
-    quantity INTEGER NOT NULL,
+    product_id UUID,
+    quantity INTEGER,
     PRIMARY KEY (cart_id, product_id)
 );
