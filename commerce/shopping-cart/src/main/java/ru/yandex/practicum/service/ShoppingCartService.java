@@ -10,6 +10,8 @@ import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.exception.ShoppingCartNotFoundException;
 import ru.yandex.practicum.model.ShoppingCart;
+import ru.yandex.practicum.repository.ShoppingCartRepository;
+import ru.yandex.practicum.utills.ShoppingCartMapper;
 
 import java.util.List;
 import java.util.Map;

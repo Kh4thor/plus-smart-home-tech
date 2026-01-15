@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.ChangeQuantityDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.model.ShoppingCart;
-import ru.yandex.practicum.service.ShoppingCartMapper;
+import ru.yandex.practicum.utills.ShoppingCartMapper;
 import ru.yandex.practicum.service.ShoppingCartService;
 
 import java.util.List;
