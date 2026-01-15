@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -27,7 +27,6 @@ import java.util.UUID;
  * @see Product
  * @see ProductDto
  * @see ProductService
- * @since 1.0
  */
 @Slf4j
 @RestController

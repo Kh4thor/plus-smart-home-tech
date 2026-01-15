@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -41,6 +41,8 @@ public class ShoppingCartController {
      *
      * @param username имя пользователя, чью корзину нужно получить
      * @return DTO корзины покупок с товарами пользователя
+     * @see ShoppingCart
+     * @see ShoppingCartDto
      * @throws jakarta.validation.ConstraintViolationException если username пустой или null
      * @see ShoppingCartService#getShoppingCart(String)
      */
