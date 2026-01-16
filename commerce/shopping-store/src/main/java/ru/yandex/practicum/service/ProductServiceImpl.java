@@ -23,13 +23,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategoryAndIsRemovedFalse(category, pageable);
+        return productRepository.findByProductCategoryAndRemovedFalse(category, pageable);
     }
 
     @Override
     public Product getById(UUID id) {
         String userMessage = "Unable to get product";
-        return productRepository.findByProductIdAndIsRemovedFalse(id).orElseThrow(() -> {
+        return productRepository.findByProductIdAndRemovedFalse(id).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean updateQuantityState(SetProductQuantityStateRequest request) {
         String userMessage = "Unable to update product quantity state";
         UUID id = request.getProductId();
-        Product current = productRepository.findByProductIdAndIsRemovedFalse(id)
+        Product current = productRepository.findByProductIdAndRemovedFalse(id)
                 .orElseThrow(() -> {
                     log.warn("{} id={}", userMessage, id);
                     return new ProductNotFoundException(userMessage, id);
@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public boolean remove(UUID id) {
         String userMessage = "Unable to remove product";
-        Product current = productRepository.findByProductIdAndIsRemovedFalse(id).orElseThrow(() -> {
+        Product current = productRepository.findByProductIdAndRemovedFalse(id).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });

@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-public class Warehouse {
+public class WarehouseApp {
     public static void main(String[] args) {
-        SpringApplication.run(Warehouse.class, args);
+        SpringApplication.run(WarehouseApp.class, args);
     }
 }
