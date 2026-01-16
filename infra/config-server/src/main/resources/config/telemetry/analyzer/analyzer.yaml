@@ -11,7 +11,7 @@ spring:
       jdbc.time_zone: UTC
       format_sql: true
       temp.use_jdbc_metadata_defaults: false
-    hibernate.ddl-auto: none
+    hibernate.ddl-auto: create-drop
     show-sql: false
   sql.init.mode: always
   logging:

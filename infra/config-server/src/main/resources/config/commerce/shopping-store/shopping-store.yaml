@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/shopping_store
-    username: user
-    password: password
+    username: store_user
+    password: store_password
     driver-class-name: org.postgresql.Driver
 
   jpa:
