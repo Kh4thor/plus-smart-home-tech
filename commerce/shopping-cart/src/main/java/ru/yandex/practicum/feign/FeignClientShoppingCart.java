@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.ChangeQuantityDto;
 import ru.yandex.practicum.dto.ShoppingCartDto;
 
 import java.util.List;

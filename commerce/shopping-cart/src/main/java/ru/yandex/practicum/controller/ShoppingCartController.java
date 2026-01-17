@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.ChangeQuantityDto;
-import ru.yandex.practicum.dto.ShoppingCartDto;
+import ru.yandex.practicum.dto.shopping.cart.ChangeQuantityDto;
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.model.ShoppingCart;
-import ru.yandex.practicum.utills.ShoppingCartMapper;
 import ru.yandex.practicum.service.ShoppingCartService;
+import ru.yandex.practicum.utills.ShoppingCartMapper;
 
 import java.util.List;
 import java.util.UUID;

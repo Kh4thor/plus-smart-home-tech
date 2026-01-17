@@ -15,5 +15,6 @@
         <module>shopping-store</module>
         <module>shopping-cart</module>
         <module>warehouse</module>
+        <module>common</module>
     </modules>
 </project>

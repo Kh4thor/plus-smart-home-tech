@@ -5,7 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.*;
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
+import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
@@ -27,14 +31,14 @@ public class WarehouseService {
     private final AddressRepository addressRepository;
 
     @Transactional
-    public void registerNewProduct(NewProductInWarehouseRequest newProduct) {
-        UUID productId = newProduct.getProductId();
+    public void registerNewProduct(NewProductInWarehouseRequest request) {
+        UUID productId = request.getProductId();
         if (warehouseRepository.existsByProductId(productId)) {
             String userMessage = "Unable to register new product";
             log.warn("{} id={}", userMessage, productId);
             throw new SpecifiedProductAlreadyInWarehouseException(userMessage, productId);
         }
-        WarehouseProduct warehouseProduct = WarehouseProductBuilder.buildWarehouseProduct(newProduct);
+        WarehouseProduct warehouseProduct = WarehouseProductBuilder.buildWarehouseProduct(request);
         warehouseRepository.save(warehouseProduct);
     }
 

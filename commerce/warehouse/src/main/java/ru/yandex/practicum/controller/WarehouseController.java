@@ -5,7 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.*;
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
+import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.service.WarehouseService;
 
 /**
@@ -40,7 +44,7 @@ public class WarehouseController {
      * Регистрирует новый товар на складе.
      * Создает карточку товара с характеристиками (вес, габариты, хрупкость) и сохраняет ее в системе.
      *
-     * @param newProduct DTO с данными нового товара для регистрации
+     * @param request DTO с данными нового товара для регистрации
      * @throws jakarta.validation.ConstraintViolationException если данные товара не проходят валидацию
      * @throws ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException если товар с таким ID уже зарегистрирован
      * @apiNote Использует HTTP метод PUT для создания нового ресурса
@@ -48,8 +52,8 @@ public class WarehouseController {
      */
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest newProduct) {
-        warehouseService.registerNewProduct(newProduct);
+    public void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest request) {
+        warehouseService.registerNewProduct(request);
     }
 
     /**

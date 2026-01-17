@@ -1,10 +1,10 @@
-package ru.yandex.practicum.dto;
+package ru.yandex.practicum.dto.shopping.store;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.enums.ProductState;
 import ru.yandex.practicum.enums.QuantityState;

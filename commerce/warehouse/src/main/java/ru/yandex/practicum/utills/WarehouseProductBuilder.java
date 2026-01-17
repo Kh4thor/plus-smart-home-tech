@@ -1,7 +1,7 @@
 package ru.yandex.practicum.utills;
 
-import ru.yandex.practicum.dto.DimensionDto;
-import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.DimensionDto;
+import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.model.Dimension;
 import ru.yandex.practicum.model.WarehouseProduct;
 
