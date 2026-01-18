@@ -65,10 +65,10 @@ public class ShoppingCartController {
      */
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ShoppingCartDto putShoppingCart(
+    public ShoppingCartDto addShoppingCart(
             @RequestBody @Valid ShoppingCartDto shoppingCartDto,
             @RequestParam @NotBlank String username) {
-        ShoppingCart saved = shoppingCartService.save(shoppingCartDto, username.trim());
+        ShoppingCart saved = shoppingCartService.addShoppingCart(shoppingCartDto, username.trim());
         return ShoppingCartMapper.toShoppingCartDto(saved);
     }
 

@@ -27,15 +27,17 @@ public class ShoppingCartService {
 
     @Transactional
     public ShoppingCart getShoppingCart(String username) {
-        String userMessage = "Unable to get shopping cart";
-        return shoppingCartRepository.findByUsername(username).orElseThrow(() -> {
-            log.warn("{} by username={}", userMessage, username);
-            return new ShoppingCartNotFoundException(userMessage, username);
+        return shoppingCartRepository.findByUsername(username).orElseGet(() -> {
+            log.info("Creating new shopping cart for user: {}", username);
+            ShoppingCart newShoppingCart = ShoppingCart.builder()
+                    .username(username)
+                    .build();
+            return shoppingCartRepository.save(newShoppingCart);
         });
     }
 
     @Transactional
-    public ShoppingCart save(ShoppingCartDto shoppingCartDto, String username) {
+    public ShoppingCart addShoppingCart(ShoppingCartDto shoppingCartDto, String username) {
         ShoppingCart shoppingCart = ShoppingCartMapper.toShoppingCart(shoppingCartDto, username);
         return shoppingCartRepository.save(shoppingCart);
     }
