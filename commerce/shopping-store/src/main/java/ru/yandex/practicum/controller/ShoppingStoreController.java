@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +22,6 @@ import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
 import ru.yandex.practicum.utills.ProductMapper;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -62,7 +62,7 @@ public class ShoppingStoreController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductDto> getProductsByCategory(
+    public Page<ProductDto> findByCategory(
             @RequestParam ProductCategory category,
             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(required = false, defaultValue = "20") @Min(1) int size,
@@ -70,28 +70,8 @@ public class ShoppingStoreController {
         Pageable pageable = createPageable(page, size, sort);
         log.debug("API: GET /api/v1/shopping-store?category={}&page={}&size={}&sort={}",
                 category, page, size, sort != null ? sort : "N/A");
-
-        return productService.findByCategory(category, pageable).stream()
-                .map(ProductMapper::toProductDto)
-                .toList();
-    }
-
-    private Pageable createPageable(int page, int size, String sort) {
-        Pageable pageable;
-        if (sort != null && !sort.isEmpty()) {
-            String[] sortParams = sort.split(",");
-            if (sortParams.length > 1) {
-                Sort.Direction direction = "desc".equalsIgnoreCase(sortParams[1])
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC;
-                pageable = PageRequest.of(page, size, Sort.by(direction, sortParams[0]));
-            } else {
-                pageable = PageRequest.of(page, size, Sort.by(sortParams[0]));
-            }
-        } else {
-            pageable = PageRequest.of(page, size);
-        }
-        return pageable;
+        return productService.findByCategory(category, pageable)
+                .map(ProductMapper::toProductDto);
     }
 
     /**
@@ -167,7 +147,6 @@ public class ShoppingStoreController {
      * Обновляет статус количества товара на складе.
      * Вызывается со стороны склада для обновления статусов "Закончился", "Мало", "Достаточно", "Много".
      *
-     * @param request DTO с идентификатором товара и новым статусом количества (обязательный параметр)
      * @return {@code true} если статус успешно обновлен, {@code false} в случае ошибки
      * @throws ProductNotFoundException                        если товар с указанным ID не найден
      * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
@@ -207,5 +186,36 @@ public class ShoppingStoreController {
         Product product = productService.getById(productId);
         log.debug("Product has been got: {}", product);
         return ProductMapper.toProductDto(product);
+    }
+
+
+    /**
+     * Создает объект {@link Pageable} для пагинации и сортировки.
+     * Вспомогательный приватный метод для создания объекта пагинации на основе параметров запроса.
+     *
+     * @param page номер страницы (0-based)
+     * @param size количество элементов на странице
+     * @param sort строка сортировки в формате "поле, направление" (например, "price, desc")
+     * @return настроенный объект {@link Pageable} для использования в репозитории
+     * @see Pageable
+     * @see PageRequest
+     * @see Sort
+     */
+    private Pageable createPageable(int page, int size, String sort) {
+        Pageable pageable;
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length > 1) {
+                Sort.Direction direction = "desc".equalsIgnoreCase(sortParams[1])
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                pageable = PageRequest.of(page, size, Sort.by(direction, sortParams[0]));
+            } else {
+                pageable = PageRequest.of(page, size, Sort.by(sortParams[0]));
+            }
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
+        return pageable;
     }
 }

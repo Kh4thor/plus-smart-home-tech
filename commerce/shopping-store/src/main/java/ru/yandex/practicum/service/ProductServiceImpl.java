@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,6 @@ import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -25,8 +25,8 @@ public class ProductServiceImpl implements ProductService {
     private static final ProductState DEACTIVATE_STATE = ProductState.DEACTIVATE;
 
     @Override
-    public List<Product> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategoryAndProductState(category, ACTIVE_STATE, pageable);
+    public Page<Product> findByCategory(ProductCategory category, Pageable pageable) {
+        return productRepository.findByProductCategory(category, pageable);
     }
 
     @Override
