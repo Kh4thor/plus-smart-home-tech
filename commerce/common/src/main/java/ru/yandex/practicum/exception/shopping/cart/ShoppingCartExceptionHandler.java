@@ -23,6 +23,11 @@ public class ShoppingCartExceptionHandler {
         return handleException(exception);
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleNoProductsInShoppingCartException(NoProductsInShoppingCartException exception) {
+        return handleException(exception);
+    }
 
     private ErrorResponse handleException(CustomException exception) {
         log.warn("{} {}", exception.getUserMessage(), exception.getMessage());
