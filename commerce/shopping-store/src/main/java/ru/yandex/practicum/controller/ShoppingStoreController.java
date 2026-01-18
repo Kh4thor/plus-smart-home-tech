@@ -68,7 +68,7 @@ public class ShoppingStoreController {
             @RequestParam(required = false, defaultValue = "20") @Min(1) int size,
             @RequestParam(required = false) String sort) {
         Pageable pageable = createPageable(page, size, sort);
-        log.info("API: GET /api/v1/shopping-store?category={}&page={}&size={}&sort={}",
+        log.debug("API: GET /api/v1/shopping-store?category={}&page={}&size={}&sort={}",
                 category, page, size, sort != null ? sort : "N/A");
 
         return productService.findByCategory(category, pageable).stream()
@@ -109,7 +109,7 @@ public class ShoppingStoreController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ProductDto create(@RequestBody @Valid ProductDto productDto) {
-        log.info("API: PUT /api/v1/shopping-store");
+        log.debug("API: PUT /api/v1/shopping-store");
         log.info("Got productDto for creation: {}", productDto);
         Product product = ProductMapper.toProduct(productDto);
         Product created = productService.create(product);
@@ -132,7 +132,7 @@ public class ShoppingStoreController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public ProductDto update(@RequestBody @Valid ProductDto productDto) {
-        log.info("API: POST /api/v1/shopping-store");
+        log.debug("API: POST /api/v1/shopping-store");
         log.info("Got productDto for total updating: {}", productDto);
         Product product = ProductMapper.toProduct(productDto);
         Product updated = productService.update(product);
@@ -153,7 +153,7 @@ public class ShoppingStoreController {
     @PostMapping("/removeProductFromStore")
     @ResponseStatus(HttpStatus.OK)
     public boolean removeProductFromStore(@RequestBody UUID productId) {
-        log.info("API: POST /api/v1/shopping-store/removeProductFromStore");
+        log.debug("API: POST /api/v1/shopping-store/removeProductFromStore");
         log.info("Got UUID for removing: {}", productId);
         if (productService.remove(productId)) {
             log.info("Product has been removed: {}", productId);
@@ -180,7 +180,7 @@ public class ShoppingStoreController {
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
     public boolean setQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) {
-        log.info("API: POST /api/v1/shopping-store/quantityState");
+        log.debug("API: POST /api/v1/shopping-store/quantityState");
         log.info("Got productDto for updating quantity state: {}", request);
         if (productService.setQuantityState(request)) {
             log.info("Product quantity state has been updated: {}", request);

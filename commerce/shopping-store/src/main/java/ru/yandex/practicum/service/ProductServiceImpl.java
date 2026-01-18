@@ -82,10 +82,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean setQuantityState(SetProductQuantityStateRequest request) {
         final String userMessage = "Unable to update product quantity state";
         UUID id = request.getProductId();
-        Product current = productRepository.findByProductIdAndProductState(id, ACTIVE_STATE).orElseThrow(() -> {
-            log.warn("{} id={}", userMessage, id);
-            return new ProductNotFoundException(userMessage, id);
-        });
+        Product current = getById(id);
         if (request.getQuantityState() != null) {
             current.setQuantityState(request.getQuantityState());
         }

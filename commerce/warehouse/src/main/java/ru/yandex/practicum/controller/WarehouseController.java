@@ -109,7 +109,7 @@ public class WarehouseController {
      */
     @GetMapping("/address")
     @ResponseStatus(HttpStatus.OK)
-    public AddressDto getAddress(@RequestBody @Valid AddressDto addressDto) {
-        return warehouseService.getAddress(addressDto);
+    public AddressDto getAddress() {
+        return warehouseService.getAddress();
     }
 }

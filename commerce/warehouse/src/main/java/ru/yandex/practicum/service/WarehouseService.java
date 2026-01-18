@@ -134,7 +134,7 @@ public class WarehouseService {
         warehouseProduct.setQuantity(quantity);
     }
 
-    public AddressDto getAddress(AddressDto addressDto) {
+    public AddressDto getAddress() {
         String address = addressRepository.getAddress();
         return AddressDto.builder()
                 .country(address)
