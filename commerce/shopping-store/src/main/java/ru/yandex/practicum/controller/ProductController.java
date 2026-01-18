@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
 import ru.yandex.practicum.utills.ProductMapper;
@@ -91,7 +92,7 @@ public class ProductController {
      *
      * @param productDto DTO с обновленными данными товара (обязательный параметр)
      * @return {@link ProductDto} обновленного товара
-     * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
+     * @throws ProductNotFoundException если товар с указанным ID не найден
      * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
      * @apiNote Для частичного обновления используйте соответствующие эндпоинты
      * @see ProductDto
@@ -113,7 +114,7 @@ public class ProductController {
      *
      * @param productId UUID идентификатор товара для удаления (обязательный параметр)
      * @return {@code true} если товар успешно удален, {@code false} в случае ошибки
-     * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
+     * @throws ProductNotFoundException если товар с указанным ID не найден
      * @apiNote Использует HTTP метод POST для удаления, что нестандартно для REST,
      * но соответствует спецификации проекта
      * @see UUID
@@ -137,7 +138,7 @@ public class ProductController {
      *
      * @param request DTO с идентификатором товара и новым статусом количества (обязательный параметр)
      * @return {@code true} если статус успешно обновлен, {@code false} в случае ошибки
-     * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
+     * @throws ProductNotFoundException если товар с указанным ID не найден
      * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
      * @apiNote Пример запроса:
      * {@code POST /api/v1/shopping-store/quantityState}
@@ -162,7 +163,7 @@ public class ProductController {
      *
      * @param productId UUID идентификатор товара (обязательный параметр пути)
      * @return {@link ProductDto} с полной информацией о товаре
-     * @throws ru.yandex.practicum.exception.ProductNotFoundException если товар с указанным ID не найден
+     * @throws ProductNotFoundException если товар с указанным ID не найден
      * @apiNote Пример запроса: {@code GET /api/v1/shopping-store/{productId}}
      * @see ProductDto
      * @see UUID

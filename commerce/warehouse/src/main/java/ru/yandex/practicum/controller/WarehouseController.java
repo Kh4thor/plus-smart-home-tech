@@ -10,6 +10,10 @@ import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
+import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
+import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
 import ru.yandex.practicum.service.WarehouseService;
 
 /**
@@ -46,7 +50,7 @@ public class WarehouseController {
      *
      * @param request DTO с данными нового товара для регистрации
      * @throws jakarta.validation.ConstraintViolationException если данные товара не проходят валидацию
-     * @throws ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException если товар с таким ID уже зарегистрирован
+     * @throws SpecifiedProductAlreadyInWarehouseException если товар с таким ID уже зарегистрирован
      * @apiNote Использует HTTP метод PUT для создания нового ресурса
      * @see NewProductInWarehouseRequest
      */
@@ -64,8 +68,8 @@ public class WarehouseController {
      * @param shoppingCartDto DTO корзины покупок с товарами и их количествами
      * @return DTO с характеристиками доставки: вес, объем и флаг хрупкости
      * @throws jakarta.validation.ConstraintViolationException если данные корзины не проходят валидацию
-     * @throws ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException если один или несколько товаров не найдены на складе
-     * @throws ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouseException если количество товара на складе недостаточно
+     * @throws NoSpecifiedProductInWarehouseException если один или несколько товаров не найдены на складе
+     * @throws ProductInShoppingCartLowQuantityInWarehouseException если количество товара на складе недостаточно
      * @see ShoppingCartDto
      * @see BookedProductsDto
      */
@@ -82,7 +86,7 @@ public class WarehouseController {
      *
      * @param request DTO запроса с идентификатором товара и новым количеством
      * @throws jakarta.validation.ConstraintViolationException если данные запроса не проходят валидацию
-     * @throws ru.yandex.practicum.exception.WarehouseProductNotFoundException если товар с указанным ID не найден
+     * @throws WarehouseProductNotFoundException если товар с указанным ID не найден
      * @apiNote Несмотря на название метода "add", он не добавляет к существующему количеству,
      *          а устанавливает новое значение
      * @see AddProductToWarehouseRequest

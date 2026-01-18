@@ -1,10 +1,12 @@
-package ru.yandex.practicum.feign;
+package ru.yandex.practicum.feign.shopping.store;
 
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.shopping.store.ProductDto;
+import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
 
 import java.util.List;

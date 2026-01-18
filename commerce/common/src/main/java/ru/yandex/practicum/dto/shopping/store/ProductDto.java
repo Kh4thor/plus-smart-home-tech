@@ -12,7 +12,6 @@ import ru.yandex.practicum.enums.QuantityState;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

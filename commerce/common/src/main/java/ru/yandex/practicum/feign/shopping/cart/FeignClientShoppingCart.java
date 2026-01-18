@@ -1,11 +1,12 @@
-package ru.yandex.practicum.feign;
+package ru.yandex.practicum.feign.shopping.cart;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.ShoppingCartDto;
+import ru.yandex.practicum.dto.shopping.cart.ChangeQuantityDto;
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 
 import java.util.List;
 import java.util.UUID;
