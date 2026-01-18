@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
-import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.enums.shopping.store.ProductCategory;
+import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
@@ -144,7 +145,7 @@ public class ShoppingStoreController {
      * {@code POST /api/v1/shopping-store/quantityState}
      * Body: {"productId": "uuid", "quantityState": "FEW"}
      * @see SetProductQuantityStateRequest
-     * @see ru.yandex.practicum.enums.QuantityState
+     * @see QuantityState
      */
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)

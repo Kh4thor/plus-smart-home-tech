@@ -2,6 +2,7 @@ package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.yandex.practicum.enums.shopping.cart.ShoppingCartStatus;
 
 import java.util.HashMap;
 import java.util.Map;

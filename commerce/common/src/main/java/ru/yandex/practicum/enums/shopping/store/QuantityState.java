@@ -1,4 +1,4 @@
-package ru.yandex.practicum.enums;
+package ru.yandex.practicum.enums.shopping.store;
 
 public enum QuantityState {
     ENDED, // товар закончился

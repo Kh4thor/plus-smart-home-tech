@@ -4,10 +4,13 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import ru.yandex.practicum.enums.ProductCategory;
-import ru.yandex.practicum.enums.ProductState;
-import ru.yandex.practicum.enums.QuantityState;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import ru.yandex.practicum.enums.shopping.store.ProductCategory;
+import ru.yandex.practicum.enums.shopping.store.ProductState;
+import ru.yandex.practicum.enums.shopping.store.QuantityState;
 
 import java.util.UUID;
 

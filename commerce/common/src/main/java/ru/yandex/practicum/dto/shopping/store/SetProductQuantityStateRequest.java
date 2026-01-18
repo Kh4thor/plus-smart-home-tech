@@ -2,7 +2,7 @@ package ru.yandex.practicum.dto.shopping.store;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import ru.yandex.practicum.enums.QuantityState;
+import ru.yandex.practicum.enums.shopping.store.QuantityState;
 
 import java.util.UUID;
 

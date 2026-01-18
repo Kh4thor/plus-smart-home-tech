@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
-import ru.yandex.practicum.enums.ProductCategory;
+import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 
 import java.util.List;
 import java.util.UUID;
