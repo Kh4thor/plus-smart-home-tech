@@ -33,7 +33,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/shopping-store")
 @RequiredArgsConstructor
-public class ProductController {
+public class ShoppingStoreController {
 
     private final ProductService productService;
     private final ObjectMapper objectMapper;

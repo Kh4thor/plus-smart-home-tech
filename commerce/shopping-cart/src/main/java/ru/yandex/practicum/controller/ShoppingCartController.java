@@ -100,7 +100,7 @@ public class ShoppingCartController {
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto removeShoppingCart(
             @RequestParam @NotBlank String username,
-            @RequestBody List<UUID> productIds) {
+            @RequestBody @Valid List<UUID> productIds) {
         ShoppingCart shoppingCart = shoppingCartService.removeShoppingCartBy(username.trim(), productIds);
         return ShoppingCartMapper.toShoppingCartDto(shoppingCart);
     }
@@ -123,7 +123,7 @@ public class ShoppingCartController {
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto changeQuantity(
             @RequestParam @NotBlank String username,
-            @RequestBody ChangeQuantityDto changeQuantityDto) {
+            @RequestBody @Valid ChangeQuantityDto changeQuantityDto) {
         ShoppingCart shoppingCart = shoppingCartService.changeQuantity(username.trim(), changeQuantityDto);
         return ShoppingCartMapper.toShoppingCartDto(shoppingCart);
     }

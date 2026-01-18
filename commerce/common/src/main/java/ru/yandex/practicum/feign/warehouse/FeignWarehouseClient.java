@@ -1,4 +1,5 @@
-package ru.yandex.practicum.feign.shopping.cart;
+package ru.yandex.practicum.feign.warehouse;
+
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -13,8 +14,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Validated
-@FeignClient(name = "shopping-cart", path = "/api/v1/shopping-cart")
-public interface FeignClientShoppingCart {
+@FeignClient(name = "warehouse", path = "/api/v1/warehouse")
+public interface FeignWarehouseClient {
+
+    @GetMapping
+    public ShoppingCartDto getShoppingCart(@RequestParam @NotBlank String username);
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
@@ -33,7 +37,8 @@ public interface FeignClientShoppingCart {
             @RequestBody List<UUID> productIds);
 
     @PostMapping("change-quantity")
+    @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto changeQuantity(
             @RequestParam @NotBlank String username,
-            @RequestBody ChangeQuantityDto changeQuantityDto);
+            @RequestBody @Valid ChangeQuantityDto changeQuantityDto);
 }
