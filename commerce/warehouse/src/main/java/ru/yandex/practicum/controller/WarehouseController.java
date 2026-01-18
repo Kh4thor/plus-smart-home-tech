@@ -101,7 +101,6 @@ public class WarehouseController {
      * Получает адрес склада.
      * Возвращает структурированную информацию об адресе склада.
      *
-     * @param addressDto DTO адреса для валидации и структурирования ответа
      * @return DTO с адресом склада
      * @throws jakarta.validation.ConstraintViolationException если DTO адреса не проходит валидацию
      * @apiNote Использует GET метод с телом запроса ({@link RequestBody}), что нестандартно для HTTP GET

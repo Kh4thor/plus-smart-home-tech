@@ -179,11 +179,12 @@ public class ShoppingStoreController {
      */
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
-    public boolean setQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) {
+    public boolean setQuantityState(@RequestParam UUID productId,
+                                    @RequestParam QuantityState quantityState) {
         log.debug("API: POST /api/v1/shopping-store/quantityState");
-        log.info("Got productDto for updating quantity state: {}", request);
-        if (productService.setQuantityState(request)) {
-            log.info("Product quantity state has been updated: {}", request);
+        log.info("Got productDto for updating quantity state productId: {}, quantity state: {}", productId, quantityState);
+        if (productService.setQuantityState(productId, quantityState)) {
+            log.info("Product quantity state id={} has been updated: {}", productId, quantityState);
             return true;
         }
         return false;

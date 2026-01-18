@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 import ru.yandex.practicum.enums.shopping.store.ProductState;
+import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
@@ -79,14 +79,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean setQuantityState(SetProductQuantityStateRequest request) {
+    public boolean setQuantityState(UUID productId, QuantityState quantityState) {
         final String userMessage = "Unable to update product quantity state";
-        UUID id = request.getProductId();
-        Product current = getById(id);
-        if (request.getQuantityState() != null) {
-            current.setQuantityState(request.getQuantityState());
+        Product current = getById(productId);
+        if (quantityState != null) {
+            current.setQuantityState(quantityState);
         }
-        log.info("QuantityState has been updated for product id={} to value={}", id, current.getQuantityState());
+        log.info("QuantityState has been updated for product id={} to value={}", productId, current.getQuantityState());
         return true;
     }
 
