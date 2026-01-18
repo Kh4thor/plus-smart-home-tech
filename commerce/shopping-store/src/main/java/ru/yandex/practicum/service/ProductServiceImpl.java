@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getById(UUID id) {
         String userMessage = "Unable to get product";
-        return productRepository.findByProductIdAndProductState(id, ACTIVE_STATE).orElseThrow(() -> {
+        return productRepository.findByProductId(id).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
@@ -102,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
             return new ProductNotFoundException(userMessage, id);
         });
         current.setProductState(DEACTIVATE_STATE);
-        log.info("Product has been removed (deactivated) id={}", id);
+        log.info("Product has been removed (deactivated), product id={}", id);
         return true;
     }
 }
