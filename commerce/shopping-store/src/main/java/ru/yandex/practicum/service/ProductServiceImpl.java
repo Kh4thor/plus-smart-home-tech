@@ -21,16 +21,18 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductState active = ProductState.ACTIVE;
+    private final ProductState deactivate = ProductState.DEACTIVATE;
 
     @Override
     public List<Product> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategoryAndRemovedFalse(category, pageable);
+        return productRepository.findByProductCategoryAndProductState(category, active, pageable);
     }
 
     @Override
     public Product getById(UUID id) {
         String userMessage = "Unable to get product";
-        return productRepository.findByProductIdAndRemovedFalse(id).orElseThrow(() -> {
+        return productRepository.findByProductIdAndProductState(id, active).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
@@ -83,16 +85,14 @@ public class ProductServiceImpl implements ProductService {
     public boolean updateQuantityState(SetProductQuantityStateRequest request) {
         String userMessage = "Unable to update product quantity state";
         UUID id = request.getProductId();
-        Product current = productRepository.findByProductIdAndRemovedFalse(id)
-                .orElseThrow(() -> {
-                    log.warn("{} id={}", userMessage, id);
-                    return new ProductNotFoundException(userMessage, id);
-                });
+        Product current = productRepository.findByProductIdAndProductState(id, active).orElseThrow(() -> {
+            log.warn("{} id={}", userMessage, id);
+            return new ProductNotFoundException(userMessage, id);
+        });
         if (request.getQuantityState() != null) {
             current.setQuantityState(request.getQuantityState());
         }
-        log.info("QuantityState has been updated for product id={} to {}",
-                id, current.getQuantityState());
+        log.info("QuantityState has been updated for product id={} to value={}", id, current.getQuantityState());
         return true;
     }
 
@@ -100,12 +100,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public boolean remove(UUID id) {
         String userMessage = "Unable to remove product";
-        Product current = productRepository.findByProductIdAndRemovedFalse(id).orElseThrow(() -> {
+        Product current = productRepository.findByProductIdAndProductState(id, deactivate).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
 
-        current.setProductState(ProductState.DEACTIVATE);
+        current.setProductState(deactivate);
         log.info("Product has been removed (deactivated) id={}", id);
         return true;
     }
