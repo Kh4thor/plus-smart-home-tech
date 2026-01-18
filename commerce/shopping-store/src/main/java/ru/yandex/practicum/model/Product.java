@@ -37,7 +37,8 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_state", nullable = false)
-    private ProductState productState;
+    @Builder.Default
+    private ProductState productState =  ProductState.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_category")
@@ -45,9 +46,6 @@ public class Product {
 
     @Column(name = "price")
     private Integer price;
-
-    @Column(name = "removed")
-    private boolean removed;
 }
 
 

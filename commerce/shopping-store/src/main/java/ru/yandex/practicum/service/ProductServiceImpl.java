@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.shopping.store.ProductCategory;
+import ru.yandex.practicum.enums.shopping.store.ProductState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
@@ -104,8 +105,8 @@ public class ProductServiceImpl implements ProductService {
             return new ProductNotFoundException(userMessage, id);
         });
 
-        current.setRemoved(true);
-        log.info("Product has been removed id={}", id);
-        return current.isRemoved();
+        current.setProductState(ProductState.DEACTIVATE);
+        log.info("Product has been removed (deactivated) id={}", id);
+        return true;
     }
 }
