@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/shopping_cart  # underscore
+    url: jdbc:postgresql://localhost:5432/shopping_cart
     username: cart_user
     password: cart_password
     driver-class-name: org.postgresql.Driver
@@ -13,11 +13,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-#  sql:
-#    init:
-#      mode: always
-#      schema-locations: classpath:schema.sql
 
 eureka:
   client:

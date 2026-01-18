@@ -21,6 +21,7 @@ import ru.yandex.practicum.repository.WarehouseRepository;
 import ru.yandex.practicum.utills.WarehouseProductBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,15 +51,16 @@ public class WarehouseService {
         Set<UUID> productIds = products.keySet();
 
         // поиск товаров на складе по списку корзины
-        Map<UUID, WarehouseProduct> productById = warehouseRepository.findAllAsMapByIds(productIds);
+        List<WarehouseProduct> warehouseProductList = warehouseRepository.findByProductIdIn(productIds);
+        Map<UUID, WarehouseProduct> productById = toMap(warehouseProductList);
 
         // список товаров, не найденных на складе
         List<UUID> productsNotFound = new ArrayList<>();
 
         // характеристика заказа (доставки)
-        double deliveryWeight = 0.0;
-        double deliveryVolume = 0.0;
-        boolean deliveryFragile = false;
+        double deliveryWeight = 0.0; // начальное значение веса
+        double deliveryVolume = 0.0; // начальное значение объема
+        boolean deliveryFragile = false; // начальное значение хрупкости
 
         // итерация по списку id-товаров из корзины
         for (UUID productId : productIds) {
@@ -172,7 +174,7 @@ public class WarehouseService {
         return width * height * depth;
     }
 
-    private Double getProductWeight(WarehouseProduct warehouseProduct, UUID  productId) {
+    private Double getProductWeight(WarehouseProduct warehouseProduct, UUID productId) {
         Double productWeight = warehouseProduct.getWeight();
 
         if (productWeight == null) {
@@ -183,4 +185,10 @@ public class WarehouseService {
         // вес единичного товара
         return productWeight;
     }
+
+    private Map<UUID, WarehouseProduct> toMap(List<WarehouseProduct> warehouseProducts) {
+        return warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+    }
+
 }
