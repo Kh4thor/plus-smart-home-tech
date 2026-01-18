@@ -2,10 +2,15 @@ package ru.yandex.practicum.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
@@ -31,6 +36,7 @@ import java.util.UUID;
  * @see ProductService
  */
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/v1/shopping-store")
 @RequiredArgsConstructor
@@ -41,27 +47,51 @@ public class ShoppingStoreController {
 
     /**
      * Получает пагинированный список товаров по указанной категории.
-     * Поддерживает сортировку и пагинацию через параметр {@link Pageable}.
      *
      * @param category категория товаров для фильтрации (обязательный параметр)
-     * @param pageable параметры пагинации и сортировки (обязательный параметр)
+     * @param page     номер страницы (по умолчанию: 0)
+     * @param size     количество элементов на странице (по умолчанию: 20)
+     * @param sort     поле для сортировки в формате: поле,направление (опционально)
      * @return список {@link ProductDto} товаров, соответствующих критериям
-     * @apiNote Пример запроса: {@code GET /api/v1/shopping-store?category=LIGHTING&page=0&size=20&sort=price,desc}
-     * @see ProductCategory
-     * @see Pageable
-     * @see ProductDto
+     * @apiNote Примеры запросов:
+     * <ul>
+     *     <li>{@code GET /api/v1/shopping-store?category=LIGHTING}</li>
+     *     <li>{@code GET /api/v1/shopping-store?category=LIGHTING&page=0&size=10}</li>
+     *     <li>{@code GET /api/v1/shopping-store?category=LIGHTING&page=0&size=20&sort=price,desc}</li>
+     * </ul>
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductDto> getAllProducts(@RequestParam ProductCategory category, @RequestParam Pageable pageable) {
+    public List<ProductDto> getProductsByCategory(
+            @RequestParam ProductCategory category,
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(required = false, defaultValue = "20") @Min(1) int size,
+            @RequestParam(required = false) String sort) {
+        Pageable pageable = createPageable(page, size, sort);
         log.info("API: GET /api/v1/shopping-store?category={}&page={}&size={}&sort={}",
-                category,
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                pageable.getSort());
+                category, page, size, sort != null ? sort : "N/A");
+
         return productService.findByCategory(category, pageable).stream()
                 .map(ProductMapper::toProductDto)
                 .toList();
+    }
+
+    private Pageable createPageable(int page, int size, String sort) {
+        Pageable pageable;
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length > 1) {
+                Sort.Direction direction = "desc".equalsIgnoreCase(sortParams[1])
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                pageable = PageRequest.of(page, size, Sort.by(direction, sortParams[0]));
+            } else {
+                pageable = PageRequest.of(page, size, Sort.by(sortParams[0]));
+            }
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
+        return pageable;
     }
 
     /**
@@ -93,8 +123,8 @@ public class ShoppingStoreController {
      *
      * @param productDto DTO с обновленными данными товара (обязательный параметр)
      * @return {@link ProductDto} обновленного товара
-     * @throws ProductNotFoundException если товар с указанным ID не найден
-     * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
+     * @throws ProductNotFoundException                        если товар с указанным ID не найден
+     * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
      * @apiNote Для частичного обновления используйте соответствующие эндпоинты
      * @see ProductDto
      * @see Product
@@ -139,8 +169,8 @@ public class ShoppingStoreController {
      *
      * @param request DTO с идентификатором товара и новым статусом количества (обязательный параметр)
      * @return {@code true} если статус успешно обновлен, {@code false} в случае ошибки
-     * @throws ProductNotFoundException если товар с указанным ID не найден
-     * @throws jakarta.validation.ConstraintViolationException        если данные не прошли валидацию
+     * @throws ProductNotFoundException                        если товар с указанным ID не найден
+     * @throws jakarta.validation.ConstraintViolationException если данные не прошли валидацию
      * @apiNote Пример запроса:
      * {@code POST /api/v1/shopping-store/quantityState}
      * Body: {"productId": "uuid", "quantityState": "FEW"}
@@ -149,10 +179,10 @@ public class ShoppingStoreController {
      */
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
-    public boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) {
+    public boolean setQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) {
         log.info("API: POST /api/v1/shopping-store/quantityState");
         log.info("Got productDto for updating quantity state: {}", request);
-        if (productService.updateQuantityState(request)) {
+        if (productService.setQuantityState(request)) {
             log.info("Product quantity state has been updated: {}", request);
             return true;
         }

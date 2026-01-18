@@ -15,7 +15,7 @@ public interface ProductService {
 
     Product update(Product toUpdate);
 
-    boolean updateQuantityState(SetProductQuantityStateRequest request);
+    boolean setQuantityState(SetProductQuantityStateRequest request);
 
     boolean remove(UUID id);
 

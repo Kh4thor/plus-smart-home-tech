@@ -21,18 +21,18 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductState active = ProductState.ACTIVE;
-    private final ProductState deactivate = ProductState.DEACTIVATE;
+    private static final ProductState ACTIVE_STATE = ProductState.ACTIVE;
+    private static final ProductState DEACTIVATE_STATE = ProductState.DEACTIVATE;
 
     @Override
     public List<Product> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategoryAndProductState(category, active, pageable);
+        return productRepository.findByProductCategoryAndProductState(category, ACTIVE_STATE, pageable);
     }
 
     @Override
     public Product getById(UUID id) {
         String userMessage = "Unable to get product";
-        return productRepository.findByProductIdAndProductState(id, active).orElseThrow(() -> {
+        return productRepository.findByProductIdAndProductState(id, ACTIVE_STATE).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
@@ -70,9 +70,6 @@ public class ProductServiceImpl implements ProductService {
         if (toUpdate.getQuantityState() != null) {
             current.setQuantityState(toUpdate.getQuantityState());
         }
-        if (toUpdate.getProductState() != null) {
-            current.setProductState(toUpdate.getProductState());
-        }
         if (toUpdate.getProductCategory() != null) {
             current.setProductCategory(toUpdate.getProductCategory());
         }
@@ -82,10 +79,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean updateQuantityState(SetProductQuantityStateRequest request) {
-        String userMessage = "Unable to update product quantity state";
+    public boolean setQuantityState(SetProductQuantityStateRequest request) {
+        final String userMessage = "Unable to update product quantity state";
         UUID id = request.getProductId();
-        Product current = productRepository.findByProductIdAndProductState(id, active).orElseThrow(() -> {
+        Product current = productRepository.findByProductIdAndProductState(id, ACTIVE_STATE).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
@@ -99,13 +96,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public boolean remove(UUID id) {
-        String userMessage = "Unable to remove product";
-        Product current = productRepository.findByProductIdAndProductState(id, deactivate).orElseThrow(() -> {
+        final String userMessage = "Unable to remove product";
+        Product current = productRepository.findByProductIdAndProductState(id, ACTIVE_STATE).orElseThrow(() -> {
             log.warn("{} id={}", userMessage, id);
             return new ProductNotFoundException(userMessage, id);
         });
-
-        current.setProductState(deactivate);
+        current.setProductState(DEACTIVATE_STATE);
         log.info("Product has been removed (deactivated) id={}", id);
         return true;
     }
