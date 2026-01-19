@@ -1,4 +1,4 @@
-package ru.yandex.practicum.feign.decoder.exception;
+package ru.yandex.practicum.feign.config.exception;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

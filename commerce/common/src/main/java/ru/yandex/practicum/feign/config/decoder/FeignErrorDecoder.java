@@ -1,9 +1,9 @@
-package ru.yandex.practicum.feign.decoder;
+package ru.yandex.practicum.feign.config.decoder;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import ru.yandex.practicum.feign.decoder.exception.InternalServerErrorException;
-import ru.yandex.practicum.feign.decoder.exception.NotFoundException;
+import ru.yandex.practicum.feign.config.exception.InternalServerErrorException;
+import ru.yandex.practicum.feign.config.exception.NotFoundException;
 
 public class FeignErrorDecoder implements ErrorDecoder {
 
