@@ -3,7 +3,6 @@ package ru.yandex.practicum.feign.shopping.cart;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.cart.ChangeQuantityDto;
@@ -17,23 +16,20 @@ import java.util.UUID;
 public interface FeignClientShoppingCart {
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
-    public ShoppingCartDto putShoppingCart(
+    ShoppingCartDto putShoppingCart(
             @RequestBody @Valid ShoppingCartDto shoppingCartDto,
             @RequestParam @NotBlank String username);
 
     @DeleteMapping
-    @ResponseStatus(HttpStatus.OK)
-    public boolean deleteShoppingCart(@RequestParam @NotBlank String username);
+    boolean deleteShoppingCart(@RequestParam @NotBlank String username);
 
     @PostMapping("/remove")
-    @ResponseStatus(HttpStatus.OK)
-    public ShoppingCartDto removeShoppingCart(
+    ShoppingCartDto removeShoppingCart(
             @RequestParam @NotBlank String username,
             @RequestBody List<UUID> productIds);
 
     @PostMapping("change-quantity")
-    public ShoppingCartDto changeQuantity(
+    ShoppingCartDto changeQuantity(
             @RequestParam @NotBlank String username,
             @RequestBody ChangeQuantityDto changeQuantityDto);
 }

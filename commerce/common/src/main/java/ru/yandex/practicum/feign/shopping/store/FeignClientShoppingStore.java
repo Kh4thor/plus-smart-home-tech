@@ -19,25 +19,25 @@ public interface FeignClientShoppingStore {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductDto> getAllProducts(@RequestParam ProductCategory category, @RequestParam Pageable pageable);
+    List<ProductDto> getAllProducts(@RequestParam ProductCategory category, @RequestParam Pageable pageable);
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ProductDto create(@RequestBody @Valid ProductDto productDto);
+    ProductDto create(@RequestBody @Valid ProductDto productDto);
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public ProductDto update(@RequestBody @Valid ProductDto productDto);
+    ProductDto update(@RequestBody @Valid ProductDto productDto);
 
     @PostMapping("/removeProductFromStore")
     @ResponseStatus(HttpStatus.OK)
-    public boolean removeProductFromStore(@RequestBody UUID productId);
+    boolean removeProductFromStore(@RequestBody UUID productId);
 
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
-    public boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request);
+    boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request);
 
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductDto getProduct(@PathVariable UUID productId);
+    ProductDto getProduct(@PathVariable UUID productId);
 }
