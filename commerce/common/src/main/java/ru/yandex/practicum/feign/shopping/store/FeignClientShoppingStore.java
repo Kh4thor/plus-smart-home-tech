@@ -1,5 +1,6 @@
 package ru.yandex.practicum.feign.shopping.store;
 
+import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
@@ -19,25 +20,27 @@ public interface FeignClientShoppingStore {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<ProductDto> getAllProducts(@RequestParam ProductCategory category, @RequestParam Pageable pageable);
+    List<ProductDto> getAllProducts(
+            @RequestParam ProductCategory category,
+            @RequestParam Pageable pageable) throws FeignException;
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    ProductDto create(@RequestBody @Valid ProductDto productDto);
+    ProductDto create(@RequestBody @Valid ProductDto productDto) throws FeignException;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    ProductDto update(@RequestBody @Valid ProductDto productDto);
+    ProductDto update(@RequestBody @Valid ProductDto productDto) throws FeignException;
 
     @PostMapping("/removeProductFromStore")
     @ResponseStatus(HttpStatus.OK)
-    boolean removeProductFromStore(@RequestBody UUID productId);
+    boolean removeProductFromStore(@RequestBody UUID productId) throws FeignException;
 
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
-    boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request);
+    boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) throws FeignException;
 
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    ProductDto getProduct(@PathVariable UUID productId);
+    ProductDto getProduct(@PathVariable UUID productId) throws FeignException;
 }

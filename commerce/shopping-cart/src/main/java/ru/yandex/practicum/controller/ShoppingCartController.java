@@ -39,7 +39,7 @@ public class ShoppingCartController {
     /**
      * Сервис для бизнес-логики работы с корзиной покупок.
      */
-    ShoppingCartService shoppingCartService;
+   private final ShoppingCartService shoppingCartService;
 
     /**
      * Получает корзину покупок для указанного пользователя.

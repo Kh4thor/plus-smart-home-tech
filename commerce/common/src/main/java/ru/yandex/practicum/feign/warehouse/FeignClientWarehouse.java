@@ -1,12 +1,11 @@
 package ru.yandex.practicum.feign.warehouse;
 
 
+import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
@@ -17,14 +16,18 @@ import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 public interface FeignClientWarehouse {
 
     @PutMapping
-    void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest request);
+    @ResponseStatus(HttpStatus.OK)
+    void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest request) throws FeignException;
 
     @PostMapping("/check")
-    BookedProductsDto checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto);
+    @ResponseStatus(HttpStatus.OK)
+    BookedProductsDto checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto) throws FeignException;
 
     @PostMapping("/add")
-    void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);
+    @ResponseStatus(HttpStatus.OK)
+    void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request) throws FeignException;
 
     @GetMapping("/address")
+    @ResponseStatus(HttpStatus.OK)
     AddressDto getAddress();
 }
