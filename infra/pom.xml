@@ -11,9 +11,21 @@
 
     <artifactId>infra</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>config-server</module>
         <module>discovery-server</module>
     </modules>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>3.3.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
