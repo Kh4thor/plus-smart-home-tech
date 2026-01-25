@@ -1,26 +1,28 @@
 spring:
-  application:
+  cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      default-filters:
+        - PrefixPath=/api/v1
+        - CircuitBreaker=myCircuitBreaker
+
       routes:
-        # Роут для shopping-cart
+        # Shopping-cart
         - id: shopping_cart_service_route
           uri: lb://shopping-cart
           predicates:
             - Path=/shopping-cart/**
-          filters:
-            - PrefixPath=/api/v1
 
-        # Роут для shopping-store
+        # Shopping-store
         - id: shopping_store_service_route
           uri: lb://shopping-store
           predicates:
             - Path=/shopping-store/**
-          filters:
-            - PrefixPath=/api/v1
+
+        # Warehouse
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
 
 server:
   port: 8080
@@ -29,15 +31,3 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
-
-# Конфигурация для Actuator Gateway
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    gateway:
-      enabled: true
