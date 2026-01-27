@@ -6,12 +6,11 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "addresses")
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "addresses")
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

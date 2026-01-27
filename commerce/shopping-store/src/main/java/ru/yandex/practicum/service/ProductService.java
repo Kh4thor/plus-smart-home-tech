@@ -6,6 +6,7 @@ import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.model.Product;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ProductService {
@@ -19,5 +20,5 @@ public interface ProductService {
 
     boolean remove(UUID id);
 
-    Page<Product> findByCategory(ProductCategory category, Pageable pageable);
+    Page<Product> findByCategory(List<ProductCategory> category, Pageable pageable);
 }

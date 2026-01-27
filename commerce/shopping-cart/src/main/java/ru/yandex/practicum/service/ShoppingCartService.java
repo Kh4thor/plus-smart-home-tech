@@ -12,7 +12,7 @@ import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.repository.ShoppingCartRepository;
-import ru.yandex.practicum.utills.ShoppingCartMapper;
+import ru.yandex.practicum.utils.ShoppingCartMapper;
 
 import java.util.List;
 import java.util.Map;

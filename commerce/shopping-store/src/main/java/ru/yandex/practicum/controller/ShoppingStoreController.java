@@ -20,8 +20,9 @@ import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.service.ProductService;
-import ru.yandex.practicum.utills.ProductMapper;
+import ru.yandex.practicum.utils.ProductMapper;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -63,7 +64,7 @@ public class ShoppingStoreController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ProductDto> findByCategory(
-            @RequestParam ProductCategory category,
+            @RequestParam List<ProductCategory> category,
             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(required = false, defaultValue = "20") @Min(1) int size,
             @RequestParam(required = false) String sort) {

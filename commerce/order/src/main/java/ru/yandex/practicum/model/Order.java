@@ -50,7 +50,7 @@ public class Order {
     Double deliveryVolume;
 
     @Column(name = "fragile")
-    Boolean fragile;
+    boolean fragile;
 
     @Column(name = "total_price")
     Double totalPrice;
