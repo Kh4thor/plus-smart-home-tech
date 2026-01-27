@@ -23,6 +23,7 @@
         <module>telemetry/analyzer</module>
         <module>telemetry/hub-router</module>
         <module>infra/gateway</module>
+        <module>commerce/order</module>
     </modules>
 
     <properties>
