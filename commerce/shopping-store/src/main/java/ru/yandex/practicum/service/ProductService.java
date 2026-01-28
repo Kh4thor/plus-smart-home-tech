@@ -20,5 +20,5 @@ public interface ProductService {
 
     boolean remove(UUID id);
 
-    Page<Product> findByCategory(List<ProductCategory> category, Pageable pageable);
+    Page<Product> findByCategories(List<ProductCategory> category, Pageable pageable);
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.feign.shopping.store;
 import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +19,11 @@ public interface FeignClientShoppingStore {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<ProductDto> getAllProducts(
-            @RequestParam ProductCategory category,
-            @RequestParam Pageable pageable) throws FeignException;
+    List<ProductDto> findByCategories(
+            @RequestParam List<ProductCategory> categories,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String sort) throws FeignException;
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,7 +39,7 @@ public interface FeignClientShoppingStore {
 
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
-    boolean updateQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) throws FeignException;
+    boolean setQuantityState(@RequestBody @Valid SetProductQuantityStateRequest request) throws FeignException;
 
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)

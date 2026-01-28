@@ -63,7 +63,7 @@ public class ShoppingStoreController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<ProductDto> findByCategory(
+    public Page<ProductDto> findByCategories(
             @RequestParam List<ProductCategory> category,
             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(required = false, defaultValue = "20") @Min(1) int size,
@@ -71,7 +71,7 @@ public class ShoppingStoreController {
         Pageable pageable = createPageable(page, size, sort);
         log.debug("API: GET /api/v1/shopping-store?category={}&page={}&size={}&sort={}",
                 category, page, size, sort != null ? sort : "N/A");
-        return productService.findByCategory(category, pageable)
+        return productService.findByCategories(category, pageable)
                 .map(ProductMapper::toProductDto);
     }
 

@@ -2,6 +2,7 @@ package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
@@ -27,10 +28,11 @@ public class OrderController {
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
     public OrderDto createNewOrderByRequest(
             @RequestParam String username,
             @RequestBody @Valid CreateNewOrderRequest request) {
-        orderService.createNewOrderByRequest(username, request);
-
+        Order newOrder = orderService.createNewOrderByRequest(username, request);
+        return OrderMapper.toOrderDto(newOrder);
     }
 }

@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     private static final ProductState DEACTIVATE_STATE = ProductState.DEACTIVATE;
 
     @Override
-    public Page<Product> findByCategory(List<ProductCategory> categories, Pageable pageable) {
+    public Page<Product> findByCategories(List<ProductCategory> categories, Pageable pageable) {
         return productRepository.findByProductCategoryIn(categories, pageable);
     }
 
