@@ -1,4 +1,4 @@
-package ru.yandex.practicum.exception.payment;
+package ru.yandex.practicum.exception.order;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,12 +10,11 @@ import ru.yandex.practicum.exception.ErrorResponse;
 
 @Slf4j
 @RestControllerAdvice
-public class PaymentExceptionHandler {
+public class OrderExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNotEnoughInfoInOrderToCalculateException(
-            NotEnoughInfoInOrderToCalculateException exception) {
+    public ErrorResponse handleOrderException(NoOrderFoundException exception) {
         return handleException(exception);
     }
 

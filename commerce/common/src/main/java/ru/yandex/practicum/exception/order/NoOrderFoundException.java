@@ -1,4 +1,4 @@
-package ru.yandex.practicum.exception.payment;
+package ru.yandex.practicum.exception.order;
 
 import ru.yandex.practicum.exception.CustomException;
 
