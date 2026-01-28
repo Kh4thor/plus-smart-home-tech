@@ -10,7 +10,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/delivery")
 public class DeliveryController {
 
-
     @PutMapping
     public DeliveryDto createNewDelivery(@RequestBody @Valid DeliveryDto deliveryDto) {
         return deliveryDto;
