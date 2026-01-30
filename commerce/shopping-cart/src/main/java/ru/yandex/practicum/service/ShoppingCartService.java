@@ -10,7 +10,7 @@ import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.shopping.cart.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
-import ru.yandex.practicum.model.ShoppingCart;
+import ru.yandex.practicum.model.shopping.cart.ShoppingCart;
 import ru.yandex.practicum.repository.ShoppingCartRepository;
 import ru.yandex.practicum.utils.ShoppingCartMapper;
 

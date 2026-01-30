@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
-import ru.yandex.practicum.model.Order;
+import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.service.OrderService;
 import ru.yandex.practicum.utils.OrderMapper;
 

@@ -18,7 +18,7 @@ import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.model.shopping.store.Product;
 import ru.yandex.practicum.service.ProductService;
 import ru.yandex.practicum.utils.ProductMapper;
 

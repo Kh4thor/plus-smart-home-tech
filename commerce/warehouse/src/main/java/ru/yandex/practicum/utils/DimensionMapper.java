@@ -1,7 +1,7 @@
 package ru.yandex.practicum.utils;
 
 import ru.yandex.practicum.dto.warehouse.DimensionDto;
-import ru.yandex.practicum.model.Dimension;
+import ru.yandex.practicum.model.warehouse.Dimension;
 
 public class DimensionMapper {
 

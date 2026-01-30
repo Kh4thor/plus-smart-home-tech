@@ -1,7 +1,7 @@
 package ru.yandex.practicum.utils;
 
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.model.shopping.store.Product;
 
 public class ProductMapper {
 

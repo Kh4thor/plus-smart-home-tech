@@ -14,8 +14,8 @@ import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseExce
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
-import ru.yandex.practicum.model.Dimension;
-import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.model.warehouse.Dimension;
+import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.repository.AddressRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 import ru.yandex.practicum.utils.WarehouseProductBuilder;

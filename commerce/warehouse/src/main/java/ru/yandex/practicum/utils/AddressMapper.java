@@ -1,7 +1,7 @@
 package ru.yandex.practicum.utils;
 
 import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.model.Address;
+import ru.yandex.practicum.model.warehouse.Address;
 
 public class AddressMapper {
 
