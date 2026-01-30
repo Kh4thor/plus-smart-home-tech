@@ -9,7 +9,7 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.service.OrderService;
-import ru.yandex.practicum.utils.OrderMapper;
+import ru.yandex.practicum.utils.order.OrderMapper;
 
 import java.util.List;
 import java.util.UUID;

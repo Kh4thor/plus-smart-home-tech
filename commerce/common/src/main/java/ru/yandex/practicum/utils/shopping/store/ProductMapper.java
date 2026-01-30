@@ -1,4 +1,4 @@
-package ru.yandex.practicum.utils;
+package ru.yandex.practicum.utils.shopping.store;
 
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.model.shopping.store.Product;

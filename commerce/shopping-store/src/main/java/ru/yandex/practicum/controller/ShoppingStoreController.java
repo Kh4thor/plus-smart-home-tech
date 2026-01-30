@@ -20,7 +20,7 @@ import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
 import ru.yandex.practicum.model.shopping.store.Product;
 import ru.yandex.practicum.service.ProductService;
-import ru.yandex.practicum.utils.ProductMapper;
+import ru.yandex.practicum.utils.shopping.store.ProductMapper;
 
 import java.util.List;
 import java.util.UUID;
