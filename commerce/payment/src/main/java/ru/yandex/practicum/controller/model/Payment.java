@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "payments")
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
