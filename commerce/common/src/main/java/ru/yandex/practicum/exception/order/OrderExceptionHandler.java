@@ -13,7 +13,7 @@ import ru.yandex.practicum.exception.ErrorResponse;
 public class OrderExceptionHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleOrderException(NoOrderFoundException exception) {
         return handleException(exception);
     }

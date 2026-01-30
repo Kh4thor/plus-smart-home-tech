@@ -1,5 +1,6 @@
 package ru.yandex.practicum.utils;
 
+import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.Order;
@@ -46,4 +47,15 @@ public class OrderMapper {
                 .address(address)
                 .build();
     }
+
+    public DeliveryDto toDelivery(OrderDto orderDto) {
+        return DeliveryDto.builder()
+                .deliveryId(orderDto.getDeliveryId())
+                .orderId(orderDto.getOrderId())
+                .fromAddress()
+                .toAddress()
+                .state(orderDto.getState())
+                .build();
+    }
+
 }
