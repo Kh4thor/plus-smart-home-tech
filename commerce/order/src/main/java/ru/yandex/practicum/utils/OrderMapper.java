@@ -52,10 +52,9 @@ public class OrderMapper {
         return DeliveryDto.builder()
                 .deliveryId(orderDto.getDeliveryId())
                 .orderId(orderDto.getOrderId())
-                .fromAddress()
+                .fromAddress(orderDto.)
                 .toAddress()
                 .state(orderDto.getState())
                 .build();
     }
-
 }
