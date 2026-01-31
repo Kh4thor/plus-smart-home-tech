@@ -36,7 +36,7 @@ public class PaymentController {
     @ResponseStatus(HttpStatus.OK)
     public Double getTotalCost(@RequestBody @Valid OrderDto orderDto) {
         log.debug("POST /api/v1/payment/totalCost - orderDto: {}", orderDto);
-        Double totalCost = paymentService.getTotalCost();
+        Double totalCost = paymentService.getTotalCost(orderDto);
         log.info("Total cost: {}", totalCost);
         return totalCost;
     }

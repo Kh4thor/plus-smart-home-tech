@@ -1,9 +1,8 @@
 package ru.yandex.practicum.utils.order;
 
-import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.order.OrderDto;
-import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.model.order.Order;
+import ru.yandex.practicum.model.warehouse.Address;
 
 public class OrderMapper {
 
@@ -45,16 +44,6 @@ public class OrderMapper {
                 .productPrice(productPrice)
                 .username(username)
                 .address(address)
-                .build();
-    }
-
-    public DeliveryDto toDelivery(OrderDto orderDto) {
-        return DeliveryDto.builder()
-                .deliveryId(orderDto.getDeliveryId())
-                .orderId(orderDto.getOrderId())
-                .fromAddress(orderDto.)
-                .toAddress()
-                .state(orderDto.getState())
                 .build();
     }
 }
