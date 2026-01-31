@@ -19,6 +19,13 @@ public class PaymentExceptionHandler {
         return handleException(exception);
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlePaymentNotFoundException(
+            PaymentNotFoundException exception) {
+        return handleException(exception);
+    }
+
     private ErrorResponse handleException(CustomException exception) {
         log.warn("{} {}", exception.getUserMessage(), exception.getMessage());
         return ErrorResponse.builder()

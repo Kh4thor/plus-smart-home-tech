@@ -8,8 +8,8 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.enums.payment.PaymentState;
 import ru.yandex.practicum.exception.order.NoOrderFoundException;
 import ru.yandex.practicum.exception.payment.NotEnoughInfoInOrderToCalculateException;
+import ru.yandex.practicum.exception.payment.PaymentNotFoundException;
 import ru.yandex.practicum.feign.order.FeignClientOrder;
-import ru.yandex.practicum.feign.payment.FeignClientPayment;
 import ru.yandex.practicum.model.payment.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
@@ -21,7 +21,6 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final FeignClientOrder feignClientOrder;
-    private final FeignClientPayment feignClientPayment;
     private static final double FEE_TAX = 0.15;
 
     //TODO
@@ -57,7 +56,10 @@ public class PaymentService {
     }
 
     private Payment getPayment(UUID paymentId) {
-        feignClientPayment.ge
+        String userMessage = "Unable to get payment by id";
+        Payment payment = paymentRepository.findByPaymentId(paymentId).orElseThrow(
+                new PaymentNotFoundException(userMessage, paymentId);
+        );
     }
 
     //TODO
