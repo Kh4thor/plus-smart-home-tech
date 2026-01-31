@@ -47,7 +47,7 @@ public class OrderController {
 
     @PostMapping("/return")
     public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request) {
-        log.debug("POST /api/v1/order - request: {}", request);
+        log.debug("POST /api/v1/order/return - request: {}", request);
         Order returnedOrder = orderService.returnOrderByRequest(request);
         log.info("Returned order: {}", returnedOrder);
         OrderDto returnedOrderDto = OrderMapper.toOrderDto(returnedOrder);
@@ -59,7 +59,7 @@ public class OrderController {
     //TODO
     @PostMapping("/payment")
     public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/payment - orderId: {}", orderId);
         Order paidOrder = orderService.makePaymentByOrderId(orderId);
         log.info("Paid order: {}", paidOrder);
         OrderDto paidOrderDto = OrderMapper.toOrderDto(paidOrder);
@@ -70,7 +70,7 @@ public class OrderController {
     //TODO
     @PostMapping("/payment/failed")
     public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/failed - orderId: {}", orderId);
         Order failedToPayOrder = orderService.failedPaymentByOrderId(orderId);
         log.info("Failed to pay order: {}", failedToPayOrder);
         OrderDto failedToPayOrderDto = OrderMapper.toOrderDto(failedToPayOrder);
@@ -82,7 +82,7 @@ public class OrderController {
     //TODO
     @PostMapping("/delivery")
     public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/delivery - orderId: {}", orderId);
         Order deliveryOrder = orderService.deliverByOrderId(orderId);
         log.info("Delivery order: {}", deliveryOrder);
         OrderDto deliveryOrderDto = OrderMapper.toOrderDto(deliveryOrder);
@@ -92,6 +92,7 @@ public class OrderController {
 
     @PostMapping("/delivery/failed")
     public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order/delivery/failed - orderId: {}", orderId);
         Order failedToDeliverOrder = orderService.failedDeliveryByOrderId(orderId);
         log.info("Failed to deliver order: {}", failedToDeliverOrder);
         OrderDto failedToDeliverOrderDto = OrderMapper.toOrderDto(failedToDeliverOrder);
@@ -103,7 +104,7 @@ public class OrderController {
     //TODO
     @PostMapping("/completed")
     public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/completed - orderId: {}", orderId);
         Order completedOrder = orderService.completedByOrderId(orderId);
         log.info("Completed order: {}", completedOrder);
         OrderDto completedOrderDto = OrderMapper.toOrderDto(completedOrder);
@@ -114,7 +115,7 @@ public class OrderController {
     //=== CALCULATE ===
     @PostMapping("/calculate/total")
     public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/calculate/total - orderId: {}", orderId);
         Order calculatedTotalPriceOrder = orderService.calculateTotalPriceByOrderId(orderId);
         log.info("Calculated total price order: {}", calculatedTotalPriceOrder);
         OrderDto calculatedTotalPriceDto = OrderMapper.toOrderDto(calculatedTotalPriceOrder);
@@ -125,7 +126,7 @@ public class OrderController {
     //=== ASSEMBLY ===
     @PostMapping("/assembly")
     public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/assembly - orderId: {}", orderId);
         Order assembledOrder = orderService.assembleByOrderId(orderId);
         log.info("Assembled order: {}", assembledOrder);
         OrderDto assembledOrderDto = OrderMapper.toOrderDto(assembledOrder);
@@ -135,7 +136,7 @@ public class OrderController {
 
     @PostMapping("/assembly/failed")
     public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        log.debug("POST /api/v1/order/assembly/failed - orderId: {}", orderId);
         Order failedToAssembleOrder = orderService.failedAssemblyByOrderId(orderId);
         log.info("Failed to assemble order: {}", failedToAssembleOrder);
         OrderDto failedToAssembleOrderDto = OrderMapper.toOrderDto(failedToAssembleOrder);

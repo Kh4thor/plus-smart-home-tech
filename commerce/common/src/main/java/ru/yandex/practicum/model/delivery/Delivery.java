@@ -33,9 +33,9 @@ public class Delivery {
     private Address toAddress;
 
     @Column(name = "order_id")
-    private UUID orderID;
+    private UUID orderId;
 
     @Column(name = "delivery_state")
     @Enumerated(value = EnumType.STRING)
-    private DeliveryState deliveryState;
+    private DeliveryState state;
 }
