@@ -8,6 +8,8 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.enums.payment.PaymentState;
 import ru.yandex.practicum.exception.order.NoOrderFoundException;
 import ru.yandex.practicum.exception.payment.NotEnoughInfoInOrderToCalculateException;
+import ru.yandex.practicum.feign.order.FeignClientOrder;
+import ru.yandex.practicum.feign.payment.FeignClientPayment;
 import ru.yandex.practicum.model.payment.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
@@ -18,6 +20,8 @@ import java.util.UUID;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final FeignClientOrder feignClientOrder;
+    private final FeignClientPayment feignClientPayment;
     private static final double FEE_TAX = 0.15;
 
     //TODO
@@ -40,7 +44,7 @@ public class PaymentService {
     public void successfulPayment(UUID paymentId) {
         Payment payment = getPaymentById(paymentId);
         payment.setState(PaymentState.SUCCESS);
-        orderClient.paymentOrder(payment.getOrderId());
+        OrderDto orderDto = feignClientOrder.makePaymentByOrderId(paymentId);
     }
 
     //TODO
@@ -50,6 +54,10 @@ public class PaymentService {
         payment.setState(PaymentState.PENDING);
         String userMessage = "Payment refunded";
         throw new NoOrderFoundException(userMessage, orderDto.getOrderId());
+    }
+
+    private Payment getPayment(UUID paymentId) {
+        feignClientPayment.ge
     }
 
     //TODO

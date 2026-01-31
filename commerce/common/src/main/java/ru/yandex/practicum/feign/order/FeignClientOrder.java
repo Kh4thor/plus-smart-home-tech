@@ -1,5 +1,6 @@
 package ru.yandex.practicum.feign.order;
 
+import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public interface FeignClientOrder {
      * @return список {@link OrderDto} заказов, принадлежащих пользователю
      */
     @GetMapping
-    public List<OrderDto> getOrdersByUserName(String username);
+    public List<OrderDto> getOrdersByUserName(String username) throws FeignException;
 
     /**
      * Создает новый заказ на основе предоставленного запроса.
@@ -43,7 +44,7 @@ public interface FeignClientOrder {
     @ResponseStatus(HttpStatus.OK)
     public OrderDto createNewOrderByRequest(
             @RequestParam String username,
-            @RequestBody @Valid CreateNewOrderRequest request);
+            @RequestBody @Valid CreateNewOrderRequest request) throws FeignException;
 
     /**
      * Обрабатывает возврат товаров в заказе на основе запроса на возврат.
@@ -52,7 +53,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} обновленного заказа после обработки возврата
      */
     @PostMapping("/return")
-    public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request);
+    public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request) throws FeignException;
 
     /**
      * Выполняет операцию оплаты для заказа с указанным идентификатором.
@@ -61,7 +62,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после успешной оплаты
      */
     @PostMapping("/payment")
-    public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Обрабатывает неудачную попытку оплаты заказа.
@@ -70,7 +71,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после обработки неудачной оплаты
      */
     @PostMapping("/payment/failed")
-    public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Инициирует процесс доставки для заказа с указанным идентификатором.
@@ -79,7 +80,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после инициации доставки
      */
     @PostMapping("/delivery")
-    public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Обрабатывает неудачную попытку доставки заказа.
@@ -88,7 +89,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после обработки неудачной доставки
      */
     @PostMapping("/delivery/failed")
-    public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Отмечает заказ как завершенный.
@@ -97,7 +98,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} завершенного заказа
      */
     @PostMapping("/completed")
-    public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Рассчитывает общую стоимость заказа с учетом всех компонентов.
@@ -106,7 +107,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа с рассчитанной общей стоимостью
      */
     @PostMapping("/calculate/total")
-    public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Инициирует процесс сборки заказа.
@@ -115,7 +116,7 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после инициации сборки
      */
     @PostMapping("/assembly")
-    public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 
     /**
      * Обрабатывает неудачную попытку сборки заказа.
@@ -124,5 +125,5 @@ public interface FeignClientOrder {
      * @return {@link OrderDto} заказа после обработки неудачной сборки
      */
     @PostMapping("/assembly/failed")
-    public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId);
+    public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
 }

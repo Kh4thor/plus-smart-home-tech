@@ -3,17 +3,16 @@ package ru.yandex.practicum.feign.payment;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.dto.order.OrderDto;
-import ru.yandex.practicum.dto.order.ProductReturnRequest;
-
-import java.util.List;
-import java.util.UUID;
+import ru.yandex.practicum.dto.payment.PaymentDto;
 
 /**
  * Feign-клиент для взаимодействия с сервисом платежей (payment service).
- * Предоставляет методы для работы с заказами, платежами, доставкой, сборкой и расчетами.
+ * Предоставляет методы для создания платежей, расчета стоимостей,
+ * обработки возвратов и неудачных платежей.
  * <p>
  * Все методы соответствуют REST API эндпоинтам сервиса платежей.
  * Используется аннотация {@link FeignClient} для интеграции через Spring Cloud OpenFeign.
@@ -23,108 +22,54 @@ import java.util.UUID;
 public interface FeignClientPayment {
 
     /**
-     * Получает список заказов по имени пользователя.
+     * Создает новый платеж на основе данных заказа.
      *
-     * @param username имя пользователя для поиска заказов
-     * @return список {@link OrderDto} заказов пользователя
+     * @param orderDto объект {@link OrderDto} с данными заказа для создания платежа
+     * @return {@link PaymentDto} созданный платеж
      */
-    @GetMapping
-    public List<OrderDto> getOrdersByUserName(String username);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public PaymentDto createPayment(@RequestBody @Valid OrderDto orderDto);
 
     /**
-     * Создает новый заказ на основе запроса.
+     * Рассчитывает общую стоимость для указанного заказа.
      *
-     * @param username имя пользователя, создающего заказ
-     * @param request  {@link CreateNewOrderRequest} с данными для создания заказа
-     * @return {@link OrderDto} созданного заказа
+     * @param orderDto объект {@link OrderDto} с данными заказа для расчета стоимости
+     * @return общая стоимость заказа
      */
-    @PutMapping
+    @PostMapping("/totalCost")
     @ResponseStatus(HttpStatus.OK)
-    public OrderDto createNewOrderByRequest(
-            @RequestParam String username,
-            @RequestBody @Valid CreateNewOrderRequest request);
+    public Double getTotalCost(@RequestBody @Valid OrderDto orderDto);
 
     /**
-     * Обрабатывает возврат товаров на основе запроса.
+     * Обрабатывает возврат платежа для указанного заказа.
+     * Метод возвращает статус NOT_FOUND (404), что может указывать на
+     * отсутствие соответствующей функциональности или специфичную бизнес-логику.
      *
-     * @param request {@link ProductReturnRequest} с данными для возврата товаров
-     * @return {@link OrderDto} обновленного заказа после возврата
+     * @param orderDto объект {@link OrderDto} с данными заказа для возврата платежа
      */
-    @PostMapping("/return")
-    public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request);
+    @PostMapping("/refund")
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void refundPayment(@RequestBody @Valid OrderDto orderDto);
 
     /**
-     * Выполняет платеж по идентификатору заказа.
+     * Получает стоимость продуктов в указанном заказе.
      *
-     * @param orderId идентификатор заказа для оплаты
-     * @return {@link OrderDto} заказа после проведения платежа
+     * @param orderDto объект {@link OrderDto} с данными заказа для расчета стоимости продуктов
+     * @return стоимость продуктов в заказе
      */
-    @PostMapping("/payment")
-    public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId);
+    @PostMapping("/productCost")
+    @ResponseStatus(HttpStatus.OK)
+    public Double getProductsCostByOrder(@RequestBody @Valid OrderDto orderDto);
 
     /**
-     * Обрабатывает неудачный платеж по идентификатору заказа.
+     * Обрабатывает неудачный платеж для указанного заказа.
+     * Метод возвращает статус NOT_FOUND (404), что может указывать на
+     * отсутствие соответствующей функциональности или специфичную бизнес-логику.
      *
-     * @param orderId идентификатор заказа с неудачным платежом
-     * @return {@link OrderDto} заказа после обработки неудачного платежа
+     * @param orderDto объект {@link OrderDto} с данными заказа с неудачным платежом
      */
-    @PostMapping("/payment/failed")
-    public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Инициирует доставку заказа по идентификатору.
-     *
-     * @param orderId идентификатор заказа для доставки
-     * @return {@link OrderDto} заказа после инициации доставки
-     */
-    @PostMapping("/delivery")
-    public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Обрабатывает неудачную доставку заказа по идентификатору.
-     *
-     * @param orderId идентификатор заказа с неудачной доставкой
-     * @return {@link OrderDto} заказа после обработки неудачной доставки
-     */
-    @PostMapping("/delivery/failed")
-    public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Отмечает заказ как завершенный по идентификатору.
-     * <p>
-     * TODO: Требуется реализация.
-     * </p>
-     *
-     * @param orderId идентификатор заказа для завершения
-     * @return {@link OrderDto} завершенного заказа
-     */
-    @PostMapping("/completed")
-    public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Рассчитывает общую стоимость заказа по идентификатору.
-     *
-     * @param orderId идентификатор заказа для расчета стоимости
-     * @return {@link OrderDto} заказа с рассчитанной общей стоимостью
-     */
-    @PostMapping("/calculate/total")
-    public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Инициирует сборку заказа по идентификатору.
-     *
-     * @param orderId идентификатор заказа для сборки
-     * @return {@link OrderDto} заказа после инициации сборки
-     */
-    @PostMapping("/assembly")
-    public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId);
-
-    /**
-     * Обрабатывает неудачную сборку заказа по идентификатору.
-     *
-     * @param orderId идентификатор заказа с неудачной сборкой
-     * @return {@link OrderDto} заказа после обработки неудачной сборки
-     */
-    @PostMapping("/assembly/failed")
-    public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId);
+    @PostMapping("/failed")
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void failedPayment(@RequestBody @Valid OrderDto orderDto);
 }
