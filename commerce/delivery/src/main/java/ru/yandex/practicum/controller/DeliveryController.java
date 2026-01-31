@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.model.delivery.Delivery;
 import ru.yandex.practicum.service.DeliveryService;
+import ru.yandex.practicum.utils.delivery.DeliveryMapper;
 
 import java.util.UUID;
 
@@ -20,29 +21,45 @@ public class DeliveryController {
 
     //TODO
     @PutMapping
-    public DeliveryDto createNewDelivery(@RequestBody @Valid DeliveryDto deliveryDto) {
+    public DeliveryDto createDeliveryByDto(@RequestBody @Valid DeliveryDto deliveryDto) {
         log.debug("POST /api/v1/delivery - delivery dto: {}", deliveryDto);
-        Delivery delivery = DeliveryMapper
-
+        Delivery createdDelivery = deliveryService.createDeliveryByDto(deliveryDto);
+        log.info("Created delivery: {}", createdDelivery);
+        DeliveryDto createdDeliveryDto = DeliveryMapper.toDeliveryDto(createdDelivery);
+        log.info("Created delivery mapped to dto: {}", createdDeliveryDto);
+        return createdDeliveryDto;
     }
 
     //TODO
     @PostMapping("/successful")
-    public void deliverySuccessful(@RequestBody @Valid UUID deliveryId) {
+    public void successfulDeliveryById(@RequestBody @Valid UUID deliveryId) {
+        log.debug("POST /api/v1/delivery/successful - delivery id: {}", deliveryId);
+        deliveryService.successfulDeliveryById(deliveryId);
+        log.info("Successful delivery id: {}", deliveryId);
     }
 
     //TODO
     @PostMapping("/picked")
-    public void deliveryPicked(@RequestBody @Valid UUID deliveryId) {
+    public void pickedDeliveryById(@RequestBody @Valid UUID deliveryId) {
+        log.debug("POST /api/v1/delivery/picked - delivery id: {}", deliveryId);
+        deliveryService.pickedDeliveryById(deliveryId);
+        log.info("Picked delivery id: {}", deliveryId);
     }
 
     //TODO
     @PostMapping("/failed")
-    public void deliveryFailed(@RequestBody @Valid UUID deliveryId) {
+    public void failedDelivery(@RequestBody @Valid UUID deliveryId) {
+        log.debug("POST /api/v1/delivery/failed - delivery id: {}", deliveryId);
+        deliveryService.failedDelivery(deliveryId);
+        log.info("Failed delivery id: {}", deliveryId);
     }
 
     //TODO
     @PostMapping("/cost")
-    public void deliveryCost(@RequestBody @Valid UUID deliveryId) {
+    public Double getDeliveryCostByDeliveryId(@RequestBody @Valid UUID deliveryId) {
+        log.debug("POST /api/v1/delivery/cost - delivery id: {}", deliveryId);
+        Double deliveryCost = deliveryService.getDeliveryCostByDeliveryId(deliveryId);
+        log.info("Calculated delivery cost for delivery id={} is: {}", deliveryId, deliveryCost);
+        return deliveryCost;
     }
 }
