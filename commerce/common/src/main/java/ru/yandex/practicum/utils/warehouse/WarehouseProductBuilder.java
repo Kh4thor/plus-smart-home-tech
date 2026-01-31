@@ -1,4 +1,4 @@
-package ru.yandex.practicum.utils;
+package ru.yandex.practicum.utils.warehouse;
 
 import ru.yandex.practicum.dto.warehouse.DimensionDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;

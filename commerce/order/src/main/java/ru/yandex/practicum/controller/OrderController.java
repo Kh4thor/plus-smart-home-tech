@@ -2,6 +2,7 @@ package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.utils.order.OrderMapper;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/order")
 @AllArgsConstructor
@@ -22,76 +24,122 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public List<OrderDto> getOrdersByUserName(String userName) {
-        List<Order> orders = orderService.getOrdersByUserName(userName);
+    public List<OrderDto> getOrdersByUserName(String username) {
+        log.debug("GET /api/v1/order - username: {}", username);
+        List<Order> orders = orderService.getOrdersByUserName(username);
         return orders.stream()
                 .map(OrderMapper::toOrderDto)
                 .toList();
     }
 
-    //TODO
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public OrderDto createNewOrderByRequest(
             @RequestParam String username,
             @RequestBody @Valid CreateNewOrderRequest request) {
-        Order newOrder = orderService.createNewOrderByRequest(username, request);
-        return OrderMapper.toOrderDto(newOrder);
+        log.debug("PUT /api/v1/order - username: {}, request: {}", username, request);
+        Order createdOrder = orderService.createNewOrderByRequest(username, request);
+        log.info("Created order: {}", createdOrder);
+        OrderDto createdOrderDto = OrderMapper.toOrderDto(createdOrder);
+        log.info("Created order mapped to dto: {}", createdOrderDto);
+        return createdOrderDto;
     }
 
-    //TODO
     @PostMapping("/return")
-    public ProductReturnRequest returnOrder(@RequestBody @Valid ProductReturnRequest productReturnRequest) {
-        return productReturnRequest;
+    public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request) {
+        log.debug("POST /api/v1/order - request: {}", request);
+        Order returnedOrder = orderService.returnOrderByRequest(request);
+        log.info("Returned order: {}", returnedOrder);
+        OrderDto returnedOrderDto = OrderMapper.toOrderDto(returnedOrder);
+        log.info("Returned order mapped to dto: {}", returnedOrderDto);
+        return returnedOrderDto;
     }
 
     //=== PAYMENT ===
     //TODO
     @PostMapping("/payment")
-    public OrderDto paymentByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order paidOrder = orderService.makePaymentByOrderId(orderId);
+        log.info("Paid order: {}", paidOrder);
+        OrderDto paidOrderDto = OrderMapper.toOrderDto(paidOrder);
+        log.info("Paid order mapped to dto: {}", paidOrderDto);
+        return paidOrderDto;
     }
 
     //TODO
     @PostMapping("/payment/failed")
-    public OrderDto failedPaymentByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order failedToPayOrder = orderService.failedPaymentByOrderId(orderId);
+        log.info("Failed to pay order: {}", failedToPayOrder);
+        OrderDto failedToPayOrderDto = OrderMapper.toOrderDto(failedToPayOrder);
+        log.info("Failed to pay order mapped to dto: {}", failedToPayOrderDto);
+        return failedToPayOrderDto;
     }
 
     //=== DELIVERY ===
     //TODO
     @PostMapping("/delivery")
-    public OrderDto deliveryByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order deliveryOrder = orderService.deliverByOrderId(orderId);
+        log.info("Delivery order: {}", deliveryOrder);
+        OrderDto deliveryOrderDto = OrderMapper.toOrderDto(deliveryOrder);
+        log.info("Delivery order mapped to dto: {}", deliveryOrderDto);
+        return deliveryOrderDto;
     }
 
-    //TODO
     @PostMapping("/delivery/failed")
-    public OrderDto failedDeliveryByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId) {
+        Order failedToDeliverOrder = orderService.failedDeliveryByOrderId(orderId);
+        log.info("Failed to deliver order: {}", failedToDeliverOrder);
+        OrderDto failedToDeliverOrderDto = OrderMapper.toOrderDto(failedToDeliverOrder);
+        log.info("Failed to deliver order mapped to dto: {}", failedToDeliverOrderDto);
+        return failedToDeliverOrderDto;
     }
 
     //=== COMPLETED ===
     //TODO
     @PostMapping("/completed")
-    public OrderDto completedOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order completedOrder = orderService.completedByOrderId(orderId);
+        log.info("Completed order: {}", completedOrder);
+        OrderDto completedOrderDto = OrderMapper.toOrderDto(completedOrder);
+        log.info("Completed order mapped to dto: {}", completedOrderDto);
+        return completedOrderDto;
     }
 
     //=== CALCULATE ===
     @PostMapping("/calculate/total")
-    public OrderDto calculateTotalPriceByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order calculatedTotalPriceOrder = orderService.calculateTotalPriceByOrderId(orderId);
+        log.info("Calculated total price order: {}", calculatedTotalPriceOrder);
+        OrderDto calculatedTotalPriceDto = OrderMapper.toOrderDto(calculatedTotalPriceOrder);
+        log.info("Calculated total price mapped to dto: {}", calculatedTotalPriceDto);
+        return calculatedTotalPriceDto;
     }
 
     //=== ASSEMBLY ===
     @PostMapping("/assembly")
-    public OrderDto assemblyByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order assembledOrder = orderService.assembleByOrderId(orderId);
+        log.info("Assembled order: {}", assembledOrder);
+        OrderDto assembledOrderDto = OrderMapper.toOrderDto(assembledOrder);
+        log.info("Assembled order mapped to dto: {}", assembledOrderDto);
+        return assembledOrderDto;
     }
 
     @PostMapping("/assembly/failed")
-    public OrderDto failedAssemblyByOrder(@RequestBody @Valid UUID orderId) {
-        return new OrderDto();
+    public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId) {
+        log.debug("POST /api/v1/order - orderId: {}", orderId);
+        Order failedToAssembleOrder = orderService.failedAssemblyByOrderId(orderId);
+        log.info("Failed to assemble order: {}", failedToAssembleOrder);
+        OrderDto failedToAssembleOrderDto = OrderMapper.toOrderDto(failedToAssembleOrder);
+        log.info("Failed to assemble order mapped to dto: {}", failedToAssembleOrderDto);
+        return failedToAssembleOrderDto;
     }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import ru.yandex.practicum.enums.order.OrderState;
+import ru.yandex.practicum.model.warehouse.Address;
 
 import java.util.Map;
 import java.util.UUID;

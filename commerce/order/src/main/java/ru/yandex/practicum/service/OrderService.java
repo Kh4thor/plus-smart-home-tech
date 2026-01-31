@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
+import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -11,12 +12,12 @@ import ru.yandex.practicum.enums.order.OrderState;
 import ru.yandex.practicum.exception.shopping.cart.ShoppingCartNotFoundException;
 import ru.yandex.practicum.feign.payment.FeignClientPayment;
 import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
-import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.model.shopping.cart.ShoppingCart;
+import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.repository.OrderRepository;
-import ru.yandex.practicum.utils.AddressMapper;
-import ru.yandex.practicum.utils.ShoppingCartMapper;
+import ru.yandex.practicum.utils.shopping.cart.ShoppingCartMapper;
+import ru.yandex.practicum.utils.warehouse.AddressMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,11 +65,46 @@ public class OrderService {
                 .state(orderState)
                 .deliveryWeight(deliveryWeight)
                 .deliveryVolume(deliveryVolume)
-                .fragile(fragile)
-                .username(username)
+                .fragile(fragile).username(username)
                 .address(address)
                 .build();
 
         return orderRepository.save(order);
+    }
+
+    public Order returnOrderByRequest(ProductReturnRequest productReturnRequest) {
+        return null;
+    }
+
+    public Order makePaymentByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order failedPaymentByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order deliverByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order failedDeliveryByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order completedByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order calculateTotalPriceByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order assembleByOrderId(UUID orderId) {
+        return null;
+    }
+
+    public Order failedAssemblyByOrderId(UUID orderId) {
+        return null;
     }
 }

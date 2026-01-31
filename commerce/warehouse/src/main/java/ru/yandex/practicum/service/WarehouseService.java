@@ -18,7 +18,7 @@ import ru.yandex.practicum.model.warehouse.Dimension;
 import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.repository.AddressRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
-import ru.yandex.practicum.utils.WarehouseProductBuilder;
+import ru.yandex.practicum.utils.warehouse.WarehouseProductBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
