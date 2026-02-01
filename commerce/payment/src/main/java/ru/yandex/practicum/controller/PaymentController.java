@@ -11,6 +11,8 @@ import ru.yandex.practicum.model.payment.Payment;
 import ru.yandex.practicum.service.PaymentService;
 import ru.yandex.practicum.utils.payment.PaymentMapper;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/payment")
@@ -44,10 +46,10 @@ public class PaymentController {
     //TODO
     @PostMapping("/refund")
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void refundPayment(@RequestBody @Valid OrderDto orderDto) {
-        log.debug("POST /api/v1/payment/refund - orderDto: {}", orderDto);
+    public void refundPayment(@RequestBody @Valid UUID paymentId) {
+        log.debug("POST /api/v1/payment/refund - orderDto: {}", paymentId);
+        paymentService.refundPayment(paymentId);
         log.warn("Payment refunded");
-        paymentService.refundPayment(orderDto);
     }
 
     //TODO

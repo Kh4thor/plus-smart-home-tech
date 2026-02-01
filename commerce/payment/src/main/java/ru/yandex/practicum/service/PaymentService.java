@@ -5,14 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.enums.payment.PaymentState;
-import ru.yandex.practicum.exception.order.NoOrderFoundException;
 import ru.yandex.practicum.exception.payment.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.exception.payment.PaymentNotFoundException;
 import ru.yandex.practicum.feign.order.FeignClientOrder;
+import ru.yandex.practicum.feign.shopping.store.FeignClientShoppingStore;
 import ru.yandex.practicum.model.payment.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -21,54 +23,61 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final FeignClientOrder feignClientOrder;
+    private final FeignClientShoppingStore feignClientShoppingStore;
     private static final double FEE_TAX = 0.15;
 
-    //TODO
     @Transactional
     public Payment createPayment(OrderDto orderDto) {
         String userMessage = "Unable to create payment";
-
-        Payment payment = Payment.builder().orderId(orderDto.getOrderId()).totalPayment(getTotalCost(orderDto, userMessage)).deliveryTotal(getDeliveryPrice(orderDto, userMessage)).feeTotal(getFeeTotal(orderDto, userMessage)).state(PaymentState.PENDING).build();
-
+        Payment payment = Payment.builder()
+                .orderId(orderDto.getOrderId())
+                .totalPayment(getTotalCost(orderDto, userMessage))
+                .deliveryTotal(getDeliveryPrice(orderDto, userMessage))
+                .feeTotal(getFeeTotal(orderDto, userMessage))
+                .state(PaymentState.PENDING)
+                .build();
         return paymentRepository.save(payment);
     }
 
-    //TODO
+    @Transactional(readOnly = true)
     public Double getTotalCost(OrderDto orderDto) {
         String userMessage = "Unable to calculate total cost";
         return getTotalCost(orderDto, userMessage);
     }
 
-    @Transactional
-    public void successfulPayment(UUID paymentId) {
-        Payment payment = getPaymentById(paymentId);
+    public void refundPayment(@Valid UUID paymentId) {
+        String userMessage = "Unable to refund payment";
+        Payment payment = getPaymentById(paymentId, userMessage);
         payment.setState(PaymentState.SUCCESS);
         OrderDto orderDto = feignClientOrder.makePaymentByOrderId(paymentId);
     }
 
-    //TODO
-    public void refundPayment(@Valid OrderDto orderDto) {
-        UUID paymentId = orderDto.getPaymentId();
-        Payment payment = getPayment(UUID paymentId);
-        payment.setState(PaymentState.PENDING);
-        String userMessage = "Payment refunded";
-        throw new NoOrderFoundException(userMessage, orderDto.getOrderId());
-    }
-
-    private Payment getPayment(UUID paymentId) {
-        String userMessage = "Unable to get payment by id";
-        Payment payment = paymentRepository.findByPaymentId(paymentId).orElseThrow(
-                new PaymentNotFoundException(userMessage, paymentId);
-        );
-    }
-
-    //TODO
     public Double getProductsCostByOrder(OrderDto orderDto) {
-        return null;
+        Map<UUID, Integer> products = orderDto.getProducts();
+        double productsCost = 0.0;
+
+        for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
+            UUID productId = entry.getKey();
+            Integer quantity = entry.getValue();
+            ProductDto productDto = feignClientShoppingStore.getProduct(productId);
+            Double productPricePerUnit = productDto.getPrice();
+            productsCost += productPricePerUnit * quantity;
+        }
+        return productsCost;
     }
 
-    public void failedPayment(OrderDto orderDto) {
+    @Transactional
+    public void failedPayment(UUID paymentId) {
+        String userMessage = "Payment failed";
+        Payment payment = getPaymentById(paymentId, userMessage);
+        payment.setState(PaymentState.FAILED);
+        OrderDto orderDto = feignClientOrder.makePaymentByOrderId(paymentId);
+    }
 
+    private Payment getPaymentById(UUID paymentId, String userMessage) {
+        return paymentRepository.findByPaymentId(paymentId).orElseThrow(() ->
+                new PaymentNotFoundException(userMessage, paymentId)
+        );
     }
 
     private double getProductPrice(OrderDto orderDto, String userMessage) {
