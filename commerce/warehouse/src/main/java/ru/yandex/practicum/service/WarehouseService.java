@@ -13,6 +13,8 @@ import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseExce
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
+import ru.yandex.practicum.feign.order.FeignClientOrder;
+import ru.yandex.practicum.model.shopping.store.Product;
 import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.model.warehouse.Dimension;
 import ru.yandex.practicum.model.warehouse.WarehouseProduct;
@@ -30,6 +32,7 @@ public class WarehouseService {
 
     private final AddressRepository addressRepository;
     private final WarehouseRepository warehouseRepository;
+    private final FeignClientOrder  feignClientOrder;
     private Map<UUID, Integer> products;
 
     @Transactional
@@ -228,5 +231,13 @@ public class WarehouseService {
             log.warn("{}. Products not found:{}", userMessage, productsNotFound);
             throw new NoSpecifiedProductInWarehouseException(userMessage, productsNotFound);
         }
+    }
+
+    public BookedProductsDto assembleProducts(Map<UUID, Integer> products) {
+        List<UUID> productIdsToAssemble = products.keySet().stream().toList();
+        List<WarehouseProduct> productsToAssemble = warehouseRepository.findAllByProductIdIn(productIdsToAssemble);
+
+        feignClientOrder.g
+
     }
 }
