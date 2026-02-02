@@ -54,5 +54,5 @@ public class OrderDto {
 
     @Builder.Default
     @PositiveOrZero(message = "Product price не может быть отрицательным")
-    private double productPrice;
+    private double productPrice = 0.0;
 }

@@ -58,13 +58,13 @@ public class OrderController {
     //=== PAYMENT ===
     //TODO
     @PostMapping("/payment")
-    public OrderDto makePaymentByOrderId(@RequestBody @Valid UUID orderId) {
-        log.debug("POST /api/v1/order/payment - orderId: {}", orderId);
-        Order paidOrder = orderService.makePaymentByOrderId(orderId);
-        log.info("Paid order: {}", paidOrder);
-        OrderDto paidOrderDto = OrderMapper.toOrderDto(paidOrder);
-        log.info("Paid order mapped to dto: {}", paidOrderDto);
-        return paidOrderDto;
+    public OrderDto makePaymentByOrderId(@RequestBody UUID orderId) {
+        log.debug("POST /api/v1/order/payment - order id: {}", orderId);
+        Order orderUpdated = orderService.makePaymentByOrderId(orderId);
+        log.info("Paid order: {}", orderUpdated);
+        OrderDto orderUpdatedDto = OrderMapper.toOrderDto(orderUpdated);
+        log.info("Paid order mapped to dto: {}", orderUpdatedDto);
+        return orderUpdatedDto;
     }
 
     //TODO

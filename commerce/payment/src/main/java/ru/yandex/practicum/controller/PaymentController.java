@@ -21,7 +21,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    //TODO
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PaymentDto createPayment(@RequestBody @Valid OrderDto orderDto) {
@@ -33,7 +32,6 @@ public class PaymentController {
         return paymentDto;
     }
 
-    //TODO
     @PostMapping("/totalCost")
     @ResponseStatus(HttpStatus.OK)
     public Double getTotalCost(@RequestBody @Valid OrderDto orderDto) {
@@ -43,7 +41,6 @@ public class PaymentController {
         return totalCost;
     }
 
-    //TODO
     @PostMapping("/refund")
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public void refundPayment(@RequestBody @Valid UUID paymentId) {
@@ -52,22 +49,19 @@ public class PaymentController {
         log.warn("Payment refunded");
     }
 
-    //TODO
     @PostMapping("/productCost")
     @ResponseStatus(HttpStatus.OK)
     public Double getProductsCostByOrder(@RequestBody @Valid OrderDto orderDto) {
-        log.debug("POST /api/v1/payment/productCost - orderDto: {}", orderDto);
+        log.debug("POST /api/v1/payment/productCost - order dto: {}", orderDto);
         Double productsCost = paymentService.getProductsCostByOrder(orderDto);
         log.info("Product cost: {}", productsCost);
         return productsCost;
     }
 
-    //TODO
     @PostMapping("/failed")
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void failedPayment(@RequestBody @Valid OrderDto orderDto) {
-        log.debug("POST /api/v1/payment/failed - orderDto: {}", orderDto);
-        log.info("Payment failed");
-        paymentService.failedPayment(orderDto);
+    public void failedPayment(@RequestBody @Valid UUID paymentId) {
+        log.debug("POST /api/v1/payment/failed - payment id: {}", paymentId);
+        paymentService.failedPayment(paymentId);
     }
 }

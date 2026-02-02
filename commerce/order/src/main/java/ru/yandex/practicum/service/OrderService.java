@@ -2,10 +2,13 @@ package ru.yandex.practicum.service;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
+import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -18,6 +21,7 @@ import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.model.shopping.cart.ShoppingCart;
 import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.repository.OrderRepository;
+import ru.yandex.practicum.utils.order.OrderMapper;
 import ru.yandex.practicum.utils.shopping.cart.ShoppingCartMapper;
 import ru.yandex.practicum.utils.warehouse.AddressMapper;
 
@@ -26,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -79,17 +84,25 @@ public class OrderService {
         Order order = getOrderById(request.getOrderId(), userMessage);
 
         if (order.getState() == OrderState.PRODUCT_RETURNED || order.getState() == OrderState.CANCELED) {
-            throw new ValidationException(
-                    String.format("ОШИБКА: Заказ c ID = %s уже был возвращён или отменён", order.getOrderId()));
+            throw new ValidationException(userMessage + ", unexpected order state: " + order.getState());
         }
         feignClientWarehouse.returnProductsToWarehouse(request.getProducts());
         order.setState(OrderState.PRODUCT_RETURNED);
         return order;
     }
 
-    //TODO
     public Order makePaymentByOrderId(UUID orderId) {
-        return null;
+        String userMessage = "Unable to make payment";
+        Order order = getOrderById(orderId, userMessage);
+        if (order.getState() != OrderState.ON_PAYMENT) {
+            throw new ValidationException("Unable to make payment. Expected OrderState.ON_PAYMENT, current state: "
+                    + order.getState());
+        }
+        OrderDto orderDto = OrderMapper.toOrderDto(order);
+        PaymentDto paymentDto = feignClientPayment.createPayment(orderDto);
+        order.setPaymentId(paymentDto.getPaymentId());
+        order.setState(OrderState.PAID);
+        return orderRepository.save(order);
     }
 
     //TODO
