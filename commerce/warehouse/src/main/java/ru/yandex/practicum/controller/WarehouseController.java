@@ -125,7 +125,6 @@ public class WarehouseController {
         return addressDto;
     }
 
-
     /**
      * Возвращает товары на склад.
      *

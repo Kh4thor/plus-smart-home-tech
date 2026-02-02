@@ -82,18 +82,9 @@ public class OrderService {
             throw new ValidationException(
                     String.format("ОШИБКА: Заказ c ID = %s уже был возвращён или отменён", order.getOrderId()));
         }
-
-        if (request.getProducts().isEmpty()) {
-            throw new ValidationException("Список товаров ПУСТ.");
-        }
-
-        feignClientWarehouse.returnProductsToWarehouse();
-
-        warehouseClient.returnProductToTheWarehouse(productReturn.getProducts());
-
+        feignClientWarehouse.returnProductsToWarehouse(request.getProducts());
         order.setState(OrderState.PRODUCT_RETURNED);
-
-        return toDto(order);
+        return order;
     }
 
     //TODO

@@ -193,9 +193,10 @@ public class WarehouseService {
     public void returnProductsToWarehouse(Map<UUID, Integer> products) {
         String userMessage = "Unable to return products to warehouse";
 
-        // поиск товаров для возврата в хранилище
+        // список id-товаров на возврат
         List<UUID> productIdsToReturn = products.keySet().stream().toList();
 
+        // поиск товаров для возврата в хранилище
         List<WarehouseProduct> productsInWarehouse = warehouseRepository.findAllByProductIdIn(productIdsToReturn);
         List<UUID> productIdsInWarehouse = productsInWarehouse.stream().map(WarehouseProduct::getProductId).toList();
 
@@ -206,7 +207,6 @@ public class WarehouseService {
 
         // список товаров с обновленными данными по количеству после возврата
         List<WarehouseProduct> productsToUpdate = new ArrayList<>();
-
 
         // итерация по списку товаров, найденных на складе
         for (WarehouseProduct warehouseProduct : productsInWarehouse) {
