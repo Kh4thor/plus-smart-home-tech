@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +49,10 @@ public class PaymentService {
     public void refundPayment(@Valid UUID paymentId) {
         String userMessage = "Unable to refund payment";
         Payment payment = getPaymentById(paymentId, userMessage);
-        payment.setState(PaymentState.SUCCESS);
         OrderDto orderDto = feignClientOrder.makePaymentByOrderId(paymentId);
+        PaymentState newState = PaymentState.SUCCESS;
+        PaymentState expectedStateOfOrder = PaymentState.PENDING;
+        validateAndSetNewState(newState, expectedStateOfOrder, payment);
     }
 
     public Double getProductsCostByOrder(OrderDto orderDto) {
@@ -70,8 +73,10 @@ public class PaymentService {
     public void failedPayment(UUID paymentId) {
         String userMessage = "Payment failed";
         Payment payment = getPaymentById(paymentId, userMessage);
-        payment.setState(PaymentState.FAILED);
         OrderDto orderDto = feignClientOrder.makePaymentByOrderId(paymentId);
+        PaymentState newState = PaymentState.FAILED;
+        PaymentState expectedStateOfOrder = PaymentState.PENDING;
+        validateAndSetNewState(newState, expectedStateOfOrder, payment);
     }
 
     private Payment getPaymentById(UUID paymentId, String userMessage) {
@@ -104,5 +109,16 @@ public class PaymentService {
         double feePrice = getFeeTotal(orderDto, userMessage);
 
         return productPrice + deliveryPrice + feePrice;
+    }
+
+    private void validateAndSetNewState(PaymentState newState, PaymentState expectedStateOfOrder, Payment payment) {
+        if (payment.getState() != expectedStateOfOrder) {
+            throw new ValidationException(
+                    "Unable to change payment status to: " + newState +
+                            ". Expected state: " + expectedStateOfOrder +
+                            ". Current state: " + payment.getState());
+        }
+        payment.setState(newState);
+        paymentRepository.save(payment);
     }
 }

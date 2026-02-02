@@ -56,20 +56,20 @@ public class OrderService {
             String userMessage = "Shopping cart is null";
             throw new ShoppingCartNotFoundException(userMessage, username);
         }
-
         ShoppingCartDto shoppingCartDto = request.getShoppingCart();
         ShoppingCart shoppingCart = ShoppingCartMapper.toShoppingCart(shoppingCartDto, username);
+        shoppingCartDto = ShoppingCartMapper.toShoppingCartDto(shoppingCart);
 
         BookedProductsDto bookedProductsDto = feignClientWarehouse.checkProductQuantity(shoppingCartDto);
         boolean fragile = bookedProductsDto.isFragile();
         double deliveryWeight = bookedProductsDto.getDeliveryWeight();
         double deliveryVolume = bookedProductsDto.getDeliveryVolume();
-        OrderState orderState = OrderState.NEW;
+        OrderState newOrderState = OrderState.NEW;
 
         Order order = Order.builder()
                 .shoppingCartId(shoppingCartId)
                 .products(products)
-                .state(orderState)
+                .state(newOrderState)
                 .deliveryWeight(deliveryWeight)
                 .deliveryVolume(deliveryVolume)
                 .fragile(fragile).username(username)
@@ -79,11 +79,16 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @Transactional
     public Order returnOrderByRequest(ProductReturnRequest request) {
         String userMessage = "Unable to return order";
         Order order = getOrderById(request.getOrderId(), userMessage);
 
-        if (order.getState() == OrderState.PRODUCT_RETURNED || order.getState() == OrderState.CANCELED) {
+        List<OrderState> invalidatedOrderStates = List.of(
+                OrderState.PRODUCT_RETURNED,
+                OrderState.CANCELED
+        );
+        if (invalidatedOrderStates.contains(order.getState())) {
             throw new ValidationException(userMessage + ", unexpected order state: " + order.getState());
         }
         feignClientWarehouse.returnProductsToWarehouse(request.getProducts());
@@ -91,58 +96,103 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
     public Order makePaymentByOrderId(UUID orderId) {
-        String userMessage = "Unable to make payment";
+        OrderState newState = OrderState.PAID;
+        String userMessage = getUserMessage(newState);
         Order order = getOrderById(orderId, userMessage);
-        if (order.getState() != OrderState.ON_PAYMENT) {
-            throw new ValidationException("Unable to make payment. Expected OrderState.ON_PAYMENT, current state: "
-                    + order.getState());
-        }
         OrderDto orderDto = OrderMapper.toOrderDto(order);
         PaymentDto paymentDto = feignClientPayment.createPayment(orderDto);
         order.setPaymentId(paymentDto.getPaymentId());
+        OrderState expectedCurrentState = OrderState.ON_PAYMENT;
+        Order updatedOrder = validateAndSetNewState(newState, expectedCurrentState, order);
+
         order.setState(OrderState.PAID);
         return orderRepository.save(order);
     }
 
-    //TODO
+    @Transactional
     public Order failedPaymentByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.PAYMENT_FAILED;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.ON_PAYMENT;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    //TODO
+    @Transactional
     public Order deliverByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.ON_DELIVERY;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.ASSEMBLED;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    //TODO
+    @Transactional
     public Order failedDeliveryByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.DELIVERY_FAILED;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.ON_DELIVERY;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    //TODO
+    @Transactional
     public Order completedByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.COMPLETED;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.DELIVERED;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    //TODO
+    @Transactional
     public Order calculateTotalPriceByOrderId(UUID orderId) {
-        return null;
+        String userMessage = "Unable to calculate total price by order id";
+        Order order = getOrderById(orderId, userMessage);
+        OrderDto orderDto = OrderMapper.toOrderDto(order);
+        Double productsPrice = feignClientPayment.getProductsCostByOrder(orderDto);
+        order.setProductPrice(productsPrice);
+        Double totalPrice = feignClientPayment.getTotalCost(orderDto);
+        order.setTotalPrice(totalPrice);
+        return order;
     }
 
-    //TODO
     public Order assembleByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.ASSEMBLED;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.PAID;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    //TODO
     public Order failedAssemblyByOrderId(UUID orderId) {
-        return null;
+        OrderState newState = OrderState.ASSEMBLY_FAILED;
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        OrderState expectedCurrentState = OrderState.PAID;
+        return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
     private Order getOrderById(UUID orderId, String userMessage) {
         return orderRepository.findByOrderId(orderId).orElseThrow(() ->
                 new NoOrderFoundException(userMessage, orderId)
         );
+    }
+
+    private Order validateAndSetNewState(OrderState newState, OrderState expectedStateOfOrder, Order order) {
+        if (order.getState() != expectedStateOfOrder) {
+            throw new ValidationException(
+                    "Unable to change order status to: " + newState +
+                            ". Expected state: " + expectedStateOfOrder +
+                            ". Current state: " + order.getState());
+        }
+        order.setState(newState);
+        return orderRepository.save(order);
+    }
+
+    private String getUserMessage(OrderState newState) {
+        return "Unable to change order status to: " + newState;
     }
 }

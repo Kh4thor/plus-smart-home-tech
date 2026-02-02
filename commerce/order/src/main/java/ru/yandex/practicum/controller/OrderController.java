@@ -56,7 +56,6 @@ public class OrderController {
     }
 
     //=== PAYMENT ===
-    //TODO
     @PostMapping("/payment")
     public OrderDto makePaymentByOrderId(@RequestBody UUID orderId) {
         log.debug("POST /api/v1/order/payment - order id: {}", orderId);
@@ -67,7 +66,6 @@ public class OrderController {
         return orderUpdatedDto;
     }
 
-    //TODO
     @PostMapping("/payment/failed")
     public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/failed - orderId: {}", orderId);
