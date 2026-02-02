@@ -14,7 +14,12 @@ import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseExce
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
+import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.service.WarehouseService;
+import ru.yandex.practicum.utils.warehouse.AddressMapper;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления складскими операциями.
@@ -50,13 +55,14 @@ public class WarehouseController {
      *
      * @param request DTO с данными нового товара для регистрации
      * @throws jakarta.validation.ConstraintViolationException если данные товара не проходят валидацию
-     * @throws SpecifiedProductAlreadyInWarehouseException если товар с таким ID уже зарегистрирован
+     * @throws SpecifiedProductAlreadyInWarehouseException     если товар с таким ID уже зарегистрирован
      * @apiNote Использует HTTP метод PUT для создания нового ресурса
      * @see NewProductInWarehouseRequest
      */
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest request) {
+        log.debug("PUT /api/v1/warehouse - request: {}", request);
         warehouseService.registerNewProduct(request);
     }
 
@@ -67,8 +73,8 @@ public class WarehouseController {
      *
      * @param shoppingCartDto DTO корзины покупок с товарами и их количествами
      * @return DTO с характеристиками доставки: вес, объем и флаг хрупкости
-     * @throws jakarta.validation.ConstraintViolationException если данные корзины не проходят валидацию
-     * @throws NoSpecifiedProductInWarehouseException если один или несколько товаров не найдены на складе
+     * @throws jakarta.validation.ConstraintViolationException      если данные корзины не проходят валидацию
+     * @throws NoSpecifiedProductInWarehouseException               если один или несколько товаров не найдены на складе
      * @throws ProductInShoppingCartLowQuantityInWarehouseException если количество товара на складе недостаточно
      * @see ShoppingCartDto
      * @see BookedProductsDto
@@ -76,6 +82,7 @@ public class WarehouseController {
     @PostMapping("/check")
     @ResponseStatus(HttpStatus.OK)
     public BookedProductsDto checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto) {
+        log.debug("POST /api/v1/warehouse/check - shoppingCartDto: {}", shoppingCartDto);
         return warehouseService.checkProductQuantity(shoppingCartDto);
     }
 
@@ -86,14 +93,15 @@ public class WarehouseController {
      *
      * @param request DTO запроса с идентификатором товара и новым количеством
      * @throws jakarta.validation.ConstraintViolationException если данные запроса не проходят валидацию
-     * @throws WarehouseProductNotFoundException если товар с указанным ID не найден
+     * @throws WarehouseProductNotFoundException               если товар с указанным ID не найден
      * @apiNote Несмотря на название метода "add", он не добавляет к существующему количеству,
-     *          а устанавливает новое значение
+     * а устанавливает новое значение
      * @see AddProductToWarehouseRequest
      */
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.OK)
     public void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request) {
+        log.debug("POST /api/v1/warehouse/add - request: {}", request);
         warehouseService.addProduct(request);
     }
 
@@ -109,6 +117,33 @@ public class WarehouseController {
     @GetMapping("/address")
     @ResponseStatus(HttpStatus.OK)
     public AddressDto getAddress() {
-        return warehouseService.getAddress();
+        log.debug("GET /api/v1/warehouse/address - request");
+        Address address = warehouseService.getAddress();
+        log.info("Address: {}", address);
+        AddressDto addressDto = AddressMapper.toAddressDto(address);
+        log.info("Address mapped to dto: {}", addressDto);
+        return addressDto;
+    }
+
+
+    /**
+     * Возвращает товары на склад.
+     *
+     * @param products Карта товаров для возврата на склад, где ключ - UUID товара,
+     *                 а значение - количество возвращаемых единиц
+     */
+    @PostMapping("/return")
+    void returnProductsToWarehouse(Map<UUID, Integer> products) {
+        warehouseService.returnProductsToWarehouse(products);
+    }
+
+    @PostMapping("/assembly")
+    BookedProductsDto assembleProducts(Map<UUID, Integer> products) {
+        BookedProductsDto productsToAssemble = warehouseService.assembleProducts(products);
+    }
+
+    @PostMapping("/shipped")
+    void shippedProducts(Map<UUID, Integer> products) {
+        warehouseService.shippedProducts(products);
     }
 }

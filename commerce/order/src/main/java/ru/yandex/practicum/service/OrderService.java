@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.enums.order.OrderState;
+import ru.yandex.practicum.exception.order.NoOrderFoundException;
 import ru.yandex.practicum.exception.shopping.cart.ShoppingCartNotFoundException;
 import ru.yandex.practicum.feign.payment.FeignClientPayment;
 import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
@@ -72,39 +74,71 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Order returnOrderByRequest(ProductReturnRequest productReturnRequest) {
-        return null;
+    public Order returnOrderByRequest(ProductReturnRequest request) {
+        String userMessage = "Unable to return order";
+        Order order = getOrderById(request.getOrderId(), userMessage);
+
+        if (order.getState() == OrderState.PRODUCT_RETURNED || order.getState() == OrderState.CANCELED) {
+            throw new ValidationException(
+                    String.format("ОШИБКА: Заказ c ID = %s уже был возвращён или отменён", order.getOrderId()));
+        }
+
+        if (request.getProducts().isEmpty()) {
+            throw new ValidationException("Список товаров ПУСТ.");
+        }
+
+        feignClientWarehouse.returnProductsToWarehouse();
+
+        warehouseClient.returnProductToTheWarehouse(productReturn.getProducts());
+
+        order.setState(OrderState.PRODUCT_RETURNED);
+
+        return toDto(order);
     }
 
+    //TODO
     public Order makePaymentByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order failedPaymentByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order deliverByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order failedDeliveryByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order completedByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order calculateTotalPriceByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order assembleByOrderId(UUID orderId) {
         return null;
     }
 
+    //TODO
     public Order failedAssemblyByOrderId(UUID orderId) {
         return null;
+    }
+
+    private Order getOrderById(UUID orderId, String userMessage) {
+        return orderRepository.findByOrderId(orderId).orElseThrow(() ->
+                new NoOrderFoundException(userMessage, orderId)
+        );
     }
 }

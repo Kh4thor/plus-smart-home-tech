@@ -5,9 +5,12 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.model.order.Order;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findAllByUsername(String username);
+
+    Optional<Order> findByOrderId(UUID orderId);
 }

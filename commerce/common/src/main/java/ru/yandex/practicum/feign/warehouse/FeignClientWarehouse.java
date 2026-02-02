@@ -11,6 +11,9 @@ import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Feign-клиент для взаимодействия с сервисом склада (warehouse service).
  * Предоставляет методы для управления товарами на складе: регистрация новых товаров,
@@ -62,4 +65,12 @@ public interface FeignClientWarehouse {
     @GetMapping("/address")
     @ResponseStatus(HttpStatus.OK)
     AddressDto getAddress();
+
+    /**
+     * Возвращает товары на склад.
+     *
+     * @param products Карта товаров для возврата на склад, где ключ - UUID товара,
+     *                 а значение - количество возвращаемых единиц
+     */
+    void returnProductsToWarehouse(Map<UUID, Integer> products);
 }

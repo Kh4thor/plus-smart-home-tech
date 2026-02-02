@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
+import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.model.warehouse.Dimension;
 import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.repository.AddressRepository;
@@ -28,8 +28,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseService {
 
-    private final WarehouseRepository warehouseRepository;
     private final AddressRepository addressRepository;
+    private final WarehouseRepository warehouseRepository;
+    private Map<UUID, Integer> products;
 
     @Transactional
     public void registerNewProduct(NewProductInWarehouseRequest request) {
@@ -126,17 +127,15 @@ public class WarehouseService {
         UUID productId = request.getProductId();
         String errorMessage = "Unable to add product to warehouse";
 
-        WarehouseProduct warehouseProduct = warehouseRepository.findByProductId(request.getProductId()).orElseThrow(() -> {
-            log.warn(errorMessage);
-            return new WarehouseProductNotFoundException(errorMessage, productId);
-        });
+        WarehouseProduct warehouseProduct = warehouseRepository.findByProductId(request.getProductId())
+                .orElseThrow(() -> new WarehouseProductNotFoundException(errorMessage, productId));
         Integer quantity = request.getQuantity();
         warehouseProduct.setQuantity(quantity);
     }
 
-    public AddressDto getAddress() {
+    public Address getAddress() {
         String address = addressRepository.getAddress();
-        return AddressDto.builder()
+        return Address.builder()
                 .country(address)
                 .city(address)
                 .street(address)
@@ -191,4 +190,43 @@ public class WarehouseService {
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
     }
 
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) {
+        String userMessage = "Unable to return products to warehouse";
+
+        // поиск товаров для возврата в хранилище
+        List<UUID> productIdsToReturn = products.keySet().stream().toList();
+
+        List<WarehouseProduct> productsInWarehouse = warehouseRepository.findAllByProductIdIn(productIdsToReturn);
+        List<UUID> productIdsInWarehouse = productsInWarehouse.stream().map(WarehouseProduct::getProductId).toList();
+
+        // список товаров, не найденных на складе
+        List<UUID> productsNotFound = productIdsToReturn.stream()
+                .filter(productId -> !productIdsInWarehouse.contains(productId))
+                .toList();
+
+        // список товаров с обновленными данными по количеству после возврата
+        List<WarehouseProduct> productsToUpdate = new ArrayList<>();
+
+
+        // итерация по списку товаров, найденных на складе
+        for (WarehouseProduct warehouseProduct : productsInWarehouse) {
+
+            // обновление данных товаров по количеству после возврата
+            UUID productId = warehouseProduct.getProductId();
+            Integer quantityCurrent = warehouseProduct.getQuantity();
+            Integer quantityToReturn = products.get(warehouseProduct.getProductId());
+            Integer totalQuantity = quantityCurrent + quantityToReturn;
+            warehouseProduct.setQuantity(totalQuantity);
+            productsToUpdate.add(warehouseProduct);
+        }
+
+        // обновление товаров в репозитории
+        warehouseRepository.saveAll(productsToUpdate);
+
+        // если список товаров, не найденных на складе, имеет записи
+        if (!productsNotFound.isEmpty()) {
+            log.warn("{}. Products not found:{}", userMessage, productsNotFound);
+            throw new NoSpecifiedProductInWarehouseException(userMessage, productsNotFound);
+        }
+    }
 }
