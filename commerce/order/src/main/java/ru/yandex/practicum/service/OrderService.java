@@ -159,6 +159,7 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
     public Order assembleByOrderId(UUID orderId) {
         OrderState newState = OrderState.ASSEMBLED;
         String userMessage = getUserMessage(newState);
@@ -175,7 +176,7 @@ public class OrderService {
         return validateAndSetNewState(newState, expectedCurrentState, order);
     }
 
-    private Order getOrderById(UUID orderId, String userMessage) {
+    public Order getOrderById(UUID orderId, String userMessage) {
         return orderRepository.findByOrderId(orderId).orElseThrow(() ->
                 new NoOrderFoundException(userMessage, orderId)
         );

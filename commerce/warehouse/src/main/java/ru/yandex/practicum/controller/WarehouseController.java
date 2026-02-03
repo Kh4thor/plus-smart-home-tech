@@ -135,7 +135,7 @@ public class WarehouseController {
 
     @PostMapping("/assembly")
     BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
-        BookedProductsDto productsToAssemble = warehouseService.assembleProducts(products);
+        BookedProductsDto productsToAssemble = warehouseService.assembleProducts(request);
     }
 
     @PostMapping("/shipped")

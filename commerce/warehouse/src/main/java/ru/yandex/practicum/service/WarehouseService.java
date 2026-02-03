@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
@@ -14,7 +16,7 @@ import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityI
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
 import ru.yandex.practicum.feign.order.FeignClientOrder;
-import ru.yandex.practicum.model.shopping.store.Product;
+import ru.yandex.practicum.feign.shopping.cart.FeignClientShoppingCart;
 import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.model.warehouse.Dimension;
 import ru.yandex.practicum.model.warehouse.WarehouseProduct;
@@ -32,7 +34,8 @@ public class WarehouseService {
 
     private final AddressRepository addressRepository;
     private final WarehouseRepository warehouseRepository;
-    private final FeignClientOrder  feignClientOrder;
+    private final FeignClientOrder feignClientOrder;
+    private final FeignClientShoppingCart feignClientShoppingCart;
     private Map<UUID, Integer> products;
 
     @Transactional
@@ -233,11 +236,39 @@ public class WarehouseService {
         }
     }
 
-    public BookedProductsDto assembleProducts(Map<UUID, Integer> products) {
-        List<UUID> productIdsToAssemble = products.keySet().stream().toList();
-        List<WarehouseProduct> productsToAssemble = warehouseRepository.findAllByProductIdIn(productIdsToAssemble);
+    public BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
+        UUID orderId = request.getOrderId();
+        Map<UUID, Integer> productsToAssemble = request.getProducts();
 
-        feignClientOrder.g
+        // изменение статуса заказа
+        OrderDto orderDto = feignClientOrder.assembleByOrderId(orderId);
 
+        // dto для запроса в checkProductQuantity
+        ShoppingCartDto shoppingCartDto = ShoppingCartDto.builder()
+                .products(productsToAssemble)
+                .build();
+
+        // проверка наличия товаров на складе
+        BookedProductsDto bookedProducts = checkProductQuantity(shoppingCartDto);
+
+        List<UUID> productIdsToAssemble = productsToAssemble.keySet().stream().toList();
+        List<WarehouseProduct> productsInWarehouse = warehouseRepository.findAllByProductIdIn(productIdsToAssemble);
+        Map<UUID, WarehouseProduct> warehouseProducts = toMap(productsInWarehouse);
+
+        List<WarehouseProduct> productsToUpdate = new ArrayList<>();
+
+        // уменьшение количества товара на складе
+        for (WarehouseProduct warehouseProduct : productsInWarehouse) {
+            UUID productId = warehouseProduct.getProductId();
+            Integer quantityToAssemble = productsToAssemble.get(productId);
+            Integer quantityInWarehouse = warehouseProduct.getQuantity();
+            Integer newQuantity = quantityInWarehouse - quantityToAssemble;
+            warehouseProduct.setQuantity(newQuantity);
+            productsToUpdate.add(warehouseProduct);
+        }
+        warehouseRepository.saveAll(productsToUpdate);
+        return bookedProducts;
     }
+
+
 }
