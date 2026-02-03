@@ -12,9 +12,11 @@ import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityI
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
 import ru.yandex.practicum.model.warehouse.Address;
+import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.service.WarehouseService;
 import ru.yandex.practicum.utils.warehouse.AddressMapper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -130,16 +132,25 @@ public class WarehouseController {
      */
     @PostMapping("/return")
     void returnProductsToWarehouse(Map<UUID, Integer> products) {
-        warehouseService.returnProductsToWarehouse(products);
+        log.debug("POST /api/v1/warehouse/return - products: {}", products);
+        List<WarehouseProduct> updatedWarehouseProducts = warehouseService.returnProductsToWarehouse(products);
+        List<UUID> updatedWarehouseProductsIds = updatedWarehouseProducts.stream()
+                .map(WarehouseProduct::getProductId)
+                .toList();
+        log.info("Updated warehouse products ids: {}", updatedWarehouseProductsIds);
     }
 
     @PostMapping("/assembly")
     BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
+        log.debug("POST /api/v1/warehouse/assembly - request: {}", request);
         BookedProductsDto productsToAssemble = warehouseService.assembleProducts(request);
+        log.info("Booked products dto: {}", productsToAssemble);
+        return productsToAssemble;
     }
 
     @PostMapping("/shipped")
-    void shippedProducts(Map<UUID, Integer> products) {
-        warehouseService.shippedProducts(products);
+    void shippingProducts(@RequestBody @Valid ShippedToDeliveryRequest request) {
+        log.debug("POST /api/v1/warehouse/shipped - request: {}", request);
+        warehouseService.shippingProducts(request);
     }
 }

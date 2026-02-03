@@ -106,7 +106,6 @@ public class OrderService {
         order.setPaymentId(paymentDto.getPaymentId());
         OrderState expectedCurrentState = OrderState.ON_PAYMENT;
         Order updatedOrder = validateAndSetNewState(newState, expectedCurrentState, order);
-
         order.setState(OrderState.PAID);
         return orderRepository.save(order);
     }
