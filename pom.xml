@@ -24,7 +24,7 @@
         <module>telemetry/hub-router</module>
         <module>infra/gateway</module>
         <module>commerce/order</module>
-        <module>commerce/Payment</module>
+        <module>commerce/payment</module>
         <module>commerce/delivery</module>
     </modules>
 

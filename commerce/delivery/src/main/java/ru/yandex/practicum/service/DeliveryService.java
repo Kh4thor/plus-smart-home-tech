@@ -11,10 +11,11 @@ import ru.yandex.practicum.model.delivery.Delivery;
 import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.model.warehouse.Address;
 import ru.yandex.practicum.repository.DeliveryRepository;
-import ru.yandex.practicum.repository.OrderRepository;
 import ru.yandex.practicum.utils.warehouse.AddressMapper;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,6 @@ public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final OrderService orderService;
-    private final OrderRepository orderRepository;
     private final WarehouseService warehouseService;
 
     public Delivery createDeliveryByDto(DeliveryDto deliveryDto) {
@@ -35,7 +35,7 @@ public class DeliveryService {
         UUID deliveryId = saved.getDeliveryId();
         Order order = orderService.getOrderById(orderId, userMessage);
         order.setDeliveryId(deliveryId);
-        orderRepository.save(order);
+        orderService.saveOrder(order);
         return delivery;
     }
 
@@ -75,7 +75,7 @@ public class DeliveryService {
         totalCost += totalCost * fragileIndex; // с учетом хрупкости товара
         totalCost += weight * weightIndex; // с учетом веса товара
         totalCost += volume * volumeIndex; // с учетом объема товара
-        totalCost += totalCost * remoteIndex; // с учетом удаленности адреса доставки
+        totalCost += totalCost * remoteIndex; // с учетом удаленности адреса доставки от склада
 
         return totalCost;
     }
@@ -132,7 +132,7 @@ public class DeliveryService {
         Delivery delivery = getDelivery(deliveryId, userMessage);
 
         if (delivery.getState() != expectedState) {
-            throw new ValidationException("Unable to change delivery status to: " + newState + "" +
+            throw new ValidationException("Unable to change delivery status to: " + newState +
                     ". Expected state: " + expectedState + ". Current state: " + delivery.getState());
         }
         delivery.setState(newState);

@@ -7,8 +7,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.feign.config.FeignConfig;
+import ru.yandex.practicum.feign.payment.FeignClientPayment;
+import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
 
-@EnableFeignClients
+@EnableFeignClients(clients = {FeignClientWarehouse.class, FeignClientPayment.class})
 @EnableDiscoveryClient
 @SpringBootApplication
 @ConfigurationPropertiesScan

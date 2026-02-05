@@ -204,4 +204,8 @@ public class OrderService {
     private String getUserMessage(OrderState newState) {
         return "Unable to change order status to: " + newState;
     }
+
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
+    }
 }
