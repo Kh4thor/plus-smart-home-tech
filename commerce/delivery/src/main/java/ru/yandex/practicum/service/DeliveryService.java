@@ -7,6 +7,8 @@ import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.enums.delivery.DeliveryState;
 import ru.yandex.practicum.exception.delivery.NoDeliveryFoundException;
+import ru.yandex.practicum.feign.order.FeignClientOrder;
+import ru.yandex.practicum.feign.warehouse.FeignClientWarehouse;
 import ru.yandex.practicum.model.delivery.Delivery;
 import ru.yandex.practicum.model.order.Order;
 import ru.yandex.practicum.model.warehouse.Address;
@@ -23,7 +25,8 @@ public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final OrderService orderService;
-    private final WarehouseService warehouseService;
+    private FeignClientOrder feignClientOrder;
+    private final FeignClientWarehouse feignClientWarehouse;
 
     public Delivery createDeliveryByDto(DeliveryDto deliveryDto) {
         String userMessage = "Unable to create delivery.";
@@ -33,7 +36,7 @@ public class DeliveryService {
         Delivery saved = deliveryRepository.save(delivery);
         UUID orderId = saved.getOrderId();
         UUID deliveryId = saved.getDeliveryId();
-        Order order = orderService.getOrderById(orderId, userMessage);
+        Order order = feignClientOrder.getOrderById(orderId, userMessage);
         order.setDeliveryId(deliveryId);
         orderService.saveOrder(order);
         return delivery;
@@ -108,7 +111,7 @@ public class DeliveryService {
     }
 
     private double getWarehouseIndex(String warehouseName) {
-        List<String> warehouseNames = warehouseService.getAllAddresses();
+        List<String> warehouseNames = feignClientWarehouse.getAllAddresses();
         if (warehouseNames.contains(warehouseName)) {
             String[] split = warehouseName.split("_");
             String index = split[1];

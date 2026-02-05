@@ -131,6 +131,7 @@ public class WarehouseController {
      *                 а значение - количество возвращаемых единиц
      */
     @PostMapping("/return")
+    @ResponseStatus(HttpStatus.OK)
     void returnProductsToWarehouse(Map<UUID, Integer> products) {
         log.debug("POST /api/v1/warehouse/return - products: {}", products);
         List<WarehouseProduct> updatedWarehouseProducts = warehouseService.returnProductsToWarehouse(products);
@@ -140,6 +141,14 @@ public class WarehouseController {
         log.info("Updated warehouse products ids: {}", updatedWarehouseProductsIds);
     }
 
+    /**
+     * Обрабатывает запрос на сборку (комплектацию) продуктов для заказа.
+     * Принимает запрос на сборку продуктов, выполняет их комплектацию через сервис
+     * и возвращает информацию о забронированных продуктах.
+     *
+     * @param request объект {@link AssemblyProductsForOrderRequest} с данными для сборки продуктов
+     * @return {@link BookedProductsDto} объект, содержащий информацию о забронированных продуктах
+     */
     @PostMapping("/assembly")
     BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
         log.debug("POST /api/v1/warehouse/assembly - request: {}", request);
@@ -148,12 +157,24 @@ public class WarehouseController {
         return productsToAssemble;
     }
 
+    /**
+     * Обрабатывает запрос на отправку продуктов в службу доставки.
+     * Отмечает продукты как отправленные для дальнейшей доставки заказчику.
+     *
+     * @param request объект {@link ShippedToDeliveryRequest} с данными об отправляемых продуктах
+     */
     @PostMapping("/shipped")
     void shippingProducts(@RequestBody @Valid ShippedToDeliveryRequest request) {
         log.debug("POST /api/v1/warehouse/shipped - request: {}", request);
         warehouseService.shippingProducts(request);
     }
 
+    /**
+     * Получает список всех доступных адресов складов.
+     * Возвращает перечень всех адресов, на которых расположены склады в системе.
+     *
+     * @return список строк с названиями/адресами складов
+     */
     @GetMapping("/all_addresses")
     List<String> getAllAddresses() {
         log.debug("GET /api/v1/warehouse/all_addresses");

@@ -11,6 +11,7 @@ import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -77,4 +78,14 @@ public interface FeignClientWarehouse {
     @PostMapping("/return")
     @ResponseStatus(HttpStatus.OK)
     void returnProductsToWarehouse(Map<UUID, Integer> products);
+
+    /**
+     * Получает список всех доступных адресов складов.
+     * Возвращает перечень всех адресов, на которых расположены склады в системе.
+     *
+     * @return список строк с названиями/адресами складов
+     */
+    @GetMapping("/all_addresses")
+    List<String> getAllAddresses();
+
 }

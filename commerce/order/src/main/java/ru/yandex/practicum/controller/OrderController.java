@@ -23,6 +23,13 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    /**
+     * Получает список всех заказов для указанного пользователя.
+     * Возвращает перечень заказов, связанных с заданным именем пользователя.
+     *
+     * @param username имя пользователя, для которого запрашиваются заказы
+     * @return список {@link OrderDto} объектов, представляющих заказы пользователя
+     */
     @GetMapping
     public List<OrderDto> getOrdersByUserName(String username) {
         log.debug("GET /api/v1/order - username: {}", username);
@@ -32,6 +39,15 @@ public class OrderController {
                 .toList();
     }
 
+    /**
+     * Создает новый заказ на основе полученного запроса.
+     * Принимает данные для создания заказа и имя пользователя,
+     * создает заказ и возвращает его DTO представление.
+     *
+     * @param username имя пользователя, создающего заказ
+     * @param request объект {@link CreateNewOrderRequest} с данными для создания заказа
+     * @return {@link OrderDto} созданный заказ
+     */
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public OrderDto createNewOrderByRequest(
@@ -45,6 +61,14 @@ public class OrderController {
         return createdOrderDto;
     }
 
+    /**
+     * Обрабатывает возврат товаров по указанному заказу.
+     * Принимает запрос на возврат продуктов, обновляет статус заказа
+     * и возвращает обновленное DTO заказа.
+     *
+     * @param request объект {@link ProductReturnRequest} с данными для возврата товаров
+     * @return {@link OrderDto} заказ с обновленным статусом возврата
+     */
     @PostMapping("/return")
     public OrderDto returnOrderByRequest(@RequestBody @Valid ProductReturnRequest request) {
         log.debug("POST /api/v1/order/return - request: {}", request);
@@ -55,7 +79,13 @@ public class OrderController {
         return returnedOrderDto;
     }
 
-    //=== PAYMENT ===
+    /**
+     * Обрабатывает успешную оплату заказа по его идентификатору.
+     * Обновляет статус заказа на "оплачен" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа для обработки оплаты
+     * @return {@link OrderDto} заказ с обновленным статусом оплаты
+     */
     @PostMapping("/payment")
     public OrderDto makePaymentByOrderId(@RequestBody UUID orderId) {
         log.debug("POST /api/v1/order/payment - order id: {}", orderId);
@@ -66,6 +96,13 @@ public class OrderController {
         return orderUpdatedDto;
     }
 
+    /**
+     * Обрабатывает неудачную попытку оплаты заказа.
+     * Обновляет статус заказа на "оплата не удалась" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа с неудачной оплатой
+     * @return {@link OrderDto} заказ с обновленным статусом неудачной оплаты
+     */
     @PostMapping("/payment/failed")
     public OrderDto failedPaymentByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/failed - orderId: {}", orderId);
@@ -76,8 +113,13 @@ public class OrderController {
         return failedToPayOrderDto;
     }
 
-    //=== DELIVERY ===
-    //TODO
+    /**
+     * Инициирует процесс доставки для указанного заказа.
+     * Обновляет статус заказа на "в доставке" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа для доставки
+     * @return {@link OrderDto} заказ с обновленным статусом доставки
+     */
     @PostMapping("/delivery")
     public OrderDto deliverByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/delivery - orderId: {}", orderId);
@@ -88,6 +130,13 @@ public class OrderController {
         return deliveryOrderDto;
     }
 
+    /**
+     * Обрабатывает неудачную попытку доставки заказа.
+     * Обновляет статус заказа на "доставка не удалась" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа с неудачной доставкой
+     * @return {@link OrderDto} заказ с обновленным статусом неудачной доставки
+     */
     @PostMapping("/delivery/failed")
     public OrderDto failedDeliveryByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/delivery/failed - orderId: {}", orderId);
@@ -98,8 +147,13 @@ public class OrderController {
         return failedToDeliverOrderDto;
     }
 
-    //=== COMPLETED ===
-    //TODO
+    /**
+     * Отмечает заказ как успешно завершенный.
+     * Обновляет статус заказа на "завершен" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор завершаемого заказа
+     * @return {@link OrderDto} заказ с обновленным статусом завершения
+     */
     @PostMapping("/completed")
     public OrderDto completedByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/completed - orderId: {}", orderId);
@@ -110,7 +164,13 @@ public class OrderController {
         return completedOrderDto;
     }
 
-    //=== CALCULATE ===
+    /**
+     * Рассчитывает общую стоимость указанного заказа.
+     * Выполняет расчет стоимости заказа и возвращает обновленное DTO с рассчитанной стоимостью.
+     *
+     * @param orderId идентификатор заказа для расчета стоимости
+     * @return {@link OrderDto} заказ с рассчитанной общей стоимостью
+     */
     @PostMapping("/calculate/total")
     public OrderDto calculateTotalPriceByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/calculate/total - orderId: {}", orderId);
@@ -121,7 +181,13 @@ public class OrderController {
         return calculatedTotalPriceDto;
     }
 
-    //=== ASSEMBLY ===
+    /**
+     * Инициирует процесс сборки (комплектации) заказа.
+     * Обновляет статус заказа на "собран" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа для сборки
+     * @return {@link OrderDto} заказ с обновленным статусом сборки
+     */
     @PostMapping("/assembly")
     public OrderDto assembleByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/assembly - orderId: {}", orderId);
@@ -132,6 +198,13 @@ public class OrderController {
         return assembledOrderDto;
     }
 
+    /**
+     * Обрабатывает неудачную попытку сборки заказа.
+     * Обновляет статус заказа на "сборка не удалась" и возвращает обновленное DTO.
+     *
+     * @param orderId идентификатор заказа с неудачной сборкой
+     * @return {@link OrderDto} заказ с обновленным статусом неудачной сборки
+     */
     @PostMapping("/assembly/failed")
     public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId) {
         log.debug("POST /api/v1/order/assembly/failed - orderId: {}", orderId);
@@ -140,5 +213,18 @@ public class OrderController {
         OrderDto failedToAssembleOrderDto = OrderMapper.toOrderDto(failedToAssembleOrder);
         log.info("Failed to assemble order mapped to dto: {}", failedToAssembleOrderDto);
         return failedToAssembleOrderDto;
+    }
+
+    /**
+     * Получает заказ по его идентификатору с пользовательским сообщением об ошибке.
+     * Используется для внутренних вызовов с кастомными сообщениями об ошибках.
+     *
+     * @param orderId идентификатор запрашиваемого заказа
+     * @param userMessage пользовательское сообщение для отображения в случае ошибки
+     * @return {@link Order} объект заказа
+     */
+    @GetMapping
+    public Order getOrderById(@RequestParam UUID orderId, String userMessage) {
+        return orderService.getOrderById(orderId, userMessage);
     }
 }

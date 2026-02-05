@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
+import ru.yandex.practicum.model.order.Order;
 
 import java.util.List;
 import java.util.UUID;
@@ -128,4 +129,8 @@ public interface FeignClientOrder {
      */
     @PostMapping("/assembly/failed")
     public OrderDto failedAssemblyByOrderId(@RequestBody @Valid UUID orderId) throws FeignException;
+
+
+    @GetMapping
+    public Order getOrderById(@RequestParam UUID orderId, String userMessage) throws FeignException;
 }
