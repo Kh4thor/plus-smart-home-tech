@@ -153,4 +153,10 @@ public class WarehouseController {
         log.debug("POST /api/v1/warehouse/shipped - request: {}", request);
         warehouseService.shippingProducts(request);
     }
+
+    @GetMapping("/all_addresses")
+    List<String> getAllAddresses() {
+        log.debug("GET /api/v1/warehouse/all_addresses");
+        return warehouseService.getAllAddresses();
+    }
 }
