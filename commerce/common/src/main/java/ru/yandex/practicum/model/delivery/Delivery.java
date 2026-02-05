@@ -1,10 +1,7 @@
 package ru.yandex.practicum.model.delivery;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import ru.yandex.practicum.enums.delivery.DeliveryState;
 import ru.yandex.practicum.model.warehouse.Address;
@@ -13,6 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

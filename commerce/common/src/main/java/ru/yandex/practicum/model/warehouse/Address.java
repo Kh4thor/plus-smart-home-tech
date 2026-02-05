@@ -8,6 +8,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "addresses")
@@ -16,6 +17,9 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "address_id")
     private UUID addressId;
+
+    @Column(name = "address_name")
+    private String addressName;
 
     @Column(name = "country")
     private String country;

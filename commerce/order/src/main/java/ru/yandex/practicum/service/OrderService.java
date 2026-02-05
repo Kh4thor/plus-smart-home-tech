@@ -181,7 +181,16 @@ public class OrderService {
         );
     }
 
-    private Order validateAndSetNewState(OrderState newState, OrderState expectedStateOfOrder, Order order) {
+    public Order setNewState(UUID orderId, OrderState newState) {
+        String userMessage = getUserMessage(newState);
+        Order order = getOrderById(orderId, userMessage);
+        order.setState(newState);
+        return orderRepository.save(order);
+    }
+
+    private Order validateAndSetNewState(OrderState newState,
+                                         OrderState expectedStateOfOrder,
+                                         Order order) {
         if (order.getState() != expectedStateOfOrder) {
             throw new ValidationException(
                     "Unable to change order status to: " + newState +

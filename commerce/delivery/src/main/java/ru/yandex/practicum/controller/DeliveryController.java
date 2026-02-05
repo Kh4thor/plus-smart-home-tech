@@ -19,7 +19,6 @@ public class DeliveryController {
 
     private final DeliveryService deliveryService;
 
-    //TODO
     @PutMapping
     public DeliveryDto createDeliveryByDto(@RequestBody @Valid DeliveryDto deliveryDto) {
         log.debug("POST /api/v1/delivery - delivery dto: {}", deliveryDto);
@@ -30,28 +29,26 @@ public class DeliveryController {
         return createdDeliveryDto;
     }
 
-    //TODO
     @PostMapping("/successful")
     public void successfulDeliveryById(@RequestBody @Valid UUID deliveryId) {
         log.debug("POST /api/v1/delivery/successful - delivery id: {}", deliveryId);
-        deliveryService.successfulDeliveryById(deliveryId);
-        log.info("Successful delivery id: {}", deliveryId);
+        Delivery delivery = deliveryService.successfulDeliveryById(deliveryId);
+        log.info("Successfully delivery: {}", delivery);
     }
 
-    //TODO
     @PostMapping("/picked")
     public void pickedDeliveryById(@RequestBody @Valid UUID deliveryId) {
         log.debug("POST /api/v1/delivery/picked - delivery id: {}", deliveryId);
-        deliveryService.pickedDeliveryById(deliveryId);
-        log.info("Picked delivery id: {}", deliveryId);
+        Delivery delivery = deliveryService.pickedDeliveryById(deliveryId);
+        log.info("Picked delivery: {}", delivery);
     }
 
     //TODO
     @PostMapping("/failed")
     public void failedDelivery(@RequestBody @Valid UUID deliveryId) {
         log.debug("POST /api/v1/delivery/failed - delivery id: {}", deliveryId);
-        deliveryService.failedDelivery(deliveryId);
-        log.info("Failed delivery id: {}", deliveryId);
+        Delivery delivery = deliveryService.failedDelivery(deliveryId);
+        log.info("Failed delivery: {}", delivery);
     }
 
     //TODO

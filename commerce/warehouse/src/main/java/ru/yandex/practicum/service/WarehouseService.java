@@ -149,6 +149,7 @@ public class WarehouseService {
         String address = addressRepository.getAddress();
         return Address.builder()
                 .country(address)
+                .addressName(address)
                 .city(address)
                 .street(address)
                 .house(address)
@@ -325,5 +326,9 @@ public class WarehouseService {
 
         // вес единичного товара
         return productWeight;
+    }
+
+    public List<String> getAllAddresses() {
+        return addressRepository.getAllAddresses();
     }
 }
