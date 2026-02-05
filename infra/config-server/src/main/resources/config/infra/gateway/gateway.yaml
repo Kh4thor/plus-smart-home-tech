@@ -24,6 +24,24 @@ spring:
           predicates:
             - Path=/warehouse/**
 
+        # Payment
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+
+        # Order
+        - id: order_service_route
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+
+        # Delivery
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
+
 server:
   port: 8080
 
