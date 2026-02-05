@@ -18,7 +18,9 @@ import ru.yandex.practicum.dto.payment.PaymentDto;
  * Используется аннотация {@link FeignClient} для интеграции через Spring Cloud OpenFeign.
  * </p>
  */
-@FeignClient(name = "payment", path = "/api/v1/payment")
+@FeignClient(name = "payment",
+        contextId = "paymentApiClient",
+        path = "/api/v1/payment")
 public interface FeignClientPayment {
 
     /**

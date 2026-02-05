@@ -24,16 +24,18 @@ import java.util.UUID;
  * </p>
  */
 @Validated
-@FeignClient(name = "shopping-store", path = "/api/v1/shopping-store")
+@FeignClient(name = "shopping-store",
+        contextId = "shopping-storeApiClient",
+        path = "/api/v1/shopping-store")
 public interface FeignClientShoppingStore {
 
     /**
      * Находит товары по указанным категориям с поддержкой пагинации и сортировки.
      *
      * @param categories список категорий товаров для фильтрации
-     * @param page номер страницы для пагинации (по умолчанию 0)
-     * @param size количество товаров на странице (по умолчанию 20)
-     * @param sort параметр сортировки (необязательный)
+     * @param page       номер страницы для пагинации (по умолчанию 0)
+     * @param size       количество товаров на странице (по умолчанию 20)
+     * @param sort       параметр сортировки (необязательный)
      * @return список {@link ProductDto} товаров, соответствующих указанным категориям
      * @throws FeignException в случае ошибки взаимодействия с сервисом
      */

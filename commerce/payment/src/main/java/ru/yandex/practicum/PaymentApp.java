@@ -13,9 +13,8 @@ import ru.yandex.practicum.feign.config.FeignConfig;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @Import(FeignConfig.class)
-public class DeliveryApp {
+public class PaymentApp {
     public static void main(String[] args) {
-        System.setProperty("spring.main.allow-bean-definition-overriding", "true");
-        SpringApplication.run(DeliveryApp.class, args);
+        SpringApplication.run(PaymentApp.class, args);
     }
 }

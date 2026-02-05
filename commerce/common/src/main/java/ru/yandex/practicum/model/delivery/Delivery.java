@@ -2,7 +2,6 @@ package ru.yandex.practicum.model.delivery;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import ru.yandex.practicum.enums.delivery.DeliveryState;
 import ru.yandex.practicum.model.warehouse.Address;
 

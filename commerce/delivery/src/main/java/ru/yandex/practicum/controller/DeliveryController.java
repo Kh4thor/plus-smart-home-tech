@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.model.delivery.Delivery;
 import ru.yandex.practicum.service.DeliveryService;
 import ru.yandex.practicum.utils.delivery.DeliveryMapper;
@@ -53,10 +54,10 @@ public class DeliveryController {
 
     //TODO
     @PostMapping("/cost")
-    public Double getDeliveryCostByDeliveryId(@RequestBody @Valid UUID deliveryId) {
-        log.debug("POST /api/v1/delivery/cost - delivery id: {}", deliveryId);
-        Double deliveryCost = deliveryService.getDeliveryCostByDeliveryId(deliveryId);
-        log.info("Calculated delivery cost for delivery id={} is: {}", deliveryId, deliveryCost);
+    public Double getDeliveryCostByDeliveryId(@RequestBody @Valid OrderDto orderDto) {
+        log.debug("POST /api/v1/delivery/cost - order dto: {}", orderDto);
+        Double deliveryCost = deliveryService.getDeliveryCost(orderDto);
+        log.info("Calculated delivery cost: {}", deliveryCost);
         return deliveryCost;
     }
 }

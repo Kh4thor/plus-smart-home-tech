@@ -21,7 +21,9 @@ import java.util.UUID;
  * Используется аннотация {@link FeignClient} для интеграции через Spring Cloud OpenFeign.
  * </p>
  */
-@FeignClient(name = "order", path = "/api/v1/order")
+@FeignClient(name = "order",
+        contextId = "orderApiClient",
+        path = "/api/v1/order")
 public interface FeignClientOrder {
 
     /**

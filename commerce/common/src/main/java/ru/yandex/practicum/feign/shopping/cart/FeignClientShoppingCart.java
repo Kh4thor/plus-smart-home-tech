@@ -24,14 +24,16 @@ import java.util.UUID;
  * </p>
  */
 @Validated
-@FeignClient(name = "shopping-cart", path = "/api/v1/shopping-cart")
+@FeignClient(name = "shopping-cart",
+        contextId = "shopping-cartApiClient",
+        path = "/api/v1/shopping-cart")
 public interface FeignClientShoppingCart {
 
     /**
      * Создает или обновляет корзину покупок для указанного пользователя.
      *
      * @param shoppingCartDto объект {@link ShoppingCartDto} с данными корзины покупок
-     * @param username имя пользователя, для которого создается или обновляется корзина
+     * @param username        имя пользователя, для которого создается или обновляется корзина
      * @return {@link ShoppingCartDto} обновленной или созданной корзины покупок
      * @throws FeignException в случае ошибки взаимодействия с сервисом
      */
@@ -55,7 +57,7 @@ public interface FeignClientShoppingCart {
     /**
      * Удаляет указанные товары из корзины покупок пользователя.
      *
-     * @param username имя пользователя, из корзины которого удаляются товары
+     * @param username   имя пользователя, из корзины которого удаляются товары
      * @param productIds список идентификаторов товаров для удаления
      * @return {@link ShoppingCartDto} корзины покупок после удаления товаров
      * @throws FeignException в случае ошибки взаимодействия с сервисом
@@ -69,7 +71,7 @@ public interface FeignClientShoppingCart {
     /**
      * Изменяет количество указанного товара в корзине покупок пользователя.
      *
-     * @param username имя пользователя, в корзине которого изменяется количество товара
+     * @param username          имя пользователя, в корзине которого изменяется количество товара
      * @param changeQuantityDto объект {@link ChangeQuantityDto} с данными об изменении количества
      * @return {@link ShoppingCartDto} корзины покупок после изменения количества товара
      * @throws FeignException в случае ошибки взаимодействия с сервисом

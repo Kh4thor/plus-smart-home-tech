@@ -275,7 +275,7 @@ public class WarehouseService {
                 .build();
 
         // запрос на создание доставки в модуле delivery
-        feignClientDelivery.createDeliveryByDto(deliveryDto);
+       DeliveryDto createdDeliveryDto = feignClientDelivery.createDeliveryByDto(deliveryDto);
 
         // обновление статуса заказа
         order.setState(newState);

@@ -122,7 +122,7 @@ public class DeliveryService {
     }
 
     private Delivery getDelivery(UUID deliveryId, String userMessage) {
-        return deliveryRepository.findByDeliveryId().orElseThrow(
+        return deliveryRepository.findByDeliveryId(deliveryId).orElseThrow(
                 () -> new NoDeliveryFoundException(userMessage, deliveryId));
     }
 

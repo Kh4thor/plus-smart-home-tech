@@ -23,7 +23,9 @@ import java.util.UUID;
  * Используется аннотация {@link FeignClient} для интеграции через Spring Cloud OpenFeign.
  * </p>
  */
-@FeignClient(name = "warehouse", path = "/api/v1/warehouse")
+@FeignClient(name = "warehouse",
+        contextId = "warehouseApiClient",
+        path = "/api/v1/warehouse")
 public interface FeignClientWarehouse {
 
     /**
@@ -72,5 +74,7 @@ public interface FeignClientWarehouse {
      * @param products Карта товаров для возврата на склад, где ключ - UUID товара,
      *                 а значение - количество возвращаемых единиц
      */
+    @PostMapping("/return")
+    @ResponseStatus(HttpStatus.OK)
     void returnProductsToWarehouse(Map<UUID, Integer> products);
 }

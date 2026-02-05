@@ -2,7 +2,6 @@ package ru.yandex.practicum.model.payment;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import ru.yandex.practicum.enums.payment.PaymentState;
 
 import java.util.UUID;
