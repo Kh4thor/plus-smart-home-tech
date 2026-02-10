@@ -1,0 +1,51 @@
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - PrefixPath=/api/v1
+        - CircuitBreaker=myCircuitBreaker
+
+      routes:
+        # Shopping-cart
+        - id: shopping_cart_service_route
+          uri: lb://shopping-cart
+          predicates:
+            - Path=/shopping-cart/**
+
+        # Shopping-store
+        - id: shopping_store_service_route
+          uri: lb://shopping-store
+          predicates:
+            - Path=/shopping-store/**
+
+        # Warehouse
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
+
+        # Payment
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+
+        # Order
+        - id: order_service_route
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+
+        # Delivery
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

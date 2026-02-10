@@ -10,9 +10,10 @@ import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 import ru.yandex.practicum.enums.shopping.store.ProductState;
 import ru.yandex.practicum.enums.shopping.store.QuantityState;
 import ru.yandex.practicum.exception.shopping.store.ProductNotFoundException;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.model.shopping.store.Product;
 import ru.yandex.practicum.repository.ProductRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -25,8 +26,8 @@ public class ProductServiceImpl implements ProductService {
     private static final ProductState DEACTIVATE_STATE = ProductState.DEACTIVATE;
 
     @Override
-    public Page<Product> findByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findByProductCategory(category, pageable);
+    public Page<Product> findByCategories(List<ProductCategory> categories, Pageable pageable) {
+        return productRepository.findByProductCategoryIn(categories, pageable);
     }
 
     @Override

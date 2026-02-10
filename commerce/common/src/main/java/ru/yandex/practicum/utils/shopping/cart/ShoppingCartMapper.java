@@ -1,0 +1,22 @@
+package ru.yandex.practicum.utils.shopping.cart;
+
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
+import ru.yandex.practicum.model.shopping.cart.ShoppingCart;
+
+public class ShoppingCartMapper {
+
+    public static ShoppingCartDto toShoppingCartDto(ShoppingCart shoppingCart) {
+        if (shoppingCart == null) return null;
+        return ShoppingCartDto.builder()
+                .shoppingCartId(shoppingCart.getShoppingCartId())
+                .products(shoppingCart.getProducts())
+                .build();
+    }
+
+    public static ShoppingCart toShoppingCart(ShoppingCartDto shoppingCartDto, String username) {
+        return ShoppingCart.builder()
+                .username(username)
+                .products(shoppingCartDto.getProducts())
+                .build();
+    }
+}

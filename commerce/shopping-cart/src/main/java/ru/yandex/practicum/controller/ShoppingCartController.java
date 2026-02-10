@@ -12,9 +12,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.cart.ChangeQuantityDto;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
-import ru.yandex.practicum.model.ShoppingCart;
+import ru.yandex.practicum.model.shopping.cart.ShoppingCart;
 import ru.yandex.practicum.service.ShoppingCartService;
-import ru.yandex.practicum.utills.ShoppingCartMapper;
+import ru.yandex.practicum.utils.shopping.cart.ShoppingCartMapper;
 
 import java.util.List;
 import java.util.Map;

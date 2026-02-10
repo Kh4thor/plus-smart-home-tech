@@ -1,24 +1,33 @@
 package ru.yandex.practicum.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.controller.ShippedToDeliveryRequest;
+import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
+import ru.yandex.practicum.enums.delivery.DeliveryState;
+import ru.yandex.practicum.enums.order.OrderState;
 import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
-import ru.yandex.practicum.model.Dimension;
-import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.feign.delivery.FeignClientDelivery;
+import ru.yandex.practicum.feign.order.FeignClientOrder;
+import ru.yandex.practicum.model.order.Order;
+import ru.yandex.practicum.model.warehouse.Address;
+import ru.yandex.practicum.model.warehouse.Dimension;
+import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.repository.AddressRepository;
+import ru.yandex.practicum.repository.OrderRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
-import ru.yandex.practicum.utills.WarehouseProductBuilder;
+import ru.yandex.practicum.utils.warehouse.AddressMapper;
+import ru.yandex.practicum.utils.warehouse.WarehouseProductBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +37,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseService {
 
-    private final WarehouseRepository warehouseRepository;
     private final AddressRepository addressRepository;
+    private final WarehouseRepository warehouseRepository;
+    private final OrderService orderService;
+    private final OrderRepository orderRepository;
+    private final FeignClientOrder feignClientOrder;
+    private final FeignClientDelivery feignClientDelivery;
 
     @Transactional
     public void registerNewProduct(NewProductInWarehouseRequest request) {
@@ -126,23 +139,152 @@ public class WarehouseService {
         UUID productId = request.getProductId();
         String errorMessage = "Unable to add product to warehouse";
 
-        WarehouseProduct warehouseProduct = warehouseRepository.findByProductId(request.getProductId()).orElseThrow(() -> {
-            log.warn(errorMessage);
-            return new WarehouseProductNotFoundException(errorMessage, productId);
-        });
+        WarehouseProduct warehouseProduct = warehouseRepository.findByProductId(request.getProductId())
+                .orElseThrow(() -> new WarehouseProductNotFoundException(errorMessage, productId));
         Integer quantity = request.getQuantity();
         warehouseProduct.setQuantity(quantity);
     }
 
-    public AddressDto getAddress() {
+    public Address getAddress() {
         String address = addressRepository.getAddress();
-        return AddressDto.builder()
+        return Address.builder()
                 .country(address)
+                .addressName(address)
                 .city(address)
                 .street(address)
                 .house(address)
                 .flat(address)
                 .build();
+    }
+
+    @Transactional
+    public List<WarehouseProduct> returnProductsToWarehouse(Map<UUID, Integer> products) {
+        String userMessage = "Unable to return products to warehouse";
+
+        // список id-товаров на возврат
+        List<UUID> productIdsToReturn = products.keySet().stream().toList();
+
+        // поиск товаров для возврата в хранилище
+        List<WarehouseProduct> productsInWarehouse = warehouseRepository.findAllByProductIdIn(productIdsToReturn);
+        List<UUID> productIdsInWarehouse = productsInWarehouse.stream().map(WarehouseProduct::getProductId).toList();
+
+        // список товаров, не найденных на складе
+        List<UUID> productsNotFound = productIdsToReturn.stream()
+                .filter(productId -> !productIdsInWarehouse.contains(productId))
+                .toList();
+
+        // список товаров с обновленными данными по количеству после возврата
+        List<WarehouseProduct> productsToUpdate = new ArrayList<>();
+
+        // итерация по списку товаров, найденных на складе
+        for (WarehouseProduct warehouseProduct : productsInWarehouse) {
+
+            // обновление данных товаров по количеству после возврата
+            UUID productId = warehouseProduct.getProductId();
+            Integer quantityCurrent = warehouseProduct.getQuantity();
+            Integer quantityToReturn = products.get(warehouseProduct.getProductId());
+            Integer totalQuantity = quantityCurrent + quantityToReturn;
+            warehouseProduct.setQuantity(totalQuantity);
+            productsToUpdate.add(warehouseProduct);
+        }
+
+        // если список товаров, не найденных на складе, имеет записи
+        if (!productsNotFound.isEmpty()) {
+            log.warn("{}. Products not found:{}", userMessage, productsNotFound);
+            throw new NoSpecifiedProductInWarehouseException(userMessage, productsNotFound);
+        }
+
+        // обновление товаров в репозитории
+        return warehouseRepository.saveAll(productsToUpdate);
+    }
+
+    @Transactional
+    public BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
+        UUID orderId = request.getOrderId();
+        Map<UUID, Integer> productsToAssemble = request.getProducts();
+
+        // изменение статуса заказа
+        OrderDto orderDto = feignClientOrder.assembleByOrderId(orderId);
+
+        // dto для запроса в checkProductQuantity
+        ShoppingCartDto shoppingCartDto = ShoppingCartDto.builder()
+                .products(productsToAssemble)
+                .build();
+
+        // проверка наличия товаров на складе
+        BookedProductsDto bookedProducts = checkProductQuantity(shoppingCartDto);
+
+        List<UUID> productIdsToAssemble = productsToAssemble.keySet().stream().toList();
+
+        // поиск товаров на складе
+        List<WarehouseProduct> productsInWarehouse = warehouseRepository.findAllByProductIdIn(productIdsToAssemble);
+
+        List<WarehouseProduct> productsToUpdate = new ArrayList<>();
+
+        // уменьшение количества товара на складе
+        for (WarehouseProduct warehouseProduct : productsInWarehouse) {
+            UUID productId = warehouseProduct.getProductId();
+            Integer quantityToAssemble = productsToAssemble.get(productId);
+            Integer quantityInWarehouse = warehouseProduct.getQuantity();
+            Integer newQuantity = quantityInWarehouse - quantityToAssemble;
+            warehouseProduct.setQuantity(newQuantity);
+            productsToUpdate.add(warehouseProduct);
+        }
+        warehouseRepository.saveAll(productsToUpdate);
+        return bookedProducts;
+    }
+
+    @Transactional
+    public void shippingProducts(ShippedToDeliveryRequest request) {
+        String userMessage = "Unable to ship product to delivery";
+
+        UUID orderId = request.getOrderId();
+        UUID deliveryId = request.getDeliveryId();
+
+        // поиск заказа
+        Order order = orderService.getOrderById(orderId, userMessage);
+
+        // новый статус заказа
+        OrderState newState = OrderState.ON_DELIVERY;
+
+        // ожидаемый текущий статус заказа
+        OrderState expectedState = OrderState.ASSEMBLED;
+
+        if (order.getState() != OrderState.ASSEMBLED) {
+            throw new ValidationException(
+                    "Unable to change order status to: " + newState +
+                            ". Expected state: " + expectedState +
+                            ". Current state: " + order.getState());
+        }
+
+        // адрес получателя
+        Address toAddress = order.getAddress();
+        AddressDto toAddressDto = AddressMapper.toAddressDto(toAddress);
+
+        // адрес склада
+        Address fromAddress = getAddress();
+        AddressDto fromAddressDto = AddressMapper.toAddressDto(fromAddress);
+
+        // dto для запроса создания новой доставки в модуле delivery
+        DeliveryDto deliveryDto = DeliveryDto.builder()
+                .deliveryId(deliveryId)
+                .fromAddress(fromAddressDto)
+                .toAddress(toAddressDto)
+                .orderId(orderId)
+                .state(DeliveryState.CREATED)
+                .build();
+
+        // запрос на создание доставки в модуле delivery
+       DeliveryDto createdDeliveryDto = feignClientDelivery.createDeliveryByDto(deliveryDto);
+
+        // обновление статуса заказа
+        order.setState(newState);
+        orderRepository.save(order);
+    }
+
+    private Map<UUID, WarehouseProduct> toMap(List<WarehouseProduct> warehouseProducts) {
+        return warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
     }
 
     private Double getProductVolume(WarehouseProduct warehouseProduct, UUID productId) {
@@ -186,9 +328,7 @@ public class WarehouseService {
         return productWeight;
     }
 
-    private Map<UUID, WarehouseProduct> toMap(List<WarehouseProduct> warehouseProducts) {
-        return warehouseProducts.stream()
-                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+    public List<String> getAllAddresses() {
+        return addressRepository.getAllAddresses();
     }
-
 }

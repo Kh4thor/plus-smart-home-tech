@@ -6,15 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.WarehouseProductNotFoundException;
+import ru.yandex.practicum.model.warehouse.Address;
+import ru.yandex.practicum.model.warehouse.WarehouseProduct;
 import ru.yandex.practicum.service.WarehouseService;
+import ru.yandex.practicum.utils.warehouse.AddressMapper;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления складскими операциями.
@@ -50,13 +54,14 @@ public class WarehouseController {
      *
      * @param request DTO с данными нового товара для регистрации
      * @throws jakarta.validation.ConstraintViolationException если данные товара не проходят валидацию
-     * @throws SpecifiedProductAlreadyInWarehouseException если товар с таким ID уже зарегистрирован
+     * @throws SpecifiedProductAlreadyInWarehouseException     если товар с таким ID уже зарегистрирован
      * @apiNote Использует HTTP метод PUT для создания нового ресурса
      * @see NewProductInWarehouseRequest
      */
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void registerNewProduct(@RequestBody @Valid NewProductInWarehouseRequest request) {
+        log.debug("PUT /api/v1/warehouse - request: {}", request);
         warehouseService.registerNewProduct(request);
     }
 
@@ -67,8 +72,8 @@ public class WarehouseController {
      *
      * @param shoppingCartDto DTO корзины покупок с товарами и их количествами
      * @return DTO с характеристиками доставки: вес, объем и флаг хрупкости
-     * @throws jakarta.validation.ConstraintViolationException если данные корзины не проходят валидацию
-     * @throws NoSpecifiedProductInWarehouseException если один или несколько товаров не найдены на складе
+     * @throws jakarta.validation.ConstraintViolationException      если данные корзины не проходят валидацию
+     * @throws NoSpecifiedProductInWarehouseException               если один или несколько товаров не найдены на складе
      * @throws ProductInShoppingCartLowQuantityInWarehouseException если количество товара на складе недостаточно
      * @see ShoppingCartDto
      * @see BookedProductsDto
@@ -76,6 +81,7 @@ public class WarehouseController {
     @PostMapping("/check")
     @ResponseStatus(HttpStatus.OK)
     public BookedProductsDto checkProductQuantity(@RequestBody @Valid ShoppingCartDto shoppingCartDto) {
+        log.debug("POST /api/v1/warehouse/check - shoppingCartDto: {}", shoppingCartDto);
         return warehouseService.checkProductQuantity(shoppingCartDto);
     }
 
@@ -86,14 +92,15 @@ public class WarehouseController {
      *
      * @param request DTO запроса с идентификатором товара и новым количеством
      * @throws jakarta.validation.ConstraintViolationException если данные запроса не проходят валидацию
-     * @throws WarehouseProductNotFoundException если товар с указанным ID не найден
+     * @throws WarehouseProductNotFoundException               если товар с указанным ID не найден
      * @apiNote Несмотря на название метода "add", он не добавляет к существующему количеству,
-     *          а устанавливает новое значение
+     * а устанавливает новое значение
      * @see AddProductToWarehouseRequest
      */
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.OK)
     public void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request) {
+        log.debug("POST /api/v1/warehouse/add - request: {}", request);
         warehouseService.addProduct(request);
     }
 
@@ -109,6 +116,68 @@ public class WarehouseController {
     @GetMapping("/address")
     @ResponseStatus(HttpStatus.OK)
     public AddressDto getAddress() {
-        return warehouseService.getAddress();
+        log.debug("GET /api/v1/warehouse/address - request");
+        Address address = warehouseService.getAddress();
+        log.info("Address: {}", address);
+        AddressDto addressDto = AddressMapper.toAddressDto(address);
+        log.info("Address mapped to dto: {}", addressDto);
+        return addressDto;
+    }
+
+    /**
+     * Возвращает товары на склад.
+     *
+     * @param products Карта товаров для возврата на склад, где ключ - UUID товара,
+     *                 а значение - количество возвращаемых единиц
+     */
+    @PostMapping("/return")
+    @ResponseStatus(HttpStatus.OK)
+    void returnProductsToWarehouse(Map<UUID, Integer> products) {
+        log.debug("POST /api/v1/warehouse/return - products: {}", products);
+        List<WarehouseProduct> updatedWarehouseProducts = warehouseService.returnProductsToWarehouse(products);
+        List<UUID> updatedWarehouseProductsIds = updatedWarehouseProducts.stream()
+                .map(WarehouseProduct::getProductId)
+                .toList();
+        log.info("Updated warehouse products ids: {}", updatedWarehouseProductsIds);
+    }
+
+    /**
+     * Обрабатывает запрос на сборку (комплектацию) продуктов для заказа.
+     * Принимает запрос на сборку продуктов, выполняет их комплектацию через сервис
+     * и возвращает информацию о забронированных продуктах.
+     *
+     * @param request объект {@link AssemblyProductsForOrderRequest} с данными для сборки продуктов
+     * @return {@link BookedProductsDto} объект, содержащий информацию о забронированных продуктах
+     */
+    @PostMapping("/assembly")
+    BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) {
+        log.debug("POST /api/v1/warehouse/assembly - request: {}", request);
+        BookedProductsDto productsToAssemble = warehouseService.assembleProducts(request);
+        log.info("Booked products dto: {}", productsToAssemble);
+        return productsToAssemble;
+    }
+
+    /**
+     * Обрабатывает запрос на отправку продуктов в службу доставки.
+     * Отмечает продукты как отправленные для дальнейшей доставки заказчику.
+     *
+     * @param request объект {@link ShippedToDeliveryRequest} с данными об отправляемых продуктах
+     */
+    @PostMapping("/shipped")
+    void shippingProducts(@RequestBody @Valid ShippedToDeliveryRequest request) {
+        log.debug("POST /api/v1/warehouse/shipped - request: {}", request);
+        warehouseService.shippingProducts(request);
+    }
+
+    /**
+     * Получает список всех доступных адресов складов.
+     * Возвращает перечень всех адресов, на которых расположены склады в системе.
+     *
+     * @return список строк с названиями/адресами складов
+     */
+    @GetMapping("/all_addresses")
+    List<String> getAllAddresses() {
+        log.debug("GET /api/v1/warehouse/all_addresses");
+        return warehouseService.getAllAddresses();
     }
 }

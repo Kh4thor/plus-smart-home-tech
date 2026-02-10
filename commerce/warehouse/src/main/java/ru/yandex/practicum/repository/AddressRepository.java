@@ -3,6 +3,8 @@ package ru.yandex.practicum.repository;
 import org.springframework.stereotype.Repository;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @Repository
@@ -15,5 +17,9 @@ public class AddressRepository {
 
     public String getAddress() {
         return CURRENT_ADDRESS;
+    }
+
+    public List<String> getAllAddresses() {
+        return Arrays.stream(ADDRESSES).toList();
     }
 }

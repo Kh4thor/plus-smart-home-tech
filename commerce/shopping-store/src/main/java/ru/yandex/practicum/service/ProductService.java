@@ -4,8 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.yandex.practicum.enums.shopping.store.ProductCategory;
 import ru.yandex.practicum.enums.shopping.store.QuantityState;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.model.shopping.store.Product;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ProductService {
@@ -19,5 +20,5 @@ public interface ProductService {
 
     boolean remove(UUID id);
 
-    Page<Product> findByCategory(ProductCategory category, Pageable pageable);
+    Page<Product> findByCategories(List<ProductCategory> category, Pageable pageable);
 }
